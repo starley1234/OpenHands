@@ -1,9 +1,15 @@
 import React from "react";
 import { ExtraProps } from "react-markdown";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { oneLight, vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { CopyableContentWrapper } from "#/components/shared/buttons/copyable-content-wrapper";
+import { useColorTheme } from "#/themes/color-themes";
 import { cn } from "#/utils/utils";
 import { SyntaxHighlighter } from "./syntax-highlighter";
+
+/** True when the active color theme is the light one (needs a light palette). */
+function isLightTheme(theme: string): boolean {
+  return theme === "openhands-light";
+}
 
 // See https://github.com/remarkjs/react-markdown?tab=readme-ov-file#use-custom-components-syntax-highlight
 
@@ -18,6 +24,7 @@ export function code({
   ExtraProps) {
   const match = /language-(\w+)/.exec(className || ""); // get the language
   const codeString = String(children).replace(/\n$/, "");
+  const colorTheme = useColorTheme();
 
   if (!match) {
     const isMultiline = String(children).includes("\n");
@@ -48,7 +55,7 @@ export function code({
     <CopyableContentWrapper text={codeString}>
       <SyntaxHighlighter
         className="rounded-lg"
-        style={vscDarkPlus}
+        style={isLightTheme(colorTheme) ? oneLight : vscDarkPlus}
         language={match?.[1]}
         PreTag="div"
       >

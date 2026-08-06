@@ -193,6 +193,8 @@ const LIGHT_HEROUI = {
   "color-scheme": "light",
 };
 
+import React from "react";
+
 import { AGENT_SERVER_UI_THEMEABLE_BRAND_VARIABLES } from "#/styles/agent-server-ui-style-scope";
 
 /** CSS custom properties overridden by color themes (see applyColorTheme). */
@@ -320,6 +322,43 @@ export function persistColorTheme(key: ColorThemeKey): void {
   }
 }
 
+// Minimal reactive channel so components (e.g. the syntax highlighter) can
+// follow the active theme at runtime without a React context. applyColorTheme
+// calls `notifyColorThemeChanged` after persisting/applying, and the hook
+// subscribes to it. This lets consumers pick theme-aware values (dark vs light
+// code-highlight palettes, etc.) that pure CSS variables can't express.
+const themeChangeListeners = new Set<(key: ColorThemeKey) => void>();
+
+function notifyColorThemeChanged(key: ColorThemeKey): void {
+  for (const listener of themeChangeListeners) {
+    try {
+      listener(key);
+    } catch {
+      // ignore a misbehaving listener
+    }
+  }
+}
+
+/**
+ * Returns the currently active color theme key, updating whenever the user
+ * switches themes at runtime. Server-safe (returns the default during SSR).
+ */
+export function useColorTheme(): ColorThemeKey {
+  const [theme, setTheme] = React.useState<ColorThemeKey>(() =>
+    readPersistedColorTheme(),
+  );
+
+  React.useEffect(() => {
+    const listener = (next: ColorThemeKey) => setTheme(next);
+    themeChangeListeners.add(listener);
+    return () => {
+      themeChangeListeners.delete(listener);
+    };
+  }, []);
+
+  return theme;
+}
+
 const THEME_STYLE_TAG_ID = "oh-color-theme-override";
 
 /**
@@ -387,6 +426,10 @@ export function applyColorTheme(key: ColorThemeKey): void {
   document.head.appendChild(styleEl);
 
   syncColorThemeTokensOnScopeRoots(tokens);
+
+  // Notify reactive consumers (useColorTheme) so they re-render with the new
+  // theme's values (e.g. a light vs dark syntax-highlight palette).
+  notifyColorThemeChanged(key);
 }
 
 function syncColorThemeTokensOnScopeRoots(

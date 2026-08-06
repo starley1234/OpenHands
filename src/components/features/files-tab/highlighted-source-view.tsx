@@ -1,7 +1,13 @@
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { oneLight, vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 import { SyntaxHighlighter } from "#/components/features/markdown/syntax-highlighter";
+import { useColorTheme } from "#/themes/color-themes";
 import { getPrismLanguageForFile } from "#/utils/file-language";
+
+/** True when the active color theme is the light one (needs a light palette). */
+function isLightTheme(theme: string): boolean {
+  return theme === "openhands-light";
+}
 
 interface HighlightedSourceViewProps {
   path: string;
@@ -28,13 +34,14 @@ export function HighlightedSourceView({
   text,
   mimeType,
 }: HighlightedSourceViewProps) {
+  const colorTheme = useColorTheme();
   const language = getPrismLanguageForFile(path, mimeType);
 
   if (!language) {
     return (
       <pre
         data-testid="file-content-viewer-plain"
-        className="h-full w-full overflow-auto whitespace-pre-wrap break-words bg-[var(--oh-surface)] p-4 text-xs leading-5 text-white custom-scrollbar-always"
+        className="h-full w-full overflow-auto whitespace-pre-wrap break-words bg-[var(--oh-surface)] p-4 text-xs leading-5 text-[var(--oh-foreground)] custom-scrollbar-always"
       >
         {text}
       </pre>
@@ -49,7 +56,7 @@ export function HighlightedSourceView({
     >
       <SyntaxHighlighter
         language={language}
-        style={vscDarkPlus}
+        style={isLightTheme(colorTheme) ? oneLight : vscDarkPlus}
         showLineNumbers
         wrapLongLines={false}
         // Override the theme's hard-coded background so the highlighter

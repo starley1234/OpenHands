@@ -175,7 +175,7 @@ export function ChangeAgentButton() {
             cn("cursor-pointer", formControlMutedHoverClassName),
           !isButtonDisabled &&
             !isExecutionAgent &&
-            "cursor-pointer text-white hover:bg-[#597FF4]",
+            "cursor-pointer text-[#ffffff] hover:bg-[#597FF4]",
           isButtonDisabled &&
             cn(
               "opacity-50 cursor-not-allowed",

@@ -183,19 +183,20 @@ export function FileContentViewer({ path, viewMode }: FileContentViewerProps) {
 
   if (kind === "text" && MARKDOWN_EXTS.has(getExtension(path))) {
     // Match the right-pane chrome color so the rich-rendered markdown
-    // blends with the surrounding files tab instead of painting a stark
-    // white card. We use `prose-invert` (typography plugin's dark-theme
-    // variant) and then layer arbitrary CSS-variable overrides on top to
-    // pin body / bold / quote text to pure white — the user specifically
-    // asked for every text element (not just headings) to read as white.
-    // The custom heading components in `markdown/headings.tsx` already
-    // hard-code `text-white`, so headers stay white through this change.
+    // blends with the surrounding files tab. We use `prose-invert` (the
+    // typography plugin's dark-theme variant) and then override the prose
+    // text tokens with `var(--oh-foreground)` (== cool-grey-100) instead of
+    // a hard-coded white. That semantic variable inverts with the active
+    // color theme: light ink in dark themes, dark ink in the light theme —
+    // so markdown text stays readable on `--oh-surface` in both modes.
+    // The custom heading components in `markdown/headings.tsx` use
+    // `text-white`, which the theme remaps to dark ink in light mode.
     return (
       <div
         data-testid="file-content-viewer-markdown"
-        className="h-full w-full overflow-auto bg-[var(--oh-surface)] text-white custom-scrollbar-always"
+        className="h-full w-full overflow-auto bg-[var(--oh-surface)] text-[var(--oh-foreground)] custom-scrollbar-always"
       >
-        <div className="prose prose-sm prose-invert max-w-none p-6 [--tw-prose-body:#fff] [--tw-prose-bold:#fff] [--tw-prose-headings:#fff] [--tw-prose-lead:#fff] [--tw-prose-counters:#fff] [--tw-prose-quotes:#fff] [--tw-prose-quote-borders:var(--oh-border-subtle)] [--tw-prose-bullets:var(--oh-muted)] [--tw-prose-hr:var(--oh-border-subtle)] [--tw-prose-captions:var(--oh-muted)] [--tw-prose-kbd:#fff]">
+        <div className="prose prose-sm prose-invert max-w-none p-6 [--tw-prose-body:var(--oh-foreground)] [--tw-prose-bold:var(--oh-foreground)] [--tw-prose-headings:var(--oh-foreground)] [--tw-prose-lead:var(--oh-foreground)] [--tw-prose-counters:var(--oh-foreground)] [--tw-prose-quotes:var(--oh-foreground)] [--tw-prose-quote-borders:var(--oh-border-subtle)] [--tw-prose-bullets:var(--oh-muted)] [--tw-prose-hr:var(--oh-border-subtle)] [--tw-prose-captions:var(--oh-muted)] [--tw-prose-kbd:var(--oh-foreground)]">
           <MarkdownRenderer
             content={text ?? ""}
             includeStandard
