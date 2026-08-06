@@ -24,16 +24,19 @@ ARG AGENT_SERVER_IMAGE
 ARG AUTOMATION_VERSION
 
 # ── Stage 1: Build frontend ──────────────────────────────────────────────────
+# Build context is the repo ROOT (../ from frontend/), so paths are prefixed
+# with `frontend/`. This lets the final stage also build the local
+# software-agent-sdk backend.
 FROM node:24-slim AS frontend-build
 
 WORKDIR /build
 
 # Cache-friendly: package files first
-COPY package.json package-lock.json ./
+COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 
 # Copy everything needed for the build
-COPY . .
+COPY frontend/ .
 
 # Build the static frontend.
 # VITE_POSTHOG_API_KEY is a public client key baked into the bundle. CI passes
@@ -49,7 +52,7 @@ RUN npm run build
 # ── Stage 1b: Generate shell-sourceable defaults from config/defaults.json ──
 # This avoids needing jq/python at container runtime to parse the JSON.
 FROM node:24-slim AS config-gen
-COPY config/defaults.json /tmp/
+COPY frontend/config/defaults.json /tmp/
 RUN node -e " \
   const c = JSON.parse(require('fs').readFileSync('/tmp/defaults.json','utf-8')); \
   const lines = [ \
@@ -106,6 +109,17 @@ RUN if command -v apt-get >/dev/null 2>&1; then \
 RUN uv pip install --system "openhands-automation==${AUTOMATION_VERSION}" 2>/dev/null \
     || pip install --no-cache-dir "openhands-automation==${AUTOMATION_VERSION}"
 
+# Install the LOCAL software-agent-sdk (openhands-sdk/tools/workspace) on top of
+# the base agent-server image. This guarantees our patches (e.g. the
+# OPENHANDS_VISION_MODELS vision support) are actually used, instead of the
+# unpatched SDK baked into ghcr.io/openhands/agent-server. --force-reinstall
+# ensures the local copy wins over the image's preinstalled one.
+COPY software-agent-sdk/ /tmp/software-agent-sdk/
+RUN uv pip install --system --force-reinstall \
+      "/tmp/software-agent-sdk/openhands-sdk" \
+      "/tmp/software-agent-sdk/openhands-tools" \
+      "/tmp/software-agent-sdk/openhands-workspace"
+
 RUN if [ -n "${AGENT_SERVER_SDK_GIT_REF}" ]; then \
       BASE_GIT_URL="git+https://github.com/OpenHands/software-agent-sdk@${AGENT_SERVER_SDK_GIT_REF}" && \
       uv pip install --system --force-reinstall \
@@ -119,8 +133,8 @@ RUN if [ -n "${AGENT_SERVER_SDK_GIT_REF}" ]; then \
 COPY --from=frontend-build /build/build /opt/agent-canvas/frontend
 
 # Copy the static-server scripts and their production runtime deps.
-COPY scripts/static-server.mjs /opt/agent-canvas/static-server.mjs
-COPY scripts/proxy-utils.mjs /opt/agent-canvas/proxy-utils.mjs
+COPY frontend/scripts/static-server.mjs /opt/agent-canvas/static-server.mjs
+COPY frontend/scripts/proxy-utils.mjs /opt/agent-canvas/proxy-utils.mjs
 COPY --from=frontend-build /build/node_modules/httpxy /opt/agent-canvas/node_modules/httpxy
 COPY --from=frontend-build /build/node_modules/sirv /opt/agent-canvas/node_modules/sirv
 COPY --from=frontend-build /build/node_modules/@polka /opt/agent-canvas/node_modules/@polka
@@ -129,18 +143,18 @@ COPY --from=frontend-build /build/node_modules/totalist /opt/agent-canvas/node_m
 
 # Copy the runtime-services-info builder (entrypoint.sh runs it as a CLI to
 # emit the agent's <RUNTIME_SERVICES> block; same builder the dev stack uses).
-COPY scripts/runtime-services-info.mjs /opt/agent-canvas/runtime-services-info.mjs
+COPY frontend/scripts/runtime-services-info.mjs /opt/agent-canvas/runtime-services-info.mjs
 
 # Persisted conversations created before the client_tools migration still
 # import canvas_ui_tool by qualname. Keep the compatibility module available;
 # new conversations define canvas_ui_control through a JSON client tool.
-COPY tools/ /opt/agent-canvas/tools/
+COPY frontend/tools/ /opt/agent-canvas/tools/
 
 # Copy generated defaults.env (from config/defaults.json via config-gen stage)
 COPY --from=config-gen /tmp/defaults.env /opt/agent-canvas/defaults.env
 
 # Copy the entrypoint
-COPY docker/entrypoint.sh /opt/agent-canvas/entrypoint.sh
+COPY frontend/docker/entrypoint.sh /opt/agent-canvas/entrypoint.sh
 # Normalize line endings: if the working copy was checked out with CRLF
 # (common on Windows / WSL with core.autocrlf=true), the `#!/usr/bin/env bash`
 # shebang becomes `bash\r` and the container dies with

@@ -42,11 +42,15 @@ for (let i = 0; i < args.length; i++) {
   }
 }
 
+// Build context must be the repo ROOT (not frontend/), because the Dockerfile
+// copies and installs the local software-agent-sdk next to the frontend.
+const repoRoot = join(projectRoot, "..");
+
 const cmd = [
   "docker",
   "build",
   "-f",
-  "docker/Dockerfile",
+  "frontend/docker/Dockerfile",
   "--build-arg",
   `AGENT_SERVER_IMAGE=${agentServerImage}`,
   "--build-arg",
@@ -56,7 +60,7 @@ const cmd = [
   "-t",
   tag,
   ...extraArgs,
-  ".",
+  repoRoot,
 ];
 
 console.log(`Agent Server image      : ${agentServerImage}`);
