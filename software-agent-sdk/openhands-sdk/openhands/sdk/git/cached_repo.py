@@ -246,14 +246,21 @@ def try_cached_clone_or_update(
             return _do_clone_or_update(url, repo_path, ref, update, git)
     except Timeout:
         logger.warning(
-            f"Timed out waiting for lock on {repo_path} after {lock_timeout}s"
+            f"Timed out waiting for lock on {repo_path} after {lock_timeout}s "
+            f"(repo={url}, ref={ref}). Check that the proxy / network for git is reachable."
         )
         return None
     except GitCommandError as e:
-        logger.warning(f"Git operation failed: {e}")
+        logger.warning(
+            f"Git operation failed for {url} (ref={ref}): {e}. "
+            "If cloning from a private/self-hosted repo, check the proxy "
+            "(HTTP(S)_PROXY / git http.proxy) and credentials."
+        )
         return None
     except Exception as e:
-        logger.warning(f"Error managing repository: {str(e)}")
+        logger.warning(
+            f"Error managing repository {url} (ref={ref}): {str(e)}"
+        )
         return None
 
 
