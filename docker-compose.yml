@@ -15,6 +15,13 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
+      args:
+        # Значения по умолчанию берутся из config/defaults.json. Docker build
+        # (в отличие от node scripts/docker-build.mjs) не читает JSON, поэтому
+        # указываем их здесь. При желании переопредели через .env.
+        AGENT_SERVER_IMAGE: "${AGENT_SERVER_IMAGE:-ghcr.io/openhands/agent-server:1.40.1-python}"
+        AUTOMATION_VERSION: "${AUTOMATION_VERSION:-1.6.0}"
+        VITE_BASE_PATH: "${VITE_BASE_PATH:-/canvas}"
     image: openhands-canvas:local
     container_name: agent-canvas
     restart: unless-stopped
