@@ -86,7 +86,6 @@ COPY software-agent-sdk/ ./
 RUN set -eux; \
     EXTRA_FLAGS=""; \
     if [ "$ENABLE_VERTEX" = "1" ]; then EXTRA_FLAGS="--extra vertex"; fi; \
-    uv python install 3.13 && \
     uv venv --python-preference only-managed --python 3.13 /opt/agent-server-venv && \
     uv sync --frozen --no-editable --managed-python --extra boto3 $EXTRA_FLAGS && \
     test -x /opt/agent-server-venv/bin/python
@@ -134,7 +133,12 @@ RUN uv pip install --system "openhands-automation==${AUTOMATION_VERSION}" 2>/dev
 # stage 1c). The base image ships a PyInstaller binary with a frozen SDK, so
 # site-packages patches never reach it — running from this source venv is the
 # only way our vision patch takes effect.
+#
+# The venv's bin/python is a symlink into the uv-managed python install
+# (/opt/uv-managed-python), so we must copy BOTH trees or the interpreter
+# symlink dangles and agent-server won't run from the venv.
 COPY --from=agent-server-build /opt/agent-server-venv /opt/agent-server-venv
+COPY --from=agent-server-build /opt/uv-managed-python /opt/uv-managed-python
 
 RUN if [ -n "${AGENT_SERVER_SDK_GIT_REF}" ]; then \
       BASE_GIT_URL="git+https://github.com/OpenHands/software-agent-sdk@${AGENT_SERVER_SDK_GIT_REF}" && \
