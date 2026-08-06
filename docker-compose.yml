@@ -1,0 +1,51 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# agent-canvas (собственная сборка с твоими правками: RU-локализация + светлая
+# тема). Собирается из локального исходника, поэтому содержит все изменения.
+#
+# Настройки подтягиваются из файла `.env` (см. `.env.example`). Создай свой
+# `.env` в этой же папке — он уже в .gitignore, в git не попадёт.
+#
+# Запуск:
+#   docker compose up -d
+# Интерфейс: http://localhost:8000/canvas
+# ═══════════════════════════════════════════════════════════════════════════════
+
+services:
+  agent-canvas:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: openhands-canvas:local
+    container_name: agent-canvas
+    restart: unless-stopped
+    ports:
+      - "${AGENT_CANVAS_PORT:-8000}:8000"
+    extra_hosts:
+      # Чтобы из контейнера были видны сервисы на хосте (Ollama, LM Studio, vLLM).
+      # Провайдера указывай как http://host.docker.internal:<port>/v1
+      - "host.docker.internal:host-gateway"
+    environment:
+      # ── Свой LLM-провайдер (через переменные окружения, defaults на старте) ──
+      LLM_MODEL: "${LLM_MODEL:-}"
+      LLM_BASE_URL: "${LLM_BASE_URL:-}"
+      LLM_API_KEY: "${LLM_API_KEY:-}"
+      LLM_API_VERSION: "${LLM_API_VERSION:-}"
+      # ── Прокси для внешних LLM-провайдеров и загрузки модулей (openhands.dev, GitHub) ──
+      HTTP_PROXY: "${HTTP_PROXY:-}"
+      HTTPS_PROXY: "${HTTPS_PROXY:-${HTTP_PROXY}}"
+      ALL_PROXY: "${ALL_PROXY:-${HTTP_PROXY}}"
+      # Обязательно! Внутренние сервисы общаются через 127.0.0.1 — без этого
+      # трафик между ними тоже уйдёт через прокси и всё сломается.
+      NO_PROXY: "localhost,127.0.0.1"
+      # ── Безопасность: свой ключ вместо автогенерации ──
+      LOCAL_BACKEND_API_KEY: "${LOCAL_BACKEND_API_KEY:-}"
+      # ── При необходимости — внешний URL (если публикуешь наружу) ──
+      AUTOMATION_BASE_URL: "${AUTOMATION_BASE_URL:-http://localhost:${AGENT_CANVAS_PORT:-8000}}"
+    volumes:
+      # Персистентность: настройки, секреты, диалоги, база автоматизаций.
+      - openhands_data:/home/openhands/.openhands
+      # Папка с проектами, с которыми будет работать агент.
+      - "${PROJECTS_PATH:-./projects}:/projects"
+
+volumes:
+  openhands_data:

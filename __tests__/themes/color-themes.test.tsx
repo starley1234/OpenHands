@@ -44,6 +44,29 @@ describe("color themes", () => {
     document.body.style.removeProperty("--oh-warning");
   });
 
+  it("includes OpenHands-Light with an inverted scale and light-aware focus", () => {
+    const light = COLOR_THEMES["openhands-light"];
+
+    expect(light.label).toBe("OpenHands-Light");
+    // Inverted scale: the shade that was the dark app-shell base (950) must be
+    // a light surface, and the shade that was light text (100) must be dark.
+    expect(light.scale["--cool-grey-950"]).not.toBe(
+      COLOR_THEMES["openhands-neutral"].scale["--cool-grey-950"],
+    );
+    expect(light.scale["--cool-grey-100"]).not.toBe(
+      COLOR_THEMES["openhands-neutral"].scale["--cool-grey-100"],
+    );
+    // Focus ring is flipped to a dark/primary color so it stays visible on
+    // light surfaces (the base sheet hardcodes white).
+    expect(light.heroui["--heroui-focus"]).toBe("#4465DB");
+  });
+
+  it("exposes Light in the settings theme picker", () => {
+    expect(AVAILABLE_COLOR_THEMES.map((theme) => theme.key)).toContain(
+      "openhands-light",
+    );
+  });
+
   it("injects override rules with order-independent doubled scope selectors", () => {
     // Act
     applyColorTheme("openhands-neutral");

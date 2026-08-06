@@ -1,7 +1,8 @@
 export type ColorThemeKey =
   | "openhands-deepsea"
   | "openhands-neutral"
-  | "openhands-neo";
+  | "openhands-neo"
+  | "openhands-light";
 
 export interface ColorThemeDefinition {
   label: string;
@@ -88,6 +89,95 @@ const NEUTRAL_HEROUI = {
   "--heroui-default-900": NEUTRAL_HSL[300],
   "--heroui-default-foreground": NEUTRAL_HSL[50],
   "--heroui-default": NEUTRAL_HSL[800],
+};
+
+/**
+ * Light theme palette.
+ *
+ * The whole UI is built on `--cool-grey-*` variables where the *numerically
+ * high* shades (900/925/950/975) are backgrounds and the *low* shades
+ * (50/100/200/…) are text. To flip the UI to light we therefore *invert* the
+ * shade-to-lightness mapping rather than touching every consumer: high shades
+ * become light surfaces and low shades become dark ink. Semantic tokens that
+ * reference `var(--cool-grey-…)` (see agent-server-ui-style-scope.ts) resolve
+ * to the right light/dark value automatically.
+ */
+const LIGHT_SCALE = {
+  "--cool-grey-50": "#05070A",
+  "--cool-grey-100": "#0B0E14",
+  "--cool-grey-200": "#21252F",
+  "--cool-grey-300": "#2C313F",
+  "--cool-grey-400": "#383F50",
+  "--cool-grey-500": "#4B5468",
+  "--cool-grey-600": "#626D82",
+  "--cool-grey-700": "#7E8A9E",
+  "--cool-grey-800": "#A3B0C4",
+  "--cool-grey-900": "#C3CDDC",
+  "--cool-grey-925": "#DCE3EE",
+  "--cool-grey-950": "#EEF2F7",
+  "--cool-grey-975": "#F7F9FC",
+};
+
+// HSL channels for the LIGHT_SCALE shades (computed from the hex values).
+const LIGHT_HSL: Record<string, string> = {
+  50:  "216 33% 3%",   // #05070A
+  100: "220 29% 6%",   // #0B0E14
+  200: "223 18% 16%",  // #21252F
+  300: "224 18% 21%",  // #2C313F
+  400: "222 18% 27%",  // #383F50
+  500: "221 16% 35%",  // #4B5468
+  600: "219 14% 45%",  // #626D82
+  700: "218 14% 56%",  // #7E8A9E
+  800: "216 22% 70%",  // #A3B0C4
+  900: "216 26% 81%",  // #C3CDDC
+  925: "217 35% 90%",  // #DCE3EE
+  950: "213 36% 95%",  // #EEF2F7
+  975: "216 45% 98%",  // #F7F9FC
+};
+
+const LIGHT_HEROUI = {
+  "--heroui-background": LIGHT_HSL[950],
+  "--heroui-background-foreground": LIGHT_HSL[50],
+  "--heroui-foreground-50": LIGHT_HSL[975],
+  "--heroui-foreground-100": LIGHT_HSL[950],
+  "--heroui-foreground-200": LIGHT_HSL[925],
+  "--heroui-foreground-300": LIGHT_HSL[900],
+  "--heroui-foreground-400": LIGHT_HSL[800],
+  "--heroui-foreground-500": LIGHT_HSL[700],
+  "--heroui-foreground-600": LIGHT_HSL[600],
+  "--heroui-foreground-700": LIGHT_HSL[500],
+  "--heroui-foreground-800": LIGHT_HSL[400],
+  "--heroui-foreground-900": LIGHT_HSL[300],
+  "--heroui-foreground": LIGHT_HSL[300],
+  "--heroui-content1": LIGHT_HSL[925],
+  "--heroui-content1-foreground": LIGHT_HSL[100],
+  "--heroui-content2": LIGHT_HSL[900],
+  "--heroui-content2-foreground": LIGHT_HSL[200],
+  "--heroui-content3": LIGHT_HSL[800],
+  "--heroui-content3-foreground": LIGHT_HSL[300],
+  "--heroui-content4": LIGHT_HSL[700],
+  "--heroui-content4-foreground": LIGHT_HSL[400],
+  "--heroui-default-50": LIGHT_HSL[975],
+  "--heroui-default-100": LIGHT_HSL[950],
+  "--heroui-default-200": LIGHT_HSL[925],
+  "--heroui-default-300": LIGHT_HSL[900],
+  "--heroui-default-400": LIGHT_HSL[800],
+  "--heroui-default-500": LIGHT_HSL[700],
+  "--heroui-default-600": LIGHT_HSL[600],
+  "--heroui-default-700": LIGHT_HSL[500],
+  "--heroui-default-800": LIGHT_HSL[400],
+  "--heroui-default-900": LIGHT_HSL[300],
+  "--heroui-default-foreground": LIGHT_HSL[50],
+  "--heroui-default": LIGHT_HSL[800],
+  // Dark focus ring so it stays visible on light surfaces (base sheet uses
+  // white, which would vanish on light backgrounds).
+  "--heroui-focus": "227 68% 56%", // #4465DB
+  // The base sheet hardcodes these for dark mode; flip them for light so they
+  // remain visible. (These are emitted as plain declarations by applyColorTheme,
+  // exactly like the --heroui-* tokens.)
+  "--oh-focus": "#4465DB",
+  "--oh-modal-title-foreground": "#0B0E14",
+  "color-scheme": "light",
 };
 
 import { AGENT_SERVER_UI_THEMEABLE_BRAND_VARIABLES } from "#/styles/agent-server-ui-style-scope";
@@ -179,6 +269,12 @@ export const COLOR_THEMES: Record<ColorThemeKey, ColorThemeDefinition> = {
     scale: NEUTRAL_SCALE,
     heroui: NEUTRAL_HEROUI,
     tokens: NEO_WHITE_BUTTON_TOKENS,
+  },
+
+  "openhands-light": {
+    label: "OpenHands-Light",
+    scale: LIGHT_SCALE,
+    heroui: LIGHT_HEROUI,
   },
 };
 
