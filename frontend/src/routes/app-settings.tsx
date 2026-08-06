@@ -11,6 +11,7 @@ import { SettingsInput } from "#/components/features/settings/settings-input";
 import { I18nKey } from "#/i18n/declaration";
 import { LanguageInput } from "#/components/features/settings/app-settings/language-input";
 import { ThemeInput } from "#/components/features/settings/app-settings/theme-input";
+import { ProxyStatusCard } from "#/components/features/settings/app-settings/proxy-status-card";
 import {
   displayErrorToast,
   displaySuccessToast,
@@ -191,6 +192,8 @@ export function AppSettingsScreen() {
           />
 
           <ThemeInput />
+
+          <ProxyStatusCard />
 
           <SettingsSwitch
             testId="enable-analytics-switch"

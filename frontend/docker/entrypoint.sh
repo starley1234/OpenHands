@@ -145,14 +145,33 @@ export OH_EXTRA_PYTHON_PATH="${OH_EXTRA_PYTHON_PATH:-/opt/agent-canvas/tools}"
 # repo, and git does not always honor the HTTP(S)_PROXY environment variables
 # reliably. Setting the config explicitly ensures those module downloads go
 # through the same proxy as the LLM / marketplace requests.
-if [ -n "${HTTPS_PROXY:-}" ]; then
+#
+# PROXY ENABLE/DISABLE SWITCH:
+#   OPENHANDS_HTTP_PROXY is the single source of truth. When set (non-empty),
+#   the container routes LLM / MCP / skills / git outbound traffic through it:
+#   it is exported as HTTP_PROXY/HTTPS_PROXY/ALL_PROXY for LiteLLM & httpx, and
+#   applied to git. When empty, the proxy is OFF and NO_PROXY is set broadly so
+#   nothing accidentally routes through a stale proxy.
+#   This makes it easy to flip proxy on/off from the .env / frontend without
+#   editing code.
+if [ -n "${OPENHANDS_HTTP_PROXY:-}" ]; then
+  export HTTP_PROXY="$OPENHANDS_HTTP_PROXY"
+  export HTTPS_PROXY="${OPENHANDS_HTTPS_PROXY:-$OPENHANDS_HTTP_PROXY}"
+  export ALL_PROXY="${OPENHANDS_HTTPS_PROXY:-$OPENHANDS_HTTP_PROXY}"
+  # Never route loopback/internal traffic through the proxy.
+  export NO_PROXY="${OPENHANDS_NO_PROXY:-localhost,127.0.0.1}"
   if command -v git >/dev/null 2>&1; then
     git config --global http.proxy "$HTTPS_PROXY"
     git config --global https.proxy "$HTTPS_PROXY"
-    # Never route loopback/internal traffic through the proxy.
-    if [ -n "${NO_PROXY:-}" ]; then
-      git config --global http.noProxy "$NO_PROXY"
-    fi
+    git config --global http.noProxy "$NO_PROXY"
+  fi
+else
+  # Proxy disabled: clear any inherited proxy vars so outbound traffic is direct.
+  unset HTTP_PROXY HTTPS_PROXY ALL_PROXY http_proxy https_proxy all_proxy 2>/dev/null || true
+  export NO_PROXY="${OPENHANDS_NO_PROXY:-*}"
+  if command -v git >/dev/null 2>&1; then
+    git config --global --unset-all http.proxy 2>/dev/null || true
+    git config --global --unset-all https.proxy 2>/dev/null || true
   fi
 fi
 

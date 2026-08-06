@@ -26,6 +26,10 @@ export interface AgentServerInfo extends BaseServerInfo {
   sdk_version?: string;
   usable_tools?: string[] | null;
   runtime_services?: unknown;
+  /** Proxy status advertised by the backend (/server_info). */
+  proxy_enabled?: boolean;
+  proxy_url?: string | null;
+  proxy_no_proxy?: string | null;
 }
 
 let cachedAgentServerInfo: AgentServerInfo | null = null;
