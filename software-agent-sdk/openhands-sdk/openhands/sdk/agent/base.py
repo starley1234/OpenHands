@@ -63,8 +63,8 @@ logger = get_logger(__name__)
 
 _SOUL_PATH = os.path.join(os.path.expanduser("~"), ".openhands", "SOUL.md")
 _DEFAULT_SOUL = (
-    "You are OpenHands agent, a helpful AI assistant that can interact"
-    " with a computer to solve tasks."
+    "Ты — агент OpenHands, полезный ИИ-ассистент, который умеет"
+    " взаимодействовать с компьютером для решения задач."
 )
 
 # Built-in prompt dir. The registry only stands in for built-in prompts here; a
