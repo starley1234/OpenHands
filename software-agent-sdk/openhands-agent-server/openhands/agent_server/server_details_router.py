@@ -78,27 +78,18 @@ class ServerInfo(BaseModel):
     # OPENHANDS_HTTP_PROXY override); proxy_url is the effective value.
     proxy_enabled: bool = Field(
         default_factory=lambda: bool(
-            os.environ.get("OPENHANDS_HTTP_PROXY")
-            or os.environ.get("OPENHANDS_HTTPS_PROXY")
-            or os.environ.get("HTTPS_PROXY")
-            or os.environ.get("HTTP_PROXY")
+            os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
         )
     )
     proxy_url: str | None = Field(
         default_factory=lambda: (
-            os.environ.get("OPENHANDS_HTTPS_PROXY")
-            or os.environ.get("OPENHANDS_HTTP_PROXY")
-            or os.environ.get("HTTPS_PROXY")
+            os.environ.get("HTTPS_PROXY")
             or os.environ.get("HTTP_PROXY")
             or None
         )
     )
     proxy_no_proxy: str | None = Field(
-        default_factory=lambda: (
-            os.environ.get("OPENHANDS_NO_PROXY")
-            or os.environ.get("NO_PROXY")
-            or None
-        )
+        default_factory=lambda: os.environ.get("NO_PROXY") or None
     )
 
 

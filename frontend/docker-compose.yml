@@ -52,12 +52,13 @@ services:
       #   OPENHANDS_VISION_MODELS: "unsloth/gemma,my-vision-model"
       OPENHANDS_VISION_MODELS: "${OPENHANDS_VISION_MODELS:-}"
       # ── Прокси для внешних LLM-провайдеров и загрузки модулей (openhands.dev, GitHub) ──
-      # OPENHANDS_HTTP_PROXY — единый переключатель «через прокси/напрямую».
-      # Если задан — entrypoint экспортирует HTTP(S)_PROXY/ALL_PROXY и ставит
-      # git-прокси. Если пуст — прокси отключён (прямые подключения).
-      OPENHANDS_HTTP_PROXY: "${OPENHANDS_HTTP_PROXY:-}"
-      OPENHANDS_HTTPS_PROXY: "${OPENHANDS_HTTPS_PROXY:-}"
-      OPENHANDS_NO_PROXY: "${OPENHANDS_NO_PROXY:-localhost,127.0.0.1}"
+      # Единый переключатель «через прокси/напрямую»: если HTTP_PROXY задан в
+      # .env — исходящий трафик (LLM, MCP, навыки/плагины, git) идёт через него;
+      # если пуст — прокси отключён (прямые подключения).
+      HTTP_PROXY: "${HTTP_PROXY:-}"
+      HTTPS_PROXY: "${HTTPS_PROXY:-${HTTP_PROXY}}"
+      ALL_PROXY: "${ALL_PROXY:-${HTTP_PROXY}}"
+      NO_PROXY: "${NO_PROXY:-localhost,127.0.0.1}"
       # ── Безопасность: свой ключ вместо автогенерации ──
       LOCAL_BACKEND_API_KEY: "${LOCAL_BACKEND_API_KEY:-}"
       # ── При необходимости — внешний URL (если публикуешь наружу) ──

@@ -146,20 +146,19 @@ export OH_EXTRA_PYTHON_PATH="${OH_EXTRA_PYTHON_PATH:-/opt/agent-canvas/tools}"
 # reliably. Setting the config explicitly ensures those module downloads go
 # through the same proxy as the LLM / marketplace requests.
 #
-# PROXY ENABLE/DISABLE SWITCH:
-#   OPENHANDS_HTTP_PROXY is the single source of truth. When set (non-empty),
-#   the container routes LLM / MCP / skills / git outbound traffic through it:
-#   it is exported as HTTP_PROXY/HTTPS_PROXY/ALL_PROXY for LiteLLM & httpx, and
-#   applied to git. When empty, the proxy is OFF and NO_PROXY is set broadly so
-#   nothing accidentally routes through a stale proxy.
-#   This makes it easy to flip proxy on/off from the .env / frontend without
-#   editing code.
-if [ -n "${OPENHANDS_HTTP_PROXY:-}" ]; then
-  export HTTP_PROXY="$OPENHANDS_HTTP_PROXY"
-  export HTTPS_PROXY="${OPENHANDS_HTTPS_PROXY:-$OPENHANDS_HTTP_PROXY}"
-  export ALL_PROXY="${OPENHANDS_HTTPS_PROXY:-$OPENHANDS_HTTP_PROXY}"
+# PROXY ENABLE/DISABLE SWITCH (single source of truth = standard env vars):
+#   HTTP_PROXY / HTTPS_PROXY come from .env (docker-compose passes them in).
+#   When HTTP_PROXY is set (non-empty), the container routes LLM / MCP /
+#   skills / git outbound traffic through it: HTTPS_PROXY/ALL_PROXY default to
+#   HTTP_PROXY, and git is configured. When HTTP_PROXY is empty, the proxy is
+#   OFF: any inherited proxy vars are cleared so nothing accidentally routes
+#   through a stale proxy.
+if [ -n "${HTTP_PROXY:-}" ]; then
+  export HTTP_PROXY="$HTTP_PROXY"
+  export HTTPS_PROXY="${HTTPS_PROXY:-$HTTP_PROXY}"
+  export ALL_PROXY="${ALL_PROXY:-$HTTPS_PROXY}"
   # Never route loopback/internal traffic through the proxy.
-  export NO_PROXY="${OPENHANDS_NO_PROXY:-localhost,127.0.0.1}"
+  export NO_PROXY="${NO_PROXY:-localhost,127.0.0.1}"
   if command -v git >/dev/null 2>&1; then
     git config --global http.proxy "$HTTPS_PROXY"
     git config --global https.proxy "$HTTPS_PROXY"
@@ -168,7 +167,7 @@ if [ -n "${OPENHANDS_HTTP_PROXY:-}" ]; then
 else
   # Proxy disabled: clear any inherited proxy vars so outbound traffic is direct.
   unset HTTP_PROXY HTTPS_PROXY ALL_PROXY http_proxy https_proxy all_proxy 2>/dev/null || true
-  export NO_PROXY="${OPENHANDS_NO_PROXY:-*}"
+  export NO_PROXY="${NO_PROXY:-*}"
   if command -v git >/dev/null 2>&1; then
     git config --global --unset-all http.proxy 2>/dev/null || true
     git config --global --unset-all https.proxy 2>/dev/null || true
