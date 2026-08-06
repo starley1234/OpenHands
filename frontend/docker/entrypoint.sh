@@ -172,12 +172,12 @@ trap cleanup EXIT SIGINT SIGTERM
 # ── 1. Start Agent Server ────────────────────────────────────────────────────
 log "Starting agent-server on port $AGENT_SERVER_PORT..."
 
-if command -v openhands-agent-server >/dev/null 2>&1; then
+if [ -x /agent-server/.venv/bin/python ]; then
+  # Source build (development image) — prefer our patched SDK venv when present.
+  /agent-server/.venv/bin/python -m openhands.agent_server --port "$AGENT_SERVER_PORT" &
+elif command -v openhands-agent-server >/dev/null 2>&1; then
   # Binary build (production image)
   openhands-agent-server --port "$AGENT_SERVER_PORT" &
-elif [ -x /agent-server/.venv/bin/python ]; then
-  # Source build (development image)
-  /agent-server/.venv/bin/python -m openhands.agent_server --port "$AGENT_SERVER_PORT" &
 else
   log_error "Cannot find agent-server binary or source venv."
   exit 1

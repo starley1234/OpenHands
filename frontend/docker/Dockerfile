@@ -111,14 +111,25 @@ RUN uv pip install --system "openhands-automation==${AUTOMATION_VERSION}" 2>/dev
 
 # Install the LOCAL software-agent-sdk (openhands-sdk/tools/workspace) on top of
 # the base agent-server image. This guarantees our patches (e.g. the
-# OPENHANDS_VISION_MODELS vision support) are actually used, instead of the
-# unpatched SDK baked into ghcr.io/openhands/agent-server. --force-reinstall
-# ensures the local copy wins over the image's preinstalled one.
+# OPENHANDS_VISION_MODELS vision support) are actually used.
+#
+# IMPORTANT: the base image (ghcr.io/openhands/agent-server:...-python) is a
+# SOURCE build that runs agent-server through its OWN venv at
+# /agent-server/.venv. Installing with `uv pip install --system` would put the
+# packages into the system interpreter, which the agent-server does NOT use.
+# We must install into /agent-server/.venv so our patched SDK wins.
 COPY software-agent-sdk/ /tmp/software-agent-sdk/
-RUN uv pip install --system --force-reinstall \
-      "/tmp/software-agent-sdk/openhands-sdk" \
-      "/tmp/software-agent-sdk/openhands-tools" \
-      "/tmp/software-agent-sdk/openhands-workspace"
+RUN if [ -x /agent-server/.venv/bin/python ]; then \
+      uv pip install --python /agent-server/.venv/bin/python --force-reinstall \
+        "/tmp/software-agent-sdk/openhands-sdk" \
+        "/tmp/software-agent-sdk/openhands-tools" \
+        "/tmp/software-agent-sdk/openhands-workspace"; \
+    else \
+      uv pip install --system --force-reinstall \
+        "/tmp/software-agent-sdk/openhands-sdk" \
+        "/tmp/software-agent-sdk/openhands-tools" \
+        "/tmp/software-agent-sdk/openhands-workspace"; \
+    fi
 
 RUN if [ -n "${AGENT_SERVER_SDK_GIT_REF}" ]; then \
       BASE_GIT_URL="git+https://github.com/OpenHands/software-agent-sdk@${AGENT_SERVER_SDK_GIT_REF}" && \
