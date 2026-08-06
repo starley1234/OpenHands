@@ -122,7 +122,7 @@ export function PlanPreview({
           onClick={handleBuildClick}
           disabled={isBuildDisabled}
           className={cn(
-            "bg-white flex items-center justify-center h-[26px] px-2 rounded-[4px] w-[93px] transition-opacity",
+            "bg-[#ffffff] flex items-center justify-center h-[26px] px-2 rounded-[4px] w-[93px] transition-opacity",
             isBuildDisabled
               ? "opacity-50 cursor-not-allowed"
               : "hover:opacity-90 cursor-pointer",

@@ -360,7 +360,7 @@ export function ConversationTabs({
             onClick={handleBuildPlanClick}
             disabled={isBuildDisabled}
             className={cn(
-              "flex h-5 min-w-17 items-center justify-center rounded bg-white px-2 transition-opacity",
+              "flex h-5 min-w-17 items-center justify-center rounded bg-[#ffffff] px-2 transition-opacity",
               isBuildDisabled
                 ? "cursor-not-allowed opacity-50"
                 : "cursor-pointer hover:opacity-90",

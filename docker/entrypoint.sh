@@ -140,6 +140,22 @@ export AUTOMATION_AGENT_SERVER_URL="${AUTOMATION_AGENT_SERVER_URL:-http://127.0.
 # conversations whose persisted metadata still references its module qualname.
 export OH_EXTRA_PYTHON_PATH="${OH_EXTRA_PYTHON_PATH:-/opt/agent-canvas/tools}"
 
+# Route git operations through the configured proxy when one is present. MCP
+# servers, plugins, and skills are frequently installed by `git clone` of a
+# repo, and git does not always honor the HTTP(S)_PROXY environment variables
+# reliably. Setting the config explicitly ensures those module downloads go
+# through the same proxy as the LLM / marketplace requests.
+if [ -n "${HTTPS_PROXY:-}" ]; then
+  if command -v git >/dev/null 2>&1; then
+    git config --global http.proxy "$HTTPS_PROXY"
+    git config --global https.proxy "$HTTPS_PROXY"
+    # Never route loopback/internal traffic through the proxy.
+    if [ -n "${NO_PROXY:-}" ]; then
+      git config --global http.noProxy "$NO_PROXY"
+    fi
+  fi
+fi
+
 # Track child PIDs so we can clean up on exit.
 PIDS=()
 

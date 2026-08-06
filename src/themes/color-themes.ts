@@ -177,6 +177,19 @@ const LIGHT_HEROUI = {
   // exactly like the --heroui-* tokens.)
   "--oh-focus": "#4465DB",
   "--oh-modal-title-foreground": "#0B0E14",
+  // The codebase uses Tailwind's `white` utility (`text-white`) pervasively for
+  // text on dark surfaces. In light mode those surfaces flip to light, so
+  // `text-white` would become invisible. Remap `--color-white` to a dark ink so
+  // every `text-white` renders as dark text. We deliberately do NOT touch
+  // `--color-black`: `bg-white text-black` tooltips/badges and `bg-black/…`
+  // scrims are already correct in light mode and must not flip.
+  "--color-white": "#0B0E14",
+  // Brand (colored) buttons keep their gold/colored backgrounds in light mode;
+  // their foreground came from `var(--cool-grey-950)` which inverts to light and
+  // kills contrast. Pin the foregrounds to dark ink instead.
+  "--oh-accent-foreground": "#0B0E14",
+  "--oh-success-foreground": "#0B0E14",
+  "--oh-warning-foreground": "#0B0E14",
   "color-scheme": "light",
 };
 

@@ -48,7 +48,7 @@ export function SkillFacetRow({
         className={cn(
           "flex size-3.5 shrink-0 items-center justify-center rounded-[3px] border",
           checked
-            ? "border-white bg-white text-black"
+            ? "border-white bg-[#ffffff] text-black"
             : "border-[var(--oh-border)]",
         )}
       >
