@@ -172,8 +172,11 @@ trap cleanup EXIT SIGINT SIGTERM
 # ── 1. Start Agent Server ────────────────────────────────────────────────────
 log "Starting agent-server on port $AGENT_SERVER_PORT..."
 
-if [ -x /agent-server/.venv/bin/python ]; then
-  # Source build (development image) — prefer our patched SDK venv when present.
+if [ -x /opt/agent-server-venv/bin/python ]; then
+  # Our locally-built agent-server (from software-agent-sdk with vision patch).
+  /opt/agent-server-venv/bin/python -m openhands.agent_server --port "$AGENT_SERVER_PORT" &
+elif [ -x /agent-server/.venv/bin/python ]; then
+  # Source build (development image)
   /agent-server/.venv/bin/python -m openhands.agent_server --port "$AGENT_SERVER_PORT" &
 elif command -v openhands-agent-server >/dev/null 2>&1; then
   # Binary build (production image)

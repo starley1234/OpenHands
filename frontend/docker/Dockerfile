@@ -70,6 +70,27 @@ RUN node -e " \
   require('fs').writeFileSync('/tmp/defaults.env', lines.join('\n') + '\n'); \
 "
 
+# ── Stage 1c: Build agent-server from the LOCAL software-agent-sdk ──────────
+# The base ghcr.io/openhands/agent-server image ships a PyInstaller binary with
+# a FROZEN copy of the SDK — installing packages into site-packages or a venv
+# cannot override it. To make our patches effective (OPENHANDS_VISION_MODELS),
+# we build a source venv from the local SDK in this repo and run agent-server
+# from it. Mirrors the upstream builder stage so the venv is fully wired.
+FROM python:3.13-bookworm AS agent-server-build
+ARG ENABLE_VERTEX=0
+ENV UV_PROJECT_ENVIRONMENT=/opt/agent-server-venv
+ENV UV_PYTHON_INSTALL_DIR=/opt/uv-managed-python
+COPY --from=ghcr.io/astral-sh/uv:0.11.6 /uv /uvx /bin/
+WORKDIR /tmp/software-agent-sdk
+COPY software-agent-sdk/ ./
+RUN set -eux; \
+    EXTRA_FLAGS=""; \
+    if [ "$ENABLE_VERTEX" = "1" ]; then EXTRA_FLAGS="--extra vertex"; fi; \
+    uv python install 3.13 && \
+    uv venv --python-preference only-managed --python 3.13 /opt/agent-server-venv && \
+    uv sync --frozen --no-editable --managed-python --extra boto3 $EXTRA_FLAGS && \
+    test -x /opt/agent-server-venv/bin/python
+
 # ── Stage 2: Combined image ──────────────────────────────────────────────────
 FROM ${AGENT_SERVER_IMAGE} AS final
 
@@ -109,27 +130,11 @@ RUN if command -v apt-get >/dev/null 2>&1; then \
 RUN uv pip install --system "openhands-automation==${AUTOMATION_VERSION}" 2>/dev/null \
     || pip install --no-cache-dir "openhands-automation==${AUTOMATION_VERSION}"
 
-# Install the LOCAL software-agent-sdk (openhands-sdk/tools/workspace) on top of
-# the base agent-server image. This guarantees our patches (e.g. the
-# OPENHANDS_VISION_MODELS vision support) are actually used.
-#
-# IMPORTANT: the base image (ghcr.io/openhands/agent-server:...-python) is a
-# SOURCE build that runs agent-server through its OWN venv at
-# /agent-server/.venv. Installing with `uv pip install --system` would put the
-# packages into the system interpreter, which the agent-server does NOT use.
-# We must install into /agent-server/.venv so our patched SDK wins.
-COPY software-agent-sdk/ /tmp/software-agent-sdk/
-RUN if [ -x /agent-server/.venv/bin/python ]; then \
-      uv pip install --python /agent-server/.venv/bin/python --force-reinstall \
-        "/tmp/software-agent-sdk/openhands-sdk" \
-        "/tmp/software-agent-sdk/openhands-tools" \
-        "/tmp/software-agent-sdk/openhands-workspace"; \
-    else \
-      uv pip install --system --force-reinstall \
-        "/tmp/software-agent-sdk/openhands-sdk" \
-        "/tmp/software-agent-sdk/openhands-tools" \
-        "/tmp/software-agent-sdk/openhands-workspace"; \
-    fi
+# Use the agent-server built from our LOCAL software-agent-sdk (see
+# stage 1c). The base image ships a PyInstaller binary with a frozen SDK, so
+# site-packages patches never reach it — running from this source venv is the
+# only way our vision patch takes effect.
+COPY --from=agent-server-build /opt/agent-server-venv /opt/agent-server-venv
 
 RUN if [ -n "${AGENT_SERVER_SDK_GIT_REF}" ]; then \
       BASE_GIT_URL="git+https://github.com/OpenHands/software-agent-sdk@${AGENT_SERVER_SDK_GIT_REF}" && \
