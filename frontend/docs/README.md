@@ -1,8 +1,9 @@
-# Agent Canvas docs
+# Документация Agent Canvas
 
-This directory contains the project documentation.
+В этом каталоге находится документация проекта.
 
-- [Architecture](./architecture.md): system boundaries, runtime modes, and quality gates.
-- [Using ACP agents](./ACP_AGENTS.md): onboard and configure external agents (Claude Code, Codex, Gemini CLI).
-- [Development guide](./DEVELOPMENT.md)
-- [Self-hosting guide](./SELF_HOSTING.md)
+- [Архитектура](./architecture.md): границы системы, режимы выполнения и контроль качества.
+- [Использование ACP-агентов](./ACP_AGENTS.md): подключение и настройка внешних агентов (Claude Code, Codex, Gemini CLI).
+- [Руководство по разработке](./DEVELOPMENT.md)
+- [Руководство по self-hosting](./SELF_HOSTING.md)
+- [Развёртывание в Docker со своими настройками](./DOCKER_DEPLOYMENT_RU.md)
