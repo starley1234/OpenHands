@@ -43,6 +43,14 @@ services:
       LLM_API_KEY: "${LLM_API_KEY:-}"
       LLM_API_VERSION: "${LLM_API_VERSION:-}"
       LLM_PROVIDER: "${LLM_PROVIDER:-}"
+      # ── Vision: включить обработку изображений для своих моделей ──
+      # Через запятую перечисли подстроки имён моделей, которые должны
+      # считаться vision-способными (если LiteLLM/реестр их не знает), напр.:
+      #   OPENHANDS_VISION_MODELS: "unsloth/gemma,my-vision-model"
+      OPENHANDS_VISION_MODELS: "${OPENHANDS_VISION_MODELS:-}"
+      # Использовать локальный software-agent-sdk (с нашими правками vision)
+      # вместо встроенного в образ agent-server. См. volumes ниже.
+      PYTHONPATH: "/opt/software-agent-sdk/openhands-sdk:${PYTHONPATH:-}"
       # ── Прокси для внешних LLM-провайдеров и загрузки модулей (openhands.dev, GitHub) ──
       HTTP_PROXY: "${HTTP_PROXY:-}"
       HTTPS_PROXY: "${HTTPS_PROXY:-${HTTP_PROXY}}"
@@ -59,6 +67,10 @@ services:
       - openhands_data:/home/openhands/.openhands
       # Папка с проектами, с которыми будет работать агент.
       - "${PROJECTS_PATH:-./projects}:/projects"
+      # Монтируем локальный software-agent-sdk (репозиторий бэкенда), чтобы
+      # патчи vision (OPENHANDS_VISION_MODELS / unsloth-gemma) применялись
+      # поверх встроенного в образ agent-server. PYTHONPATH указан выше.
+      - "../software-agent-sdk:/opt/software-agent-sdk:ro"
 
 volumes:
   openhands_data:

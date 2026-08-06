@@ -1,3 +1,4 @@
+import os
 import warnings
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
@@ -8,6 +9,23 @@ from litellm import get_supported_openai_params
 from litellm.utils import supports_vision as litellm_supports_vision
 
 from openhands.sdk.llm.utils.openhands_provider import OPENHANDS_PROVIDER_PREFIX
+
+# Comma-separated list of model-name substrings that must be treated as
+# vision-capable even when LiteLLM / the built-in registry does not recognise
+# them. Lets self-hosted / proxied / custom models (e.g. unsloth/gemma) use
+# image input without editing code. Example:
+#   OPENHANDS_VISION_MODELS="unsloth/gemma,gpt-4o-custom"
+ENV_VISION_MODELS = "OPENHANDS_VISION_MODELS"
+
+
+def _env_vision_models() -> tuple[str, ...]:
+    """Return vision-capable model substrings from the environment."""
+    raw = (os.environ.get(ENV_VISION_MODELS, "") or "").strip()
+    return tuple(
+        token.strip()
+        for token in raw.split(",")
+        if token.strip() and not token.strip().startswith("#")
+    )
 
 
 def model_matches(model: str | None, patterns: Iterable[str]) -> bool:
@@ -217,13 +235,21 @@ SEND_REASONING_CONTENT_MODELS: list[str] = [
 ]
 
 # Match token -> canonical LiteLLM ID for vision metadata overrides.
-VISION_MODEL_OVERRIDES = {"kimi-k3": "moonshot/kimi-k3"}
+VISION_MODEL_OVERRIDES = {
+    "kimi-k3": "moonshot/kimi-k3",
+    # Self-hosted / community Gemma models (e.g. unsloth/gemma-4-12b-it) that
+    # support image input but are not recognised by LiteLLM's registry.
+    "unsloth/gemma": "unsloth/gemma-4-12b-it",
+}
 
 
 @cache
 def _model_supports_vision(model: str | None) -> bool:
-    """Return whether LiteLLM or our override list marks the model as visual."""
+    """Return whether LiteLLM, our override list, or the env list marks the
+    model as visual."""
     if model and model_matches(model, VISION_MODEL_OVERRIDES.keys()):
+        return True
+    if model and model_matches(model, _env_vision_models()):
         return True
     normalized = _normalize_model_for_litellm(model)
     with warnings.catch_warnings():
