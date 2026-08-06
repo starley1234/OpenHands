@@ -141,7 +141,13 @@ COPY --from=config-gen /tmp/defaults.env /opt/agent-canvas/defaults.env
 
 # Copy the entrypoint
 COPY docker/entrypoint.sh /opt/agent-canvas/entrypoint.sh
-RUN chmod +x /opt/agent-canvas/entrypoint.sh
+# Normalize line endings: if the working copy was checked out with CRLF
+# (common on Windows / WSL with core.autocrlf=true), the `#!/usr/bin/env bash`
+# shebang becomes `bash\r` and the container dies with
+# "env: 'bash\r': No such file or directory". Strip any stray CR so the built
+# image always contains a valid LF shebang regardless of the source file.
+RUN sed -i 's/\r$//' /opt/agent-canvas/entrypoint.sh && \
+    chmod +x /opt/agent-canvas/entrypoint.sh
 
 # Pre-create persistence directories with correct ownership so the
 # openhands user can write to them even when Docker creates anonymous
