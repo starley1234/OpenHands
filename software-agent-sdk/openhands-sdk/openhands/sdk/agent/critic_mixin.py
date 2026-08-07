@@ -188,7 +188,11 @@ class CriticMixin:
             marker_seen = False
             for event in state.active_branch():
                 if isinstance(event, MessageEvent) and event.source == "user":
-                    text = content_to_str(event.llm_message.content) or ""
+                    # content_to_str returns a LIST of strings; join before the
+                    # substring check, otherwise `in` does list-membership
+                    # (equality) instead of substring and the [AUTONOMOUS]
+                    # marker is never detected → autonomous mode never turns on.
+                    text = " ".join(content_to_str(event.llm_message.content)) or ""
                     if AUTONOMOUS_MARKER in text:
                         marker_seen = True
                         break
