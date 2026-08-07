@@ -200,8 +200,11 @@ class CriticMixin:
                 AUTONOMOUS_ENABLED_KEY: True,
             }
         steps = state.agent_state.get(AUTONOMOUS_ITERATION_KEY, 0)
+        # Resolution: explicit per-conversation agent_state override > the
+        # agent's configured autonomous_max_steps (set via settings → UI) >
+        # the module-level default.
         max_steps = int(state.agent_state.get("autonomous_max_steps", 0) or 0) or (
-            AUTONOMOUS_DEFAULT_MAX
+            getattr(self, "autonomous_max_steps", None) or AUTONOMOUS_DEFAULT_MAX
         )
 
         if steps >= max_steps:

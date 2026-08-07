@@ -634,10 +634,21 @@ def test_validate_path_invalid(editor):
         editor(command="view", path=str(invalid_file))
 
 
-def test_create_existing_file_error(editor):
+def test_create_existing_file_overwrites(editor):
+    # `create` on an existing file is now allowed and overwrites the content
+    # (with the prior version kept on the undo stack) instead of raising. This
+    # lets weak models "re-create" a file in autonomous mode without stalling.
     editor, test_file = editor
-    with pytest.raises(EditorToolParameterInvalidError):
-        editor(command="create", path=str(test_file), file_text="New content")
+    result = editor(command="create", path=str(test_file), file_text="New content")
+    assert result.prev_exist is True
+    with open(test_file) as f:
+        assert f.read() == "New content"
+
+    # undo_edit restores the previous content
+    undo = editor(command="undo_edit", path=str(test_file))
+    assert undo is not None
+    with open(test_file) as f:
+        assert f.read() != "New content"
 
 
 def test_str_replace_missing_old_str(editor):

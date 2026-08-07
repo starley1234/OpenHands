@@ -122,14 +122,30 @@ class FileEditor:
         elif command == "create":
             if file_text is None:
                 raise EditorToolParameterMissingError(command, "file_text")
+            # A weak model in autonomous mode often "re-creates" a file that
+            # already exists. Previously that raised a hard error and stalled
+            # the run. Now treat `create` on an existing file as an overwrite:
+            # push the current content onto the undo stack so undo_edit can
+            # restore it, then write the new content.
+            prev_exist = _path.exists()
+            if prev_exist:
+                try:
+                    old = self.read_file(_path)
+                except Exception:
+                    old = None
+                if old is not None:
+                    self._history_manager.add_history(_path, old)
             self.write_file(_path, file_text)
             self._history_manager.add_history(_path, file_text)
             return FileEditorObservation.from_text(
-                text=f"File created successfully at: {_path}",
+                text=(
+                    f"File {'overwritten' if prev_exist else 'created'} "
+                    f"successfully at: {_path}"
+                ),
                 command=command,
                 path=str(_path),
                 new_content=file_text,
-                prev_exist=False,
+                prev_exist=prev_exist,
             )
         elif command == "str_replace":
             if old_str is None:
@@ -648,13 +664,6 @@ class FileEditor:
             )
 
         # Check if path and command are compatible
-        if command == "create" and path.exists():
-            raise EditorToolParameterInvalidError(
-                "path",
-                str(path),
-                f"File already exists at: {path}. Cannot overwrite files using "
-                "command `create`.",
-            )
         if command != "create" and not path.exists():
             raise EditorToolParameterInvalidError(
                 "path",
