@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from openhands.sdk.critic.base import CriticResult
 from openhands.sdk.event import ActionEvent, LLMConvertibleEvent, MessageEvent
+from openhands.sdk.llm import content_to_str
 from openhands.sdk.logger import get_logger
 from openhands.sdk.tool import Action
 from openhands.sdk.tool.builtins import FinishAction
@@ -20,6 +21,17 @@ logger = get_logger(__name__)
 
 # Key for storing iterative refinement iteration count in agent_state
 ITERATIVE_REFINEMENT_ITERATION_KEY = "iterative_refinement_iteration"
+
+# Marker a user can put at the start of a task prompt to enable autonomous
+# continuation for THAT conversation only (no global env flag). When present,
+# the agent, instead of finishing, keeps working by re-emitting a "continue"
+# user message until it hits the per-conversation limit.
+AUTONOMOUS_MARKER = "[AUTONOMOUS]"
+# Key storing how many autonomous "continue" steps have been issued.
+AUTONOMOUS_ITERATION_KEY = "autonomous_continuation_iteration"
+# Default max autonomous continuation steps before the agent is allowed to
+# finish (prevents infinite loops).
+AUTONOMOUS_DEFAULT_MAX = 8
 
 
 class CriticMixin:
@@ -87,6 +99,14 @@ class CriticMixin:
             If should_continue is True, the agent should continue with the
             followup_message instead of finishing.
         """
+        # Autonomous continuation (per-conversation marker, no global flag).
+        # If the user started the task with the [AUTONOMOUS] marker, keep the
+        # agent working by re-emitting a "continue" user message instead of
+        # letting it finish, up to a per-conversation limit.
+        autonomous = self._check_autonomous_continue(conversation)
+        if autonomous is not None:
+            return autonomous
+
         # Check if critic has iterative refinement config
         if self.critic is None or self.critic.iterative_refinement is None:
             return False, None
@@ -135,4 +155,56 @@ class CriticMixin:
             f"iteration {new_iteration}/{config.max_iterations})"
         )
         followup = self.critic.get_followup_prompt(critic_result, new_iteration)
+        return True, followup
+
+    def _check_autonomous_continue(
+        self, conversation: LocalConversation
+    ) -> tuple[bool, str | None] | None:
+        """Autonomous per-conversation continuation (no global env flag).
+
+        If the task prompt contains the ``[AUTONOMOUS]`` marker, the agent
+        keeps working instead of finishing: ``finalize`` re-emits a "continue"
+        user message up to ``max_steps`` times. Returns None when the marker is
+        absent (fall through to normal finish/critic logic).
+
+        Returns:
+            (should_continue, followup) when autonomous mode applies, else None.
+        """
+        marker_seen = False
+        for event in conversation.state.active_branch():
+            if isinstance(event, MessageEvent) and event.source == "user":
+                text = content_to_str(event.llm_message.content) or ""
+                if AUTONOMOUS_MARKER in text:
+                    marker_seen = True
+                    break
+        if not marker_seen:
+            return None
+
+        state = conversation.state
+        steps = state.agent_state.get(AUTONOMOUS_ITERATION_KEY, 0)
+        max_steps = int(state.agent_state.get("autonomous_max_steps", 0) or 0) or (
+            AUTONOMOUS_DEFAULT_MAX
+        )
+
+        if steps >= max_steps:
+            logger.info(
+                f"Autonomous continuation: reached limit ({max_steps}), finishing"
+            )
+            return False, None
+
+        new_steps = steps + 1
+        state.agent_state = {
+            **state.agent_state,
+            AUTONOMOUS_ITERATION_KEY: new_steps,
+        }
+        logger.info(
+            f"Autonomous continuation: step {new_steps}/{max_steps}, "
+            "re-emitting continue message"
+        )
+        followup = (
+            "[Автономный режим] Задача ещё не завершена. Продолжай работу "
+            "самостоятельно: выполняй оставшиеся шаги, проверяй результаты, "
+            "и только когда реально закончишь — вызови finish с итоговым "
+            "отчётом. Не останавливайся на промежуточных этапах."
+        )
         return True, followup
