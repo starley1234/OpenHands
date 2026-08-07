@@ -246,6 +246,29 @@ class ResponseDispatchMixin:
         """Handle LLM response with text content — finishes conversation."""
         self._emit_message_event(message, llm_response, conversation, on_event)
         self._maybe_emit_vllm_tokens(llm_response, on_event)
+
+        # Autonomous mode: a plain text message is NOT an explicit finish — the
+        # agent is expected to call FinishAction only when truly done. If the
+        # [AUTONOMOUS] marker is present and the per-conversation continuation
+        # limit isn't reached, re-emit a "continue" user message and stay
+        # RUNNING instead of marking the conversation FINISHED. This covers the
+        # common case where a weaker model narrates progress ("I'll continue…")
+        # without emitting any tool call — which previously stopped the run.
+        autonomous = self._check_autonomous_continue(conversation)
+        if autonomous is not None:
+            should_continue, followup = autonomous
+            if should_continue and followup:
+                on_event(
+                    MessageEvent(
+                        source="user",
+                        llm_message=Message(
+                            role="user",
+                            content=[TextContent(text=followup)],
+                        ),
+                    )
+                )
+                return
+
         logger.debug("LLM produced a message response - awaits user input")
         state.execution_status = ConversationExecutionStatus.FINISHED
 

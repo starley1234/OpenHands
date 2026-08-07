@@ -287,6 +287,78 @@ def test_content_response_sets_finished():
     assert msg_events[0].source == "agent"
 
 
+def test_autonomous_content_response_keeps_running():
+    """[AUTONOMOUS] + plain-text reply must NOT finish — it re-emits continue.
+
+    A weaker model often "narrates" progress ("I'll continue…") without emitting
+    any tool call or FinishAction. That previously fell into
+    ``_handle_content_response`` which unconditionally set FINISHED, stopping the
+    run even though autonomous mode wanted the agent to keep working.
+    """
+    seed = [_user_message("[AUTONOMOUS] Создай интерактивный сайт с 32 страницами")]
+    msg = Message(
+        role="assistant",
+        content=[TextContent(text="Начинаю процесс автономного написания...")],
+    )
+    events, convo = _run_single_step(
+        _make_llm_response(msg),
+        seed_events=seed,
+        record_emitted_events_in_state=True,
+    )
+    msg_events = [e for e in events if isinstance(e, MessageEvent)]
+
+    # Not finished: the run loop will keep stepping instead of stopping.
+    assert convo.state.execution_status != ConversationExecutionStatus.FINISHED
+    # The agent's narration message + the auto-injected "continue" user message.
+    assert len(msg_events) == 2
+    assert msg_events[0].source == "agent"
+    assert msg_events[1].source == "user"
+    assert "[Автономный режим]" in (
+        msg_events[1].llm_message.content[0].text
+        if isinstance(msg_events[1].llm_message.content[0], TextContent)
+        else ""
+    )
+
+
+def test_autonomous_content_response_finishes_at_limit():
+    """[AUTONOMOUS] + plain-text reply finishes once the step limit is hit."""
+    seed = [_user_message("[AUTONOMOUS] Закончи задачу")]
+    msg = Message(role="assistant", content=[TextContent(text="Готово.")])
+    # Pre-seed the iteration counter so the limit (8) is already reached.
+    seed_convo = _run_single_step(
+        _make_llm_response(msg),
+        seed_events=seed,
+        record_emitted_events_in_state=True,
+    )[1]
+    seed_convo.state.agent_state["autonomous_continuation_iteration"] = 8
+
+    # Re-run a step against the same conversation (agent_state persists) with a
+    # fresh agent whose canned response is again a plain-text message.
+    from openhands.sdk.llm import LLM, LLMResponse
+
+    class SingleShotLLM(LLM):
+        def __init__(self, response: LLMResponse):
+            super().__init__(model="test-model")
+            self._response = response
+
+        def completion(self, *, messages, tools=None, **kwargs) -> LLMResponse:
+            return self._response
+
+    agent = Agent(llm=SingleShotLLM(_make_llm_response(msg)), tools=[])
+    events2: list[Event] = []
+    agent.step(seed_convo, on_event=events2.append)
+
+    assert (
+        seed_convo.state.execution_status
+        == ConversationExecutionStatus.FINISHED
+    )
+    # No auto-injected "continue" user message once the limit is reached.
+    assert all(
+        not (isinstance(e, MessageEvent) and e.source == "user")
+        for e in events2
+    )
+
+
 def test_empty_response_sends_nudge():
     """_handle_no_content_response emits agent message + corrective nudge."""
     msg = Message(role="assistant", content=[])
