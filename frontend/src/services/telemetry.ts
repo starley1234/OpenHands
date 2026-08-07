@@ -252,21 +252,10 @@ function isBrowser(): boolean {
  * PostHog is a browser-only library, so we dynamically import it only when needed.
  */
 async function getPostHog(): Promise<PostHog | null> {
-  if (!isBrowser()) {
-    return null;
-  }
-
-  if (posthogInstance) {
-    return posthogInstance;
-  }
-
-  try {
-    const { default: posthog } = await import("posthog-js");
-    return posthog;
-  } catch {
-    // Failed to load PostHog - telemetry will be disabled
-    return null;
-  }
+  // Telemetry is fully disabled: the PostHog client is never loaded and no
+  // data is ever sent anywhere. Kept as a null-returning stub so callers and
+  // their types remain intact without any runtime side effects.
+  return null;
 }
 
 /**

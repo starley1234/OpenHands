@@ -72,6 +72,26 @@ class ServerInfo(BaseModel):
     docs: str = "/docs"
     redoc: str = "/redoc"
 
+    # Proxy status for outbound LLM / MCP / skills traffic. Exposed so the
+    # frontend can show "working via proxy or not" and gate outbound calls.
+    # proxy_enabled is derived from HTTP(S)_PROXY (or the SDK's own
+    # OPENHANDS_HTTP_PROXY override); proxy_url is the effective value.
+    proxy_enabled: bool = Field(
+        default_factory=lambda: bool(
+            os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")
+        )
+    )
+    proxy_url: str | None = Field(
+        default_factory=lambda: (
+            os.environ.get("HTTPS_PROXY")
+            or os.environ.get("HTTP_PROXY")
+            or None
+        )
+    )
+    proxy_no_proxy: str | None = Field(
+        default_factory=lambda: os.environ.get("NO_PROXY") or None
+    )
+
 
 def update_last_execution_time():
     global _last_event_time

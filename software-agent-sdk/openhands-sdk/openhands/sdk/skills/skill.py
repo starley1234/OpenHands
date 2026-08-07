@@ -1024,7 +1024,11 @@ def _load_and_merge_from_dirs(
             logger.warning(f"Failed to load {source_label} from {skills_dir}: {str(e)}")
 
 
-def load_project_skills(work_dir: str | Path) -> list[Skill]:
+def load_project_skills(
+    work_dir: str | Path,
+    *,
+    include_repo_root: bool = True,
+) -> list[Skill]:
     """Load skills from project-specific directories.
 
     Searches for skills in {work_dir}/.agents/skills/, {work_dir}/.openhands/skills/,
@@ -1048,6 +1052,11 @@ def load_project_skills(work_dir: str | Path) -> list[Skill]:
 
     Args:
         work_dir: Path to the project/working directory.
+        include_repo_root: Whether to also load skills from the enclosing git
+            repo root when it differs from ``work_dir``. Set to False to isolate
+            a project from repository-level guidance (e.g. when running inside a
+            monorepo / SDK checkout whose `.agents/skills` must not leak into a
+            user's project).
 
     Returns:
         List of Skill objects loaded from project directories.
@@ -1063,7 +1072,7 @@ def load_project_skills(work_dir: str | Path) -> list[Skill]:
 
     # Working dir takes precedence (more local rules override repo root rules)
     search_roots: list[Path] = [work_dir]
-    if git_root is not None and git_root != work_dir:
+    if include_repo_root and git_root is not None and git_root != work_dir:
         search_roots.append(git_root)
 
     # First, load third-party skill files (AGENTS.md, .cursorrules, etc.) from each
@@ -1117,10 +1126,14 @@ def load_project_skills(work_dir: str | Path) -> list[Skill]:
     return all_skills
 
 
-# Public skills repository configuration
-PUBLIC_SKILLS_REPO = "https://github.com/OpenHands/extensions"
-# Allow overriding the ref via EXTENSIONS_REF environment variable.
-# Accepts a branch name, tag (e.g. "v1.0.0"), or full 40-char commit SHA.
+# Public skills repository configuration.
+# Allow overriding the repository URL via EXTENSIONS_REPO (e.g. a self-hosted
+# or private fork of https://github.com/OpenHands/extensions) and the ref via
+# EXTENSIONS_REF. EXTENSIONS_REF accepts a branch name, tag (e.g. "v1.0.0"),
+# or full 40-char commit SHA.
+PUBLIC_SKILLS_REPO = os.environ.get(
+    "EXTENSIONS_REPO", "https://github.com/OpenHands/extensions"
+)
 PUBLIC_SKILLS_REF = os.environ.get("EXTENSIONS_REF", "main")
 DEFAULT_MARKETPLACE_PATH = "marketplaces/default.json"
 

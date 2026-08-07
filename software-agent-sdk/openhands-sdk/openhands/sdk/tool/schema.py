@@ -305,12 +305,16 @@ class Schema(DiscriminatedUnionMixin):
             )
 
         field_definitions: Any = fields
+        # MCP tools are dynamic: models frequently emit extra keys (e.g. a
+        # stray "command") that aren't in the tool's declared schema. Ignoring
+        # them (rather than extra="forbid") prevents a validation
+        # "extra_forbidden" error that made agents retry the same call forever.
         if has_aliased_field:
             model = create_model(  # type: ignore[reportCallIssue, return-value]
                 model_name,
                 __base__=cls,
                 __config__=ConfigDict(
-                    extra="forbid",
+                    extra="ignore",
                     frozen=True,
                     populate_by_name=True,
                 ),
@@ -320,6 +324,11 @@ class Schema(DiscriminatedUnionMixin):
             model = create_model(  # type: ignore[reportCallIssue, return-value]
                 model_name,
                 __base__=cls,
+                __config__=ConfigDict(
+                    extra="ignore",
+                    frozen=True,
+                    populate_by_name=True,
+                ),
                 **field_definitions,
             )
         if alias_specs:

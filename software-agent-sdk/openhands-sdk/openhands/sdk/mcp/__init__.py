@@ -13,6 +13,7 @@ from openhands.sdk.mcp.config import (
     to_fastmcp_mcp_config,
 )
 from openhands.sdk.mcp.exceptions import MCPError, MCPTimeoutError
+from openhands.sdk.mcp.integrations import load_mcp_integration_catalog
 
 
 if TYPE_CHECKING:
@@ -55,6 +56,7 @@ __all__ = [
     "MCPToolProvider",
     "create_mcp_tools",
     "to_fastmcp_mcp_config",
+    "load_mcp_integration_catalog",
     "MCPError",
     "MCPTimeoutError",
 ]

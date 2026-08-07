@@ -4,10 +4,10 @@
   <img src="https://assets.openhands.dev/logo-whitebackground.png" alt="OpenHands logo" width="340">
   <h1 align="center" style="border-bottom: none">Agent Canvas</h1>
   <p align="center">
-    <strong>The self-hosted developer control center for coding agents and automations.</strong>
+    <strong>Самохостимый центр управления для агентов-программистов и автоматизаций.</strong>
   </p>
   <p align="center">
-    Run OpenHands, Claude Code, Codex, Gemini, or any ACP-compatible agent across local, remote, and cloud backends.
+    Запускайте OpenHands, Claude Code, Codex, Gemini или любого ACP-совместимого агента на локальных, удалённых и облачных бэкендах.
   </p>
 </div>
 <div align="center">
@@ -18,11 +18,11 @@
   <a href="https://go.openhands.dev/slack"><img src="https://img.shields.io/badge/Slack-Join%20the%20community-611f69?logo=slack&logoColor=white&style=for-the-badge" alt="Join us on Slack"></a>
 </div>
 <div align="center">
-  <a href="#quickstart">Quickstart</a> |
-  <a href="./docs/README.md">Docs</a> |
+  <a href="#quickstart">Быстрый старт</a> |
+  <a href="./docs/README.md">Документация</a> |
   <a href="./docs/SELF_HOSTING.md">Self-Hosting</a> |
-  <a href="https://docs.openhands.dev/openhands/usage/agent-canvas/acp-agents">ACP Agents</a> |
-  <a href="https://docs.openhands.dev/openhands/usage/agent-canvas/prebuilt-automations">Automations</a> |
+  <a href="https://docs.openhands.dev/openhands/usage/agent-canvas/acp-agents">ACP-агенты</a> |
+  <a href="https://docs.openhands.dev/openhands/usage/agent-canvas/prebuilt-automations">Автоматизации</a> |
   <a href="https://go.openhands.dev/slack">Slack</a>
 </div>
 <p align="center">
@@ -30,66 +30,61 @@
 </p>
 <hr>
 
-OpenHands Agent Canvas turns your coding agents into a self-hosted, always-on engineering team. It's a developer control center for starting conversations and automating everyday tasks — like generating reports that publish to Slack or automatically decomposing GitHub issues into tasks.
+OpenHands Agent Canvas превращает ваших агентов-программистов в самохостимую, постоянно работающую команду инженеров. Это центр управления для разработчиков: запуск диалогов и автоматизация повседневных задач — например, генерация отчётов, публикуемых в Slack, или автоматическая декомпозиция задач GitHub на подзадачи.
 
-It runs locally on your machine by default, but can connect to multiple “agent backends”, e.g. running agents in Docker containers, on VMs, or within your company infrastructure. You can optionally choose to run agents on OpenHands Cloud or OpenHands Enterprise infrastructure.
+По умолчанию он работает локально на вашей машине, но может подключаться к нескольким «агентным бэкендам» — например, к агентам в Docker-контейнерах, на виртуальных машинах или в инфраструктуре вашей компании. При желании можно запускать агентов на инфраструктуре OpenHands Cloud или OpenHands Enterprise.
 
-Agent Canvas runs the open source OpenHands agent out-of-the-box, but can use any third-party agent like Claude Code and Codex.
+Agent Canvas «из коробки» запускает агента OpenHands с открытым исходным кодом, но может использовать и любых сторонних агентов, таких как Claude Code и Codex.
 
-|                                                                                                                      |                                                                                                                                          |
-| -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| [**Self-host your way**](https://docs.openhands.dev/openhands/usage/agent-canvas/backend-setup/vm)                   | Run agents locally, in Docker, on VMs, or anywhere you can run an agent server backend                                                   |
-| [**Switch between different backends**](https://docs.openhands.dev/openhands/usage/agent-canvas/backends)            | Switch between local, remote, and cloud agents without losing focus                                                                      |
-| [**Create automations**](https://docs.openhands.dev/openhands/usage/agent-canvas/prebuilt-automations)               | Create automations and workflows that integrate with Slack, GitHub, Linear, and more. Run on a schedule or in response to webhook events |
-| [**Integrate with the tools you use**](https://docs.openhands.dev/openhands/usage/agent-canvas/prebuilt-automations) | Connect your automations with third-party services like Slack, GitHub, Notion, and more to automate workflows                            |
-| [**Bring your own model**](https://docs.openhands.dev/openhands/usage/settings/llm-settings#llm-profiles)            | Use with any LLM                                                                                                                         |
-| [**Use with any agent**](https://docs.openhands.dev/openhands/usage/agent-canvas/acp-agents)                         | Use with OpenHands, Claude Code, Codex, Gemini, or any agent with Agent-Client Protocol (ACP).                                           |
+| | |
+| --- | --- |
+| [**Самохостинг на ваш вкус**](https://docs.openhands.dev/openhands/usage/agent-canvas/backend-setup/vm) | Запускайте агентов локально, в Docker, на виртуальных машинах или где угодно, где можно запустить бэкенд агентного сервера |
+| [**Переключение между бэкендами**](https://docs.openhands.dev/openhands/usage/agent-canvas/backends) | Переключайтесь между локальными, удалёнными и облачными агентами без потери фокуса |
+| [**Создание автоматизаций**](https://docs.openhands.dev/openhands/usage/agent-canvas/prebuilt-automations) | Создавайте автоматизации и рабочие процессы, интегрируемые со Slack, GitHub, Linear и другим. Запуск по расписанию или по вебхукам |
+| [**Интеграция с вашими инструментами**](https://docs.openhands.dev/openhands/usage/agent-canvas/prebuilt-automations) | Подключайте автоматизации к сторонним сервисам: Slack, GitHub, Notion и другим |
+| [**Своя LLM-модель**](https://docs.openhands.dev/openhands/usage/settings/llm-settings#llm-profiles) | Работа с любой LLM |
+| [**Работа с любым агентом**](https://docs.openhands.dev/openhands/usage/agent-canvas/acp-agents) | OpenHands, Claude Code, Codex, Gemini или любой агент с Agent-Client Protocol (ACP). |
 
-If you have questions or feedback, please open a GitHub issue or join the [#proj-agent-canvas channel in Slack](https://openhands.dev/joinslack).
+Если у вас есть вопросы или замечания, создайте issue на GitHub или зайдите в [#proj-agent-canvas channel in Slack](https://openhands.dev/joinslack).
 
-## Quickstart
+## Быстрый старт
 
-You can install OpenHands to run agents on any machine: on your laptop, on a dedicated computer like a Mac Mini,
-or on a server in the cloud.
+Вы можете установить OpenHands для запуска агентов на любой машине: на ноутбуке, на выделенном компьютере (например, Mac Mini) или на сервере в облаке.
 
-The most powerful way to run OpenHands is on a server in the cloud. This allows your agents to continue running
-even when your laptop is shut, and makes it easier to trigger your agents through third-party services
-like Slack, GitHub, and Datadog. See [SELF_HOSTING.md](docs/SELF_HOSTING.md) for details, especially with respect to security hardening.
+Самый мощный способ запустить OpenHands — на сервере в облаке. Это позволяет агентам продолжать работать, даже когда ноутбук закрыт, и упрощает запуск агентов через сторонние сервисы (Slack, GitHub, Datadog). См. [SELF_HOSTING.md](docs/SELF_HOSTING.md), особенно в части усиления безопасности.
 
-Notably, you can run the backend in _multiple different environments_, and switch between
-them from the same Agent Canvas frontend. E.g. you can share an Agent Server with your team for agents doing
-code review and dependency updates, then have your personal agents running on your laptop.
+Важно: вы можете запускать бэкенд в _нескольких разных окружениях_ и переключаться между ними из одного и того же фронтенда Agent Canvas. Например, можно дать команде общий Agent Server для агентов, делающих ревью кода и обновление зависимостей, а личные агенты держать на ноутбуке.
 
-### Option 1: Without a Sandbox
+### Вариант 1: Без песочницы
 
 > [!WARNING]
-> This runs the agent-server directly on the machine you're installing on — the agent will have full access to your filesystem!
+> Это запускает agent-server напрямую на машине, где вы устанавливаете, — агент получит полный доступ к вашей файловой системе!
 
-**Prerequisites**: Node.js 22.12.x or later, `uv`
+**Требования**: Node.js 22.12.x или новее, `uv`
 
 ```sh
 npm install -g @openhands/agent-canvas
 agent-canvas
 ```
 
-The `agent-canvas` command starts the full local stack by default. You can also split it when you want to run pieces separately:
+Команда `agent-canvas` по умолчанию запускает полный локальный стек. Вы также можете разделять его, когда нужно запускать части отдельно:
 
 ```sh
-agent-canvas --frontend-only  # static frontend + ingress only
-agent-canvas --backend-only   # agent server + automation backend + ingress only
+agent-canvas --frontend-only  # только статический фронтенд + ingress
+agent-canvas --backend-only   # agent server + automation backend + ingress
 ```
 
-### Option 2: With a Docker Sandbox
+### Вариант 2: С песочницей Docker
 
-**Prerequisites**:
+**Требования**:
 
-- Docker: Docker Desktop on macOS/Windows, or Docker Engine/Docker Desktop on Linux.
-- A host directory for `PROJECTS_PATH` containing the project folders you want the agent to access. Create it before starting the container.
+- Docker: Docker Desktop на macOS/Windows или Docker Engine/Docker Desktop на Linux.
+- Каталог хоста для `PROJECTS_PATH`, содержащий папки проектов, к которым агент должен иметь доступ. Создайте его перед запуском контейнера.
 
 **macOS / Linux:**
 
 ```sh
-export PROJECTS_PATH="$HOME/projects"  # directory containing your project folders
+export PROJECTS_PATH="$HOME/projects"  # каталог с папками ваших проектов
 mkdir -p "$PROJECTS_PATH" "$HOME/.openhands"
 
 docker run -it --rm \
@@ -99,16 +94,16 @@ docker run -it --rm \
   ghcr.io/openhands/agent-canvas:1.10.0 # x-release-please-version
 ```
 
-**Windows (PowerShell / Windows Terminal):** See [README.windows.md](./README.windows.md) for the equivalent commands.
+**Windows (PowerShell / Windows Terminal):** эквивалентные команды см. в [README.windows.md](./README.windows.md).
 
-The agent will be able to access any project under `PROJECTS_PATH`.
+Агент сможет получить доступ к любому проекту в `PROJECTS_PATH`.
 
-### Option 3: From Source
+### Вариант 3: Из исходников
 
 > [!WARNING]
-> This runs the agent-server directly on the machine you're installing on — the agent will have full access to your filesystem!
+> Это запускает agent-server напрямую на машине, где вы устанавливаете, — агент получит полный доступ к вашей файловой системе!
 
-**Prerequisites**: Node.js 22.12.x or later, `npm`, `uv` (for running the agent server via `uvx`)
+**Требования**: Node.js 22.12.x или новее, `npm`, `uv` (для запуска agent server через `uvx`)
 
 ```sh
 git clone https://github.com/OpenHands/OpenHands.git
@@ -119,26 +114,27 @@ npm run dev
 
 ---
 
-Access the UI at [http://localhost:8000](http://localhost:8000) for the npm/source launchers, or [http://localhost:8000/canvas](http://localhost:8000/canvas) for the Docker image. You can add additional backends directly from the UI.
+Доступ к интерфейсу: [http://localhost:8000](http://localhost:8000) для npm/source-запусков или [http://localhost:8000/canvas](http://localhost:8000/canvas) для Docker-образа. Дополнительные бэкенды можно добавить прямо из интерфейса.
 
-# Architecture
+# Архитектура
 
-Agent Canvas is powered by the [OpenHands Agent Server](https://github.com/OpenHands/software-agent-sdk/tree/main/openhands-agent-server/openhands/agent_server), a REST API for running multiple agents on a single machine. Each Agent Server runs on a single host/port; the Agent Canvas can connect to multiple Agent Servers and easily flip between them.
+Agent Canvas работает на [OpenHands Agent Server](https://github.com/OpenHands/software-agent-sdk/tree/main/openhands-agent-server/openhands/agent_server) — REST API для запуска нескольких агентов на одной машине. Каждый Agent Server работает на одном хосте/порту; Agent Canvas может подключаться к нескольким Agent Server и легко переключаться между ними.
 
-You can run an Agent Server anywhere:
+Agent Server можно запустить где угодно:
 
-- Directly on your laptop (be careful!)
-- On a dedicated machine like a Mac Mini
-- On a virtual machine in the cloud
-- Inside OpenHands Cloud (our commercial offering)
+- Напрямую на ноутбуке (осторожно!)
+- На выделенной машине, например Mac Mini
+- На виртуальной машине в облаке
+- Внутри OpenHands Cloud (наше коммерческое предложение)
 
-The Agent Server is often paired with an [Automation Server](https://github.com/OpenHands/automation), which lets you set up agents that run on a schedule or in response to events.
+Agent Server часто используется вместе с [Automation Server](https://github.com/OpenHands/automation), который позволяет настраивать агентов, работающих по расписанию или по событиям.
 
 <img width="1456" height="1258" alt="image" src="https://github.com/user-attachments/assets/cb6de6f5-ac30-4d04-a76a-b5c259f0c163" />
 
-## More documentation
+## Дополнительная документация
 
-- [Documentation index](./docs/README.md)
-- [Architecture overview](./docs/architecture.md)
-- [Development guide](./docs/DEVELOPMENT.md)
-- [Self-hosting guide](./docs/SELF_HOSTING.md)
+- [Индекс документации](./docs/README.md)
+- [Обзор архитектуры](./docs/architecture.md)
+- [Руководство по разработке](./docs/DEVELOPMENT.md)
+- [Руководство по self-hosting](./docs/SELF_HOSTING.md)
+- [Развёртывание в Docker со своими настройками](./docs/DOCKER_DEPLOYMENT_RU.md)

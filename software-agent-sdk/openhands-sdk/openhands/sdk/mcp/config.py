@@ -511,6 +511,24 @@ class MCPServer(_MCPBaseModel):
     keep_alive: bool | None = None
     headers: dict[str, SecretStr] | None = None
     auth: MCPAuthCredential | None = None
+    proxy: str | None = Field(
+        default=None,
+        description=(
+            "HTTP(S) proxy URL used by this MCP server. When set, the proxy is "
+            "exported as HTTP_PROXY/HTTPS_PROXY/ALL_PROXY to a stdio server's "
+            "subprocess environment, and used for remote (http/sse) transports. "
+            "When unset, the SDK falls back to the global HTTP_PROXY/HTTPS_PROXY "
+            "environment variables."
+        ),
+    )
+    no_proxy: str | None = Field(
+        default=None,
+        description=(
+            "Comma-separated hosts that must bypass the proxy for this MCP "
+            "server. Exported as NO_PROXY to stdio subprocesses; defaults to "
+            "the global NO_PROXY when unset."
+        ),
+    )
     enabled: bool = Field(
         default=True,
         description=(
@@ -699,6 +717,31 @@ def _normalize_server_for_fastmcp(
         server["headers"] = headers
     elif "headers" in server:
         server.pop("headers", None)
+
+    # Apply per-server proxy: export HTTP_PROXY/HTTPS_PROXY/ALL_PROXY (and
+    # NO_PROXY) into the stdio subprocess env so the child process's HTTP calls
+    # route through the configured proxy. For remote (http/sse) transports the
+    # env vars are also injected so httpx (used by fastmcp) picks them up; this
+    # mirrors the global container-level HTTP(S)_PROXY behaviour but scoped to a
+    # single server. If `proxy` is unset we leave the process env untouched so
+    # the global HTTP_PROXY/HTTPS_PROXY still apply.
+    proxy = server.get("proxy")
+    no_proxy = server.get("no_proxy")
+    if proxy or no_proxy:
+        env = dict(server.get("env") or {})
+        # env values are secret-wrapped; read plaintext via their repr if needed.
+        def _plain(v: Any) -> str:
+            return str(v) if not hasattr(v, "get_secret_value") else v.get_secret_value()
+
+        if proxy:
+            env.setdefault("HTTP_PROXY", proxy)
+            env.setdefault("HTTPS_PROXY", proxy)
+            env.setdefault("ALL_PROXY", proxy)
+        if no_proxy:
+            env.setdefault("NO_PROXY", no_proxy)
+        server["env"] = {k: _plain(v) for k, v in env.items()}
+        server.pop("proxy", None)
+        server.pop("no_proxy", None)
 
     return server
 

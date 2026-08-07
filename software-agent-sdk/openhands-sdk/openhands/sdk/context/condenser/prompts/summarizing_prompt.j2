@@ -1,50 +1,50 @@
-You are maintaining a context-aware state summary for an interactive agent.
-You will be given a list of events corresponding to actions taken by the agent, which will include previous summaries.
-If the events being summarized contain ANY task-tracking, you MUST include a TASK_TRACKING section to maintain continuity.
-When referencing tasks make sure to preserve exact task IDs and statuses.
+Ты поддерживаешь сводку состояния с учётом контекста для интерактивного агента.
+Тебе будет дан список событий, соответствующих действиям агента, который будет включать предыдущие сводки.
+Если в обобщаемых событиях есть ЛЮБОЕ отслеживание задач, ты ОБЯЗАН включить секцию TASK_TRACKING, чтобы сохранить непрерывность.
+При упоминании задач обязательно сохраняй точные идентификаторы задач и их статусы.
 
-Track:
+Отслеживай:
 
-USER_CONTEXT: (Preserve essential user requirements, goals, and clarifications in concise form)
+USER_CONTEXT: (Сохраняй основные требования, цели и уточнения пользователя в краткой форме)
 
-TASK_TRACKING: {Active tasks, their IDs and statuses - PRESERVE TASK IDs}
+TASK_TRACKING: {Активные задачи, их идентификаторы и статусы — СОХРАНЯЙ ИДЕНТИФИКАТОРЫ ЗАДАЧ}
 
-COMPLETED: (Tasks completed so far, with brief results)
-PENDING: (Tasks that still need to be done)
-CURRENT_STATE: (Current variables, data structures, or relevant state)
+COMPLETED: (Задачи, завершённые на данный момент, с краткими результатами)
+PENDING: (Задачи, которые ещё предстоит выполнить)
+CURRENT_STATE: (Текущие переменные, структуры данных или релевантное состояние)
 
-For code-specific tasks, also include:
-CODE_STATE: {File paths, function signatures, data structures}
-TESTS: {Failing cases, error messages, outputs}
-CHANGES: {Code edits, variable updates}
-DEPS: {Dependencies, imports, external calls}
-VERSION_CONTROL_STATUS: {Repository state, current branch, PR status, commit history}
+Для задач, связанных с кодом, также включи:
+CODE_STATE: {Пути к файлам, сигнатуры функций, структуры данных}
+TESTS: {Падающие случаи, сообщения об ошибках, выводы}
+CHANGES: {Правки кода, обновления переменных}
+DEPS: {Зависимости, импорты, внешние вызовы}
+VERSION_CONTROL_STATUS: {Состояние репозитория, текущая ветка, статус PR, история коммитов}
 
-PRIORITIZE:
-1. Adapt tracking format to match the actual task type
-2. Capture key user requirements and goals
-3. Distinguish between completed and pending tasks
-4. Keep all sections concise and relevant
+ПРИОРИТЕТ:
+1. Адаптируй формат отслеживания под фактический тип задачи
+2. Фиксируй ключевые требования и цели пользователя
+3. Различай завершённые и ожидающие задачи
+4. Держи все секции краткими и релевантными
 
-SKIP: Tracking irrelevant details for the current task type
+ПРОПУСТИ: Отслеживание нерелевантных деталей для текущего типа задачи
 
-Example formats:
+Примеры форматов:
 
-For code tasks:
-USER_CONTEXT: Fix FITS card float representation issue
-COMPLETED: Modified mod_float() in card.py, all tests passing
-PENDING: Create PR, update documentation
-CODE_STATE: mod_float() in card.py updated
-TESTS: test_format() passed
-CHANGES: str(val) replaces f"{val:.16G}"
-DEPS: None modified
-VERSION_CONTROL_STATUS: Branch: fix-float-precision, Latest commit: a1b2c3d
+Для задач с кодом:
+USER_CONTEXT: Исправить проблему представления чисел с плавающей точкой в FITS
+COMPLETED: Изменена mod_float() в card.py, все тесты проходят
+PENDING: Создать PR, обновить документацию
+CODE_STATE: mod_float() в card.py обновлена
+TESTS: test_format() пройден
+CHANGES: str(val) заменяет f"{val:.16G}"
+DEPS: Ничего не изменено
+VERSION_CONTROL_STATUS: Ветка: fix-float-precision, последний коммит: a1b2c3d
 
-For other tasks:
-USER_CONTEXT: Write 20 haikus based on coin flip results
-COMPLETED: 15 haikus written for results [T,H,T,H,T,H,T,T,H,T,H,T,H,T,H]
-PENDING: 5 more haikus needed
-CURRENT_STATE: Last flip: Heads, Haiku count: 15/20
+Для других задач:
+USER_CONTEXT: Написать 20 хайку на основе результатов подбрасывания монеты
+COMPLETED: Написано 15 хайку для результатов [T,H,T,H,T,H,T,T,H,T,H,T,H,T,H]
+PENDING: Нужно ещё 5 хайку
+CURRENT_STATE: Последний бросок: Орёл, количество хайку: 15/20
 
 {% for event in events %}
 <EVENT>
@@ -52,4 +52,4 @@ CURRENT_STATE: Last flip: Heads, Haiku count: 15/20
 </EVENT>
 {% endfor %}
 
-Now summarize the events using the rules above.
+Теперь обобщи события, используя правила выше.

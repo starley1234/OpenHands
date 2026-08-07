@@ -329,9 +329,18 @@ class Message(BaseModel):
 
     def _string_serializer(self) -> dict[str, Any]:
         # convert content to a single string
-        content = "\n".join(
-            item.text for item in self.content if isinstance(item, TextContent)
-        )
+        parts: list[str] = []
+        for item in self.content:
+            if not isinstance(item, TextContent):
+                continue
+            text = item.text
+            if not isinstance(text, str):
+                try:
+                    text = json.dumps(text, ensure_ascii=False)
+                except (TypeError, ValueError):
+                    text = str(text)
+            parts.append(text)
+        content = "\n".join(parts)
         if self.role == "tool":
             content = self._maybe_truncate_tool_text(content)
         message_dict: dict[str, Any] = {"content": content, "role": self.role}
@@ -361,8 +370,23 @@ class Message(BaseModel):
             if self.role == "tool" and item_dicts:
                 for d in item_dicts:
                     text_val = d.get("text")
-                    if d.get("type") == "text" and isinstance(text_val, str):
-                        d["text"] = self._maybe_truncate_tool_text(text_val)
+                    if d.get("type") == "text":
+                        # Some custom tools return a non-string value (dict,
+                        # list, URL object, …) in the text slot. That produces a
+                        # provider-side 400 "content must be a string or an array
+                        # of objects". Normalize any non-string text to a JSON
+                        # string so tool results always serialize cleanly.
+                        if isinstance(text_val, str):
+                            d["text"] = self._maybe_truncate_tool_text(text_val)
+                        else:
+                            try:
+                                d["text"] = self._maybe_truncate_tool_text(
+                                    json.dumps(text_val, ensure_ascii=False)
+                                )
+                            except (TypeError, ValueError):
+                                d["text"] = self._maybe_truncate_tool_text(
+                                    str(text_val)
+                                )
 
             # We have to remove cache_prompt for tool content and move it up to the
             # message level

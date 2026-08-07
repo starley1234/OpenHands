@@ -180,7 +180,7 @@ def test_llm_security_analyzer_template_kwargs():
 
     # Verify that the security risk assessment section is included in the system prompt
     assert "<SECURITY_RISK_ASSESSMENT>" in system_message
-    assert "# Security Risk Policy" in system_message
+    assert "# Политика оценки риска безопасности" in system_message
     assert "When using tools that support the security_risk parameter" in system_message
     # By default, cli_mode is True, so we should see the CLI mode version
     assert "**LOW**: Safe, read-only actions" in system_message
@@ -209,7 +209,7 @@ def test_llm_security_analyzer_sandbox_mode():
 
     # Verify that the security risk assessment section is included with sandbox mode content  # noqa: E501
     assert "<SECURITY_RISK_ASSESSMENT>" in system_message
-    assert "# Security Risk Policy" in system_message
+    assert "# Политика оценки риска безопасности" in system_message
     assert "When using tools that support the security_risk parameter" in system_message
     # With cli_mode=False, we should see the sandbox mode version
     assert "**LOW**: Read-only actions inside sandbox" in system_message
@@ -235,7 +235,7 @@ def test_no_security_analyzer_still_includes_risk_assessment():
 
     # Verify that the security risk assessment section is NOT included
     assert "<SECURITY_RISK_ASSESSMENT>" in system_message
-    assert "# Security Risk Policy" in system_message
+    assert "# Политика оценки риска безопасности" in system_message
     assert "When using tools that support the security_risk parameter" in system_message
 
 
@@ -263,7 +263,7 @@ def test_non_llm_security_analyzer_still_includes_risk_assessment():
 
     # Verify that the security risk assessment section is NOT included
     assert "<SECURITY_RISK_ASSESSMENT>" in system_message
-    assert "# Security Risk Policy" in system_message
+    assert "# Политика оценки риска безопасности" in system_message
     assert "When using tools that support the security_risk parameter" in system_message
 
 
