@@ -113,6 +113,16 @@ export const useCreateConversation = () => {
 
       const requestedAgentProfileId =
         agentProfileId ?? agentProfiles?.active_agent_profile_id ?? undefined;
+      // True when the user explicitly picked this profile (e.g. the "+" menu →
+      // "Switch agent profile" recreation). Such a pick is deliberate and must
+      // always launch from that profile; the implicit-launch heuristics below
+      // (default-profile→agent_settings shortcut and the dangling llm_profile_ref
+      // downgrade) only apply to the home-launch path, where the profile was
+      // resolved automatically from `active_agent_profile_id`. Skipping them for
+      // an explicit pick ensures the conversation gets `launched_agent_profile`
+      // stamped, so the agent-profile switcher names what the user chose instead
+      // of silently falling back to the active (default) profile.
+      const isExplicitProfile = agentProfileId != null;
 
       // Fall back to the legacy agent_settings launch when the resolved agent
       // profile can't resolve its LLM. The agent-server seeds a `default`
@@ -136,6 +146,7 @@ export const useCreateConversation = () => {
       const isCloud = backend.kind === "cloud";
       let effectiveAgentProfileId = requestedAgentProfileId;
       if (
+        !isExplicitProfile &&
         !isCloud &&
         resolvedAgentProfile?.name === WELL_KNOWN_DEFAULT_AGENT_PROFILE_NAME &&
         resolvedAgentProfile?.agent_kind === "openhands"
@@ -160,6 +171,7 @@ export const useCreateConversation = () => {
         // resolves `default` server-side via agent_profile_id (validated below).
         effectiveAgentProfileId = undefined;
       } else if (
+        !isExplicitProfile &&
         resolvedAgentProfile?.agent_kind === "openhands" &&
         resolvedAgentProfile.llm_profile_ref
       ) {
