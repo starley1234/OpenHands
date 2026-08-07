@@ -2,9 +2,9 @@
 
 from collections.abc import Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, ClassVar, Literal
 
-from pydantic import Field, PrivateAttr
+from pydantic import ConfigDict, Field, PrivateAttr
 
 
 if TYPE_CHECKING:
@@ -28,6 +28,12 @@ CommandLiteral = Literal["view", "create", "str_replace", "insert", "undo_edit"]
 
 class FileEditorAction(Action):
     """Schema for file editor operations."""
+
+    # Models (especially weaker ones like Gemma) often attach extra fields
+    # (e.g. security_risk, reasoning) to tool calls. Ignore them so validation
+    # doesn't fail with extra_forbidden and make the agent retry the same bad
+    # call forever. (path remains required.)
+    model_config: ClassVar[ConfigDict] = ConfigDict(extra="ignore", frozen=True)
 
     command: CommandLiteral = Field(
         description="The commands to run. Allowed options are: `view`, `create`, "

@@ -25,11 +25,18 @@ services:
         AGENT_SERVER_IMAGE: "${AGENT_SERVER_IMAGE:-ghcr.io/openhands/agent-server:1.40.1-python}"
         AUTOMATION_VERSION: "${AUTOMATION_VERSION:-1.6.0}"
         VITE_BASE_PATH: "${VITE_BASE_PATH:-/canvas}"
+        # Рабочая директория для новых диалогов. По умолчанию /projects (смонтированный
+        # хост-каталог), чтобы файлы, созданные агентом, переживали пересборку образа.
+        # Внутри контейнера рабочая директория = <VITE_WORKING_DIR>/<id_hex>.
+        VITE_WORKING_DIR: "${VITE_WORKING_DIR:-/projects}"
     image: openhands-canvas:local
     container_name: agent-canvas
     restart: unless-stopped
     ports:
       - "${AGENT_CANVAS_PORT:-8000}:8000"
+      # Проброс диапазона портов, на которых агент может запускать свои
+      # веб-серверы (например сайт на 8099). Открой с хоста как localhost:8099.
+      - "8090-8100:8090-8100"
     extra_hosts:
       # Чтобы из контейнера были видны сервисы на хосте (Ollama, LM Studio, vLLM).
       # Провайдера указывай как http://host.docker.internal:<port>/v1

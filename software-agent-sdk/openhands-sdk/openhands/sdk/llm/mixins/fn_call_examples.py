@@ -163,7 +163,7 @@ The server is running on port 5000 with PID 126. You can access the list of numb
         "create_file": """
 ASSISTANT:
 There is no `app.py` file in the current directory. Let me create a Python file `app.py`:
-<function=str_replace_editor>
+<function=file_editor>
 <parameter=command>create</parameter>
 <parameter=path>/workspace/app.py</parameter>
 <parameter=file_text>
@@ -182,13 +182,13 @@ if __name__ == '__main__':
 <parameter=summary>Create Flask app.py with number list endpoint</parameter>
 </function>
 
-USER: EXECUTION RESULT of [str_replace_editor]:
+USER: EXECUTION RESULT of [file_editor]:
 File created successfully at: /workspace/app.py
 """,  # noqa: E501
         "edit_file": """
 ASSISTANT:
 Now let me display the numbers in a table format:
-<function=str_replace_editor>
+<function=file_editor>
 <parameter=command>str_replace</parameter>
 <parameter=path>/workspace/app.py</parameter>
 <parameter=old_str>return str(numbers)</parameter>
@@ -197,7 +197,7 @@ Now let me display the numbers in a table format:
 <parameter=summary>Update return statement to render HTML table</parameter>
 </function>
 
-USER: EXECUTION RESULT of [str_replace_editor]:
+USER: EXECUTION RESULT of [file_editor]:
 The file /workspace/app.py has been edited. Here's the result of running `cat -n` on a snippet of /workspace/app.py:
      3
      4  @app.route('/')

@@ -1,9 +1,17 @@
 """
 AgentFinishedCritic implementation.
 
-This critic evaluates whether an agent properly finished a task by checking:
-1. The agent's last action was a FinishAction (proper completion)
-2. The generated git patch is non-empty (actual changes were made)
+This critic evaluates whether an agent actually did work and finished properly.
+It checks:
+1. The agent performed at least one real (non-trivial) action — e.g. wrote a
+   file, edited code, ran a command — not just thought/finish.
+2. The agent's last action was a FinishAction (proper completion).
+3. If a git patch is available and non-empty, that also counts as "made changes".
+
+Unlike a git-based check alone, this works even when the workspace is not a
+git repository (so git_patch is always None) — otherwise a local critic would
+return score 0 forever and drive the agent into an endless "redo" loop that
+grows the context.
 """
 
 from collections.abc import Sequence
@@ -16,25 +24,32 @@ from openhands.sdk.tool.builtins.finish import FinishAction
 
 if TYPE_CHECKING:
     from openhands.sdk.event.base import LLMConvertibleEvent
+    from openhands.sdk.event.llm_convertible.action import ActionEvent
 
 
 logger = get_logger(__name__)
 
 
+# Tool names that never count as "making changes" (pure thought / navigation).
+_TRIVIAL_TOOLS = frozenset({"think", "finish"})
+
+
 class AgentFinishedCritic(CriticBase):
     """
-    Critic that evaluates whether an agent properly finished a task.
+    Critic that evaluates whether an agent actually did work and finished.
 
-    This critic checks two main criteria:
-    1. The agent's last action was a FinishAction (proper completion)
-    2. The generated git patch is non-empty (actual changes were made)
+    Criteria:
+    1. A real (non-trivial) action was performed.
+    2. The agent finished with a FinishAction.
+    A non-empty git_patch also satisfies criterion 1 (when the workspace is a
+    git repo and the caller provides it).
     """
 
     def evaluate(
         self, events: Sequence["LLMConvertibleEvent"], git_patch: str | None = None
     ) -> CriticResult:
         """
-        Evaluate if an agent properly finished with a non-empty git patch.
+        Evaluate if an agent actually did work and finished properly.
 
         Args:
             events: List of events from the agent's execution
@@ -45,30 +60,53 @@ class AgentFinishedCritic(CriticBase):
         """
         reasons = []
 
-        # Check if git patch is non-empty
-        if not git_patch or not git_patch.strip():
-            reasons.append("Empty git patch")
-            logger.debug("AgentFinishedCritic: Empty git patch")
+        # Non-empty git patch is the strongest signal of real work.
+        if git_patch and git_patch.strip():
+            if not self._has_finish_action(events):
+                return CriticResult(
+                    score=0.0,
+                    message="Agent produced changes but did not finish properly.",
+                )
             return CriticResult(
-                score=0.0,
-                message="Agent did not produce a non-empty git patch. "
-                + "; ".join(reasons),
+                score=1.0,
+                message="Agent completed with FinishAction and non-empty patch",
             )
 
-        # Check if agent properly finished with FinishAction
+        # No git patch (e.g. not a git repo). Fall back to inspecting events:
+        # at least one real action + a FinishAction means the task was worked on.
+        if not self._has_real_action(events):
+            reasons.append("No real actions performed")
         if not self._has_finish_action(events):
             reasons.append("No FinishAction found")
-            logger.debug("AgentFinishedCritic: No FinishAction")
+
+        if not reasons:
             return CriticResult(
-                score=0.0,
-                message="Agent did not finish properly. " + "; ".join(reasons),
+                score=1.0,
+                message="Agent performed real work and finished properly",
             )
 
-        logger.debug("AgentFinishedCritic: Successfully completed")
+        logger.debug("AgentFinishedCritic: incomplete — %s", "; ".join(reasons))
         return CriticResult(
-            score=1.0,
-            message="Agent completed with FinishAction and non-empty patch",
+            score=0.0,
+            message="Agent did not produce a non-empty git patch. " + "; ".join(reasons),
         )
+
+    def _has_real_action(self, events: Sequence["LLMConvertibleEvent"]) -> bool:
+        """True if any ActionEvent performed a non-trivial tool call."""
+        from openhands.sdk.event.llm_convertible.action import ActionEvent
+
+        for event in events:
+            if isinstance(event, ActionEvent):
+                tool_name = (event.tool_call.name if event.tool_call else "") or ""
+                if tool_name and tool_name not in _TRIVIAL_TOOLS:
+                    return True
+                # Some ActionEvents carry the action directly (e.g. FinishAction)
+                # — only trivial ones are filtered; anything else counts.
+                if event.action is not None and not isinstance(
+                    event.action, FinishAction
+                ):
+                    return True
+        return False
 
     def _has_finish_action(self, events: Sequence["LLMConvertibleEvent"]) -> bool:
         """Check if the last action was a FinishAction."""
@@ -85,3 +123,4 @@ class AgentFinishedCritic(CriticBase):
                 return False
 
         return False
+

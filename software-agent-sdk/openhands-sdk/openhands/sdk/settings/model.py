@@ -345,6 +345,29 @@ class VerificationSettings(BaseModel):
             ).model_dump()
         },
     )
+    critic_type: Literal["api", "agent_finished"] = Field(
+        default="api",
+        description=(
+            "Which critic implementation to use. 'api' uses APIBasedCritic "
+            "(an external LLM service that grades the result; requires an "
+            "API key). 'agent_finished' uses AgentFinishedCritic — a local, "
+            "dependency-free critic that grades whether the agent actually "
+            "produced changes (non-empty git patch) and finished properly. "
+            "Pick 'agent_finished' for local/offline autonomous runs."
+        ),
+        json_schema_extra={
+            SETTINGS_METADATA_KEY: SettingsFieldMetadata(
+                label="Critic type",
+                choices=[
+                    SettingsChoice(label="API-based", value="api"),
+                    SettingsChoice(
+                        label="Local (agent finished)",
+                        value="agent_finished",
+                    ),
+                ],
+            ).model_dump()
+        },
+    )
     critic_mode: CriticMode = Field(
         default="finish_and_message",
         description="When critic evaluation should run.",
@@ -1372,12 +1395,7 @@ class OpenHandsAgentSettings(AgentSettingsBase):
         if not self.verification.critic_enabled:
             return None
 
-        api_key = self.verification.critic_api_key or self.llm.api_key
-        if api_key is None:
-            return None
-
         from openhands.sdk.critic.base import IterativeRefinementConfig
-        from openhands.sdk.critic.impl.api import APIBasedCritic
 
         iterative_refinement = None
         if self.verification.enable_iterative_refinement:
@@ -1385,6 +1403,25 @@ class OpenHandsAgentSettings(AgentSettingsBase):
                 success_threshold=self.verification.critic_threshold,
                 max_iterations=self.verification.max_refinement_iterations,
             )
+
+        # Local, dependency-free critic: grades whether the agent actually
+        # produced changes and finished properly. No API key / external LLM
+        # needed — ideal for offline autonomous runs.
+        if self.verification.critic_type == "agent_finished":
+            from openhands.sdk.critic.impl.agent_finished import (
+                AgentFinishedCritic,
+            )
+
+            return AgentFinishedCritic(
+                mode=self.verification.critic_mode,
+                iterative_refinement=iterative_refinement,
+            )
+
+        api_key = self.verification.critic_api_key or self.llm.api_key
+        if api_key is None:
+            return None
+
+        from openhands.sdk.critic.impl.api import APIBasedCritic
 
         overrides: dict[str, Any] = {}
         if self.verification.critic_server_url is not None:
