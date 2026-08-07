@@ -43,10 +43,15 @@ COPY frontend/ .
 # production for tagged releases and staging for PR/main images.
 # VITE_BASE_PATH is baked into React Router/Vite so the Docker image serves
 # Canvas under the Cloud subpath instead of a dedicated hostname.
+# VITE_WORKING_DIR sets the default workspace path for new conversations; point
+# it at a bind-mounted host directory (e.g. /projects) so agent-created files
+# survive container rebuilds.
 ARG VITE_POSTHOG_API_KEY=""
 ARG VITE_BASE_PATH="/canvas"
+ARG VITE_WORKING_DIR="/projects"
 ENV VITE_POSTHOG_API_KEY=${VITE_POSTHOG_API_KEY}
 ENV VITE_BASE_PATH=${VITE_BASE_PATH}
+ENV VITE_WORKING_DIR=${VITE_WORKING_DIR}
 RUN npm run build
 
 # ── Stage 1b: Generate shell-sourceable defaults from config/defaults.json ──
