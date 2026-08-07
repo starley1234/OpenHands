@@ -265,6 +265,34 @@ def _normalize_arguments(arguments: dict[str, Any]) -> dict[str, Any]:
             normalized["security_risk"] = normalized.pop(typo)
             break
 
+    # Heuristic rescue for file_editor: weak models sometimes emit the path
+    # as a *mangled key* (e.g. `"/home/.../index.html",security_risk": "LOW"`)
+    # instead of a proper `"path"` key, because their JSON quoting collapsed.
+    # If `path` is missing but exactly one leftover key looks like an absolute
+    # path, rename it to `path` so the tool call survives.
+    if "path" not in normalized:
+        hints = {
+            "old_str",
+            "new_str",
+            "insert_line",
+            "file_text",
+            "view_range",
+            "command",
+            "summary",
+            "security_risk",
+        }
+        candidate = None
+        for key, value in normalized.items():
+            if key in hints:
+                continue
+            if isinstance(value, str) and (
+                key.lstrip('"').startswith("/") or "/" in key
+            ):
+                candidate = key
+                break
+        if candidate is not None:
+            normalized["path"] = str(normalized.pop(candidate)).lstrip('"')
+
     # Remove any arguments that are clearly not valid (None values, etc.)
     # but keep all others to preserve tool-specific arguments
     return {k: v for k, v in normalized.items() if v is not None}
