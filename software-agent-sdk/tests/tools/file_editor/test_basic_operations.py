@@ -521,19 +521,22 @@ Review the changes and make sure they are as expected (correct indentation, no d
     )
 
 
-def test_insert_invalid_line(editor):
+def test_insert_out_of_range_clamps_to_end(editor):
+    # A weak model often overshoots the file's line count (here the fixture has
+    # 2 lines, model says 10). This must NOT hard-fail the run — clamp to the
+    # last line (append) instead.
     editor, test_file = editor
-    with pytest.raises(EditorToolParameterInvalidError) as exc_info:
-        editor(
-            command="insert",
-            path=str(test_file),
-            insert_line=10,
-            new_str="Invalid Insert",
-        )
-    assert "Invalid `insert_line` parameter" in str(exc_info.value.message)
-    assert "It should be within the range of allowed values:" in str(
-        exc_info.value.message
+    result = editor(
+        command="insert",
+        path=str(test_file),
+        insert_line=10,
+        new_str="Invalid Insert",
     )
+    assert isinstance(result, FileEditorObservation)
+    content = test_file.read_text()
+    assert "Invalid Insert" in content
+    # Clamped to end → the inserted line comes last.
+    assert content.rstrip().endswith("Invalid Insert")
 
 
 def test_insert_with_empty_string(editor):

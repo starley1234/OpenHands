@@ -514,20 +514,43 @@ class FileEditor:
             )
             encoding = default
 
-        with self._temp_file(path, file_text, encoding) as tmp_path:
+        # Some mounts (e.g. WSL /mnt/d drvfs, certain network filesystems)
+        # reject creating a temp file in the directory (EPERM) even though a
+        # direct write works. Fall back to a plain (non-atomic) write only in
+        # that case so the edit still lands instead of failing the run.
+        try:
+            tmp_path = self._create_temp_file(path, file_text, encoding)
+        except OSError:
+            logger.warning(
+                f"Cannot create temp file for atomic write to {path} "
+                f"({path.parent} may not support it); falling back to direct write."
+            )
+            try:
+                with open(path, "w", encoding=encoding) as f:
+                    f.write(file_text)
+            except Exception as e:
+                raise ToolError(
+                    f"Ran into {e} while trying to write to {path}"
+                ) from None
+            return
+
+        try:
             # Preserve the original file's permission bits when it already exists.
             if path.exists():
                 os.chmod(tmp_path, os.stat(path).st_mode & 0o7777)
             Path.replace(tmp_path, path)
+        except BaseException:
+            # A failed rename must leave the original file intact (atomicity).
+            tmp_path.unlink(missing_ok=True)
+            raise
 
-    @contextmanager
-    def _temp_file(self, path: Path, file_text: str, encoding: str) -> Iterator[Path]:
-        """Write file_text to a fresh temp file beside path and yield its Path.
+    def _create_temp_file(self, path: Path, file_text: str, encoding: str) -> Path:
+        """Create a fresh temp file beside path, write file_text into it.
 
-        The temp file is removed on any failure (write, chmod or replace), so the
-        original file is never destroyed and no stray temp file is left behind. The
-        unlink runs after the file is closed because Windows cannot delete an open
-        file.
+        Returns the temp file path. On any failure the temp file is removed, so
+        no stray file is left behind and the original is never destroyed. The
+        unlink runs after the file is closed because Windows cannot delete an
+        open file.
         """
         tmp = tempfile.NamedTemporaryFile(
             mode="w",
@@ -541,10 +564,10 @@ class FileEditor:
         try:
             with tmp:
                 tmp.write(file_text)
-            yield tmp_path
         except BaseException:
             tmp_path.unlink(missing_ok=True)
             raise
+        return tmp_path
 
     @with_encoding
     def insert(
@@ -570,11 +593,16 @@ class FileEditor:
         num_lines = self._count_lines(path)
 
         if insert_line < 0 or insert_line > num_lines:
-            raise EditorToolParameterInvalidError(
-                "insert_line",
-                str(insert_line),
-                f"It should be within the range of allowed values: {[0, num_lines]}",
+            # A weak model often guesses a line number that overshoots the
+            # file's current length (e.g. 30 when the file has 22 lines).
+            # Clamp to a valid value (append at the end) and report the
+            # adjustment instead of hard-failing the whole run.
+            clamped = min(max(insert_line, 0), num_lines)
+            logger.warning(
+                f"insert_line {insert_line} out of range [0, {num_lines}] "
+                f"for {path}; clamping to {clamped}"
             )
+            insert_line = clamped
 
         new_str_lines = new_str.split("\n")
 

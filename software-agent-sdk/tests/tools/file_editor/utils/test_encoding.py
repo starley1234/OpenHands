@@ -419,6 +419,31 @@ def test_write_failure_leaves_original_file_intact(temp_non_utf8_file, monkeypat
     assert leftovers == [], f"stray temp files left behind: {leftovers}"
 
 
+def test_write_falls_back_to_direct_write_when_temp_creation_fails(
+    tmp_path, monkeypatch
+):
+    """Regression: on mounts (e.g. WSL /mnt/d drvfs) that reject creating a temp
+    file (EPERM), the editor must fall back to a direct write instead of failing."""
+    test_file = tmp_path / "book.md"
+    test_file.write_text("Chapter 1\n")
+
+    def boom(*args, **kwargs):
+        raise PermissionError(
+            "[Errno 1] Operation not permitted: '/projects/book.md.xyz.tmp'"
+        )
+
+    monkeypatch.setattr("tempfile.NamedTemporaryFile", boom)
+
+    result = file_editor(
+        command="create",
+        path=str(test_file),
+        file_text="Chapter 1\nChapter 2\n",
+    )
+
+    assert not result.is_error
+    assert test_file.read_text() == "Chapter 1\nChapter 2\n"
+
+
 def test_create_non_utf8_file():
     """Test creating a new file with non-UTF-8 content."""
     # Create a temporary path
