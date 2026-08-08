@@ -151,7 +151,12 @@ class FileEditor:
             if old_str is None:
                 raise EditorToolParameterMissingError(command, "old_str")
             if new_str is None:
-                raise EditorToolParameterMissingError(command, "new_str")
+                # A weak model sometimes puts the content in `file_text`
+                # instead of `new_str`. Recover.
+                if file_text is not None:
+                    new_str = file_text
+                else:
+                    raise EditorToolParameterMissingError(command, "new_str")
             if new_str == old_str:
                 raise EditorToolParameterInvalidError(
                     "new_str",
@@ -164,7 +169,12 @@ class FileEditor:
             if insert_line is None:
                 raise EditorToolParameterMissingError(command, "insert_line")
             if new_str is None:
-                raise EditorToolParameterMissingError(command, "new_str")
+                # A weak model sometimes puts the content in `file_text`
+                # (the `create` field) instead of `new_str`. Recover.
+                if file_text is not None:
+                    new_str = file_text
+                else:
+                    raise EditorToolParameterMissingError(command, "new_str")
             return self.insert(_path, insert_line, new_str)
         elif command == "undo_edit":
             return self.undo_edit(_path)
@@ -525,13 +535,7 @@ class FileEditor:
                 f"Cannot create temp file for atomic write to {path} "
                 f"({path.parent} may not support it); falling back to direct write."
             )
-            try:
-                with open(path, "w", encoding=encoding) as f:
-                    f.write(file_text)
-            except Exception as e:
-                raise ToolError(
-                    f"Ran into {e} while trying to write to {path}"
-                ) from None
+            self._direct_write(path, file_text, encoding)
             return
 
         try:
@@ -539,10 +543,31 @@ class FileEditor:
             if path.exists():
                 os.chmod(tmp_path, os.stat(path).st_mode & 0o7777)
             Path.replace(tmp_path, path)
+        except PermissionError:
+            # On mounts like WSL /mnt/d (drvfs), creating the temp file works but
+            # the atomic rename-over-existing is denied (EPERM, errno 1). Fall
+            # back to a direct write so the edit lands instead of failing.
+            tmp_path.unlink(missing_ok=True)
+            logger.warning(
+                f"Atomic rename to {path} denied ({path.parent} may not support "
+                "rename-over-existing); falling back to direct write."
+            )
+            self._direct_write(path, file_text, encoding)
         except BaseException:
-            # A failed rename must leave the original file intact (atomicity).
+            # Any other failure (e.g. a real I/O error on replace) must leave the
+            # original file intact (atomicity).
             tmp_path.unlink(missing_ok=True)
             raise
+
+    def _direct_write(self, path: Path, file_text: str, encoding: str) -> None:
+        """Write file_text directly to path (no temp file / rename)."""
+        try:
+            with open(path, "w", encoding=encoding) as f:
+                f.write(file_text)
+        except Exception as e:
+            raise ToolError(
+                f"Ran into {e} while trying to write to {path}"
+            ) from None
 
     def _create_temp_file(self, path: Path, file_text: str, encoding: str) -> Path:
         """Create a fresh temp file beside path, write file_text into it.

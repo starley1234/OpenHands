@@ -539,6 +539,21 @@ def test_insert_out_of_range_clamps_to_end(editor):
     assert content.rstrip().endswith("Invalid Insert")
 
 
+def test_insert_uses_file_text_when_new_str_missing(editor):
+    # A weak model sometimes calls `insert` with the content in `file_text`
+    # (the `create` field) instead of `new_str`. Recover from that.
+    editor, test_file = editor
+    result = editor(
+        command="insert",
+        path=str(test_file),
+        insert_line=1,
+        file_text="Inserted via file_text",
+    )
+    assert isinstance(result, FileEditorObservation)
+    assert not result.is_error
+    assert "Inserted via file_text" in test_file.read_text()
+
+
 def test_insert_with_empty_string(editor):
     editor, test_file = editor
     result = editor(
