@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Документация по репозиторию</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+      h1 { font-size: 1.5rem; }
+      input, button { font-size: 1rem; padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; width: 100%; }
+      button { cursor: pointer; background: #111; color: #fff; border: none; margin-top: 0.5rem; }
+      #status { margin-top: 1rem; color: #666; }
+      #error { margin-top: 0.5rem; color: #c00; }
+      a { color: #06c; }
+    </style>
+  </head>
+  <body>
+    <h1>Документация по репозиторию</h1>
+    <p>Укажите путь к папке репозитория на хосте — агент прочитает код и соберёт сайт документации.</p>
+    <form id="form">
+      <input id="repo" placeholder="Например: /home/user/myproject или ./projects/myapp" required />
+      <button type="submit">Сгенерировать документацию</button>
+    </form>
+    <div id="status"></div>
+    <div id="error"></div>
+    <div id="result"></div>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      let timer = null;
+      $("form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        $("error").textContent = ""; $("result").innerHTML = ""; $("status").textContent = "Запускаю…";
+        const res = await fetch("/api/run", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ repo_path: $("repo").value.trim() }) });
+        const data = await res.json();
+        if (!data.ok) { $("error").textContent = data.error || "Ошибка запуска"; return; }
+        clearInterval(timer); timer = setInterval(poll, 3000); poll();
+      });
+      async function poll() {
+        const s = await (await fetch("/api/status")).json();
+        $("status").textContent = "Статус: " + s.status;
+        if (s.status === "running") return;
+        clearInterval(timer);
+        if (s.status === "error") { $("error").textContent = "Ошибка выполнения"; return; }
+        const r = await (await fetch("/api/result")).json();
+        $("result").innerHTML = "Готово: " + (r.sections || []).length + " разделов. " + '<a href="' + r.site_url + '" target="_blank">Открыть документацию</a>';
+      }
+    </script>
+  </body>
+</html>

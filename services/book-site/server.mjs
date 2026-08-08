@@ -12,48 +12,49 @@
  *
  * Ничего не форкает: единый бэкенд — единственный исполнитель. Сервис лишь
  * инкапсулирует настройки функции и прячет их от пользовательского фронтенда.
+ *
+ * Пути: бэкенд работает внутри контейнера и видит рабочую директорию как
+ * /projects/<subdir>. Сервис запускается на хосте и читает те же файлы как
+ * ./projects/<subdir>. Маппинг задаётся env-переменными (см. ниже).
  */
 import { readFile, writeFile, mkdir, readdir, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { createServer } from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  startConversation,
+  getConversationStatus,
+} from "../lib/agent-server.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const config = JSON.parse(
   await readFile(path.join(__dirname, "config.json"), "utf-8"),
 );
 
-// ── Единый бэкенд ───────────────────────────────────────────────────────────
-// AGENT_SERVER_URL, AGENT_SERVER_API_KEY — как у основного фронтенда.
-// Прослойка использует REST API agent-server (создание диалога, статус, файлы).
-const AGENT_SERVER_URL = (process.env.AGENT_SERVER_URL || "http://127.0.0.1:8000").replace(/\/+$/, "");
-const AGENT_SERVER_API_KEY = process.env.AGENT_SERVER_API_KEY || "";
-const API_BASE = `${AGENT_SERVER_URL}/api`;
+// ── Маппинг путей контейнер ↔ хост ─────────────────────────────────────────
+// AGENT_WORK_ROOT  — где внутри контейнера лежит рабочая директория (по умолч. /projects)
+// HOST_WORK_ROOT   — где на хосте лежит та же директория (по умолч. <корень>/projects)
+const AGENT_WORK_ROOT = (process.env.AGENT_WORK_ROOT || "/projects").replace(/\/+$/, "");
+const HOST_WORK_ROOT = (
+  process.env.HOST_WORK_ROOT || path.resolve(__dirname, "..", "..", "projects")
+).replace(/\/+$/, "");
 
-async function agentFetch(pathname, { method = "GET", body } = {}) {
-  const res = await fetch(`${API_BASE}${pathname}`, {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-      ...(AGENT_SERVER_API_KEY ? { Authorization: `Bearer ${AGENT_SERVER_API_KEY}` } : {}),
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`agent-server ${method} ${pathname} -> ${res.status}: ${text}`);
+/** container /projects/<sub> -> host ./projects/<sub> */
+function agentToHostDir(agentDir) {
+  if (!agentDir) return null;
+  if (agentDir.startsWith(AGENT_WORK_ROOT)) {
+    return path.join(HOST_WORK_ROOT, agentDir.slice(AGENT_WORK_ROOT.length).replace(/^\/+/, ""));
   }
-  return res.json();
+  return agentDir;
 }
 
-// Состояние текущей задачи (одна книга за раз — для примера; для многих задач
-// замените на Map<id, state>).
 const state = {
   conversationId: null,
   status: "idle", // idle | running | finished | error
   error: null,
-  workingDir: null,
+  agentWorkDir: null,
+  hostWorkDir: null,
 };
 
 const MIME = {
@@ -89,37 +90,36 @@ async function handleRun(body) {
   const subject = (body && body.subject || "").trim();
   if (!subject) return { ok: false, error: "subject is required" };
 
-  const title = (config.scenario.title_template || "{{subject}}").replace("{{subject}}", subject);
+  // Уникальная подпапка проекта под эту книгу.
+  const sub = `${config.project_subdir}-${Date.now().toString(36)}`;
+  const agentWorkDir = `${AGENT_WORK_ROOT}/${sub}`;
+
   const prompt = [
     config.scenario.system_prompt,
     "",
     `Тема книги: ${subject}`,
     "",
-    `Записывай главы в подпапку проекта '${config.project_subdir}' проекта.`,
+    `Записывай каждую главу как файл chapter-<N>.md в каталоге проекта. В конце создай TOC.md со списком глав.`,
   ].join("\n");
 
-  // Создать диалог на едином бэкенде (пример; уточните поля по реальному
-  // контракту agent-server / Canvas).
-  const created = await agentFetch("/conversations", {
-    method: "POST",
-    body: {
-      initial_message: { role: "user", content: prompt },
-      title,
-      conversation_instructions: prompt,
-    },
+  const created = await startConversation({
+    workingDir: agentWorkDir,
+    prompt,
+    maxIterations: config.max_iterations ?? 50,
   });
 
-  state.conversationId = created.id ?? created.conversation_id ?? created.app_conversation_id ?? null;
+  state.conversationId = created.id;
   state.status = "running";
   state.error = null;
-  state.workingDir = created.workspace?.working_dir ?? null;
+  state.agentWorkDir = created.working_dir || agentWorkDir;
+  state.hostWorkDir = agentToHostDir(state.agentWorkDir);
   return { ok: true, conversation_id: state.conversationId };
 }
 
 async function handleStatus() {
   if (!state.conversationId) return { status: state.status, conversation_id: null };
   try {
-    const info = await agentFetch(`/conversations/${state.conversationId}`);
+    const info = await getConversationStatus(state.conversationId);
     const status = info.execution_status ?? "running";
     if (["finished", "error", "stuck"].includes(status)) {
       state.status = status === "finished" ? "finished" : "error";
@@ -137,14 +137,12 @@ async function handleResult() {
 }
 
 async function readChapters() {
-  // Агент пишет главы в <workingDir>/<project_subdir>/*.md
-  if (!state.workingDir) return [];
-  const dir = path.join(state.workingDir, config.project_subdir);
+  if (!state.hostWorkDir) return [];
   try {
-    const files = (await readdir(dir)).filter((f) => f.endsWith(".md")).sort();
+    const files = (await readdir(state.hostWorkDir)).filter((f) => f.endsWith(".md")).sort();
     const out = [];
     for (const f of files) {
-      const text = await readFile(path.join(dir, f), "utf-8");
+      const text = await readFile(path.join(state.hostWorkDir, f), "utf-8");
       out.push({ file: f, text });
     }
     return out;
@@ -154,7 +152,6 @@ async function readChapters() {
 }
 
 async function buildSite() {
-  // Статик-генератор: главы -> простой HTML-сайт в out/.
   const outDir = path.join(__dirname, "out");
   await mkdir(outDir, { recursive: true });
   const chapters = await readChapters();

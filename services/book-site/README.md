@@ -26,21 +26,19 @@ node server.mjs
 | --- | --- |
 | `port` | порт публикации сервиса (входит в диапазон 8290–8300, уже открыт в Docker) |
 | `scenario.system_prompt` | сценарий/роль агента |
-| `scenario.title_template` | шаблон заголовка диалога |
 | `skills`, `mcp_servers` | какие скиллы/MCP включить для этой функции |
-| `project_subdir` | где агент пишет главы в проекте |
+| `project_subdir` | подпапка рабочей директории, где агент пишет главы |
+| `max_iterations` | лимит итераций агента |
+
+## Как это работает
+
+`server.mjs` использует общий хелпер `../lib/agent-server.mjs`:
+- `startConversation({ workingDir, prompt })` — забирает настройки агента с
+  единого бэкенда (`GET /api/settings`) и создаёт диалог (`POST /api/conversations`);
+- `getConversationStatus(id)` — опрашивает статус.
+Маппинг путей: бэкенд пишет в `/projects/<subdir>`, сервис читает `./projects/<subdir>`.
 
 ## Endpoints
 
 `GET /` (тонкий фронтенд) · `GET /health` · `POST /api/run` · `GET /api/status` ·
 `GET /api/result` · `GET /out/*` (опубликованный сайт)
-
-## Следующие шаги для реального деплоя
-
-1. Уточнить контракт создания диалога в `server.mjs` под актуальный API
-   agent-server (поля `initial_message`, `conversation_instructions`, получение
-   `workspace.working_dir`).
-2. Добавить отдельный `Dockerfile` и зарегистрировать порт сервиса в
-   `docker-compose.yml`.
-3. Заменить «одна задача» на `Map<id, задача>`, если сервис должен обслуживать
-   много пользователей одновременно.
