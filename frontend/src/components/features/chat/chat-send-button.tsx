@@ -16,10 +16,10 @@ export function ChatSendButton({
     <button
       type="button"
       className={cn(
-        "flex items-center justify-center rounded-full border border-white size-8",
+        "flex items-center justify-center rounded-full border size-8 border-[var(--oh-border)] text-[var(--oh-foreground)]",
         disabled
-          ? "cursor-not-allowed border-[var(--oh-muted)]"
-          : "cursor-pointer hover:bg-white/10",
+          ? "cursor-not-allowed opacity-50"
+          : "cursor-pointer hover:bg-[var(--oh-interactive-hover)]",
         buttonClassName,
       )}
       data-name="arrow-up-circle-fill"
@@ -27,10 +27,7 @@ export function ChatSendButton({
       onClick={handleSubmit}
       disabled={disabled}
     >
-      <ArrowUp
-        className="w-4 h-4"
-        color={disabled ? "var(--oh-muted)" : "white"}
-      />
+      <ArrowUp className="w-4 h-4" color="currentColor" />
     </button>
   );
 }
