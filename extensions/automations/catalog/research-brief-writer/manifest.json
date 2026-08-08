@@ -1,8 +1,8 @@
 {
   "id": "research-brief-writer",
-  "name": "Research brief writer",
-  "category": "Research",
-  "description": "Monitor a topic, gather sources from the web, and publish a short brief for your team.",
+  "name": "Автор исследовательских брифов",
+  "category": "Исследования",
+  "description": "Отслеживает тему, собирает источники в вебе и публикует короткий бриф для вашей команды.",
   "requires": {
     "integrations": {
       "tavily": {

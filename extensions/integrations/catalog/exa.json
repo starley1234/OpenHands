@@ -1,7 +1,7 @@
 {
   "id": "exa",
   "name": "Exa",
-  "description": "Neural web search with semantic ranking, content extraction, and similar-page lookup.",
+  "description": "Нейровеб-поиск с семантическим ранжированием, извлечением контента и поиском похожих страниц.",
   "docsUrl": "https://docs.exa.ai/reference/exa-mcp",
   "iconBg": "var(--oh-surface)",
   "keywords": [

@@ -1,7 +1,7 @@
 {
   "id": "atlassian",
-  "name": "Atlassian (Jira & Confluence)",
-  "description": "Search Jira issues, manage tickets, and read Confluence pages from your agent.",
+  "name": "Atlassian (Jira и Confluence)",
+  "description": "Ищите задачи Jira, управляйте тикетами и читайте страницы Confluence из агента.",
   "categories": [
     "Project management",
     "Documentation"

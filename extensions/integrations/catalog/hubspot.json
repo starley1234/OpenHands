@@ -1,7 +1,7 @@
 {
   "id": "hubspot",
   "name": "HubSpot",
-  "description": "CRM, marketing, tickets, and customer lifecycle workflows.",
+  "description": "CRM, маркетинг, тикеты и рабочие процессы жизненного цикла клиентов.",
   "categories": [
     "CRM",
     "Marketing"

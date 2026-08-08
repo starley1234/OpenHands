@@ -1,7 +1,7 @@
 {
   "id": "zoom",
   "name": "Zoom",
-  "description": "Meetings, recordings, webinars, and scheduling operations.",
+  "description": "Встречи, записи, вебинары и операции планирования.",
   "categories": [
     "Meetings",
     "Calendar"

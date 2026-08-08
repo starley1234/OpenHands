@@ -1,7 +1,7 @@
 {
   "id": "microsoft-outlook",
   "name": "Microsoft Outlook",
-  "description": "Mail, calendar, contacts, and meeting workflows through Microsoft Graph.",
+  "description": "Почта, календарь, контакты и рабочие процессы встреч через Microsoft Graph.",
   "categories": [
     "Email",
     "Calendar"

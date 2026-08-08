@@ -1,7 +1,7 @@
 {
   "id": "google-sheets",
   "name": "Google Sheets",
-  "description": "Spreadsheet reads, writes, formulas, and reporting workflows.",
+  "description": "Чтение и запись таблиц, формулы и рабочие процессы отчётов.",
   "categories": [
     "Spreadsheets",
     "Analytics"

@@ -1,7 +1,7 @@
 {
   "id": "cloudflare-docs",
   "name": "Cloudflare Docs",
-  "description": "Search and reference Cloudflare's developer documentation directly from the agent.",
+  "description": "Ищите и используйте документацию разработчика Cloudflare прямо из агента.",
   "docsUrl": "https://developers.cloudflare.com/agents/model-context-protocol/",
   "iconBg": "#F38020",
   "logoUrl": "https://cdn.simpleicons.org/cloudflare/FFFFFF",

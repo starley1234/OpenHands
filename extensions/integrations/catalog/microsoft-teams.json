@@ -1,7 +1,7 @@
 {
   "id": "microsoft-teams",
   "name": "Microsoft Teams",
-  "description": "Chats, channels, meetings, and collaboration via Microsoft Graph.",
+  "description": "Чаты, каналы, встречи и совместная работа через Microsoft Graph.",
   "categories": [
     "Communication",
     "Enterprise"

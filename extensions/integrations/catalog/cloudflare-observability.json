@@ -1,7 +1,7 @@
 {
   "id": "cloudflare-observability",
   "name": "Cloudflare Observability",
-  "description": "Tail Workers logs and query observability data from your Cloudflare account.",
+  "description": "Смотрите логи Workers и запрашивайте данные наблюдаемости из вашего аккаунта Cloudflare.",
   "docsUrl": "https://developers.cloudflare.com/agents/model-context-protocol/",
   "iconBg": "#F38020",
   "logoUrl": "https://cdn.simpleicons.org/cloudflare/FFFFFF",

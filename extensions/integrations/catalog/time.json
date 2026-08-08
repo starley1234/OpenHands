@@ -1,7 +1,7 @@
 {
   "id": "time",
   "name": "Time",
-  "description": "Timezone-aware current time, conversions, and timestamp formatting.",
+  "description": "Текущее время с учётом часового пояса, конвертация и форматирование меток времени.",
   "docsUrl": "https://github.com/modelcontextprotocol/servers/tree/main/src/time",
   "iconBg": "var(--oh-surface)",
   "keywords": [

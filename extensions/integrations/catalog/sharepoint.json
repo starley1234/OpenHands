@@ -1,7 +1,7 @@
 {
   "id": "sharepoint",
   "name": "SharePoint",
-  "description": "Sites, document libraries, lists, and intranet content.",
+  "description": "Сайты, библиотеки документов, списки и интранет-контент.",
   "categories": [
     "Knowledge base",
     "Enterprise"

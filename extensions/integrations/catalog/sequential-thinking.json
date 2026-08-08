@@ -1,7 +1,7 @@
 {
   "id": "sequential-thinking",
-  "name": "Sequential Thinking",
-  "description": "Lets the agent emit and revise a chain of structured thoughts.",
+  "name": "Последовательное мышление",
+  "description": "Позволяет агенту строить и пересматривать цепочку структурированных размышлений.",
   "docsUrl": "https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking",
   "iconBg": "var(--oh-color-base)",
   "keywords": [

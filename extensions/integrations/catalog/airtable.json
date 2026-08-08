@@ -1,7 +1,7 @@
 {
   "id": "airtable",
   "name": "Airtable",
-  "description": "List bases, query records, and update fields across your Airtable workspace.",
+  "description": "Просматривайте базы, запрашивайте записи и обновляйте поля в вашем рабочем пространстве Airtable.",
   "categories": [
     "Database",
     "Operations"

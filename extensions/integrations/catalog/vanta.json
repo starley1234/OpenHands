@@ -1,7 +1,7 @@
 {
   "id": "vanta",
   "name": "Vanta",
-  "description": "Query Vanta compliance controls, tests, evidence, risks, and vulnerabilities from the agent.",
+  "description": "Запрашивайте контрольные меры соответствия Vanta, тесты, свидетельства, риски и уязвимости.",
   "categories": [
     "Security",
     "Compliance"

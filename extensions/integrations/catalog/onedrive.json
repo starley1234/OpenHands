@@ -1,7 +1,7 @@
 {
   "id": "onedrive",
   "name": "OneDrive",
-  "description": "Cloud file access and document workflows through Microsoft Graph.",
+  "description": "Доступ к облачным файлам и документные рабочие процессы через Microsoft Graph.",
   "categories": [
     "Storage",
     "Documents"

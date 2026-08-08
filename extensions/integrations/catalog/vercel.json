@@ -1,7 +1,7 @@
 {
   "id": "vercel",
   "name": "Vercel",
-  "description": "Deployments, projects, domains, and preview environment workflows.",
+  "description": "Деплои, проекты, домены и рабочие процессы preview-окружений.",
   "categories": [
     "Developer tools",
     "Deployment"

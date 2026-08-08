@@ -1,7 +1,7 @@
 {
   "id": "confluence",
   "name": "Confluence",
-  "description": "Wiki pages, spaces, and internal documentation search.",
+  "description": "Вики-страницы, пространства и поиск по внутренней документации.",
   "categories": [
     "Documentation",
     "Knowledge base"

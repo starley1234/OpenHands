@@ -1,7 +1,7 @@
 {
   "id": "git",
   "name": "Git",
-  "description": "Local git repository operations: log, diff, blame, status, and more.",
+  "description": "Операции с локальным git-репозиторием: log, diff, blame, status и другое.",
   "docsUrl": "https://github.com/modelcontextprotocol/servers/tree/main/src/git",
   "iconBg": "#F1502F",
   "keywords": [

@@ -1,7 +1,7 @@
 {
   "name": "qa-changes",
   "version": "0.1.0",
-  "description": "Automated QA validation of PR changes — sets up the environment, runs tests, exercises changed behavior, and reports results",
+  "description": "Автоматическая QA-проверка изменений PR — настраивает окружение, запускает тесты, проверяет изменённое поведение и сообщает результаты.",
   "author": {
     "name": "OpenHands",
     "email": "contact@all-hands.dev"

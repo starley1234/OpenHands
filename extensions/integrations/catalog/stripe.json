@@ -1,7 +1,7 @@
 {
   "id": "stripe",
   "name": "Stripe",
-  "description": "Query customers, payments, subscriptions, and invoices via Stripe's hosted MCP server.",
+  "description": "Запрашивайте клиентов, платежи, подписки и счета через хостируемый MCP-сервер Stripe.",
   "categories": [
     "Payments",
     "Finance"

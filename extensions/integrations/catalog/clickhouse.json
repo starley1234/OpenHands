@@ -1,7 +1,7 @@
 {
   "id": "clickhouse",
   "name": "ClickHouse",
-  "description": "Run analytical SQL queries against a ClickHouse cluster.",
+  "description": "Выполняйте аналитические SQL-запросы к кластеру ClickHouse.",
   "docsUrl": "https://github.com/ClickHouse/mcp-clickhouse",
   "iconBg": "#FFFF00",
   "logoUrl": "https://cdn.simpleicons.org/clickhouse/000000",

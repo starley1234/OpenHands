@@ -1,7 +1,7 @@
 {
   "id": "jira",
   "name": "Jira",
-  "description": "Issue tracking, sprint workflows, and engineering program management.",
+  "description": "Отслеживание задач, спринты и управление инженерными программами.",
   "categories": [
     "Project management",
     "Engineering"

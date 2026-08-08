@@ -1,7 +1,7 @@
 {
   "id": "elevenlabs",
   "name": "ElevenLabs",
-  "description": "Generate speech, clone voices, and transcribe audio via ElevenLabs.",
+  "description": "Генерация речи, клонирование голосов и транскрибация аудио через ElevenLabs.",
   "categories": [
     "Audio",
     "AI"

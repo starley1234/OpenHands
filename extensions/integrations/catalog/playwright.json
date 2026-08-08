@@ -1,7 +1,7 @@
 {
   "id": "playwright",
   "name": "Playwright",
-  "description": "Headless-browser automation backed by Microsoft Playwright.",
+  "description": "Автоматизация headless-браузера на базе Microsoft Playwright.",
   "docsUrl": "https://github.com/microsoft/playwright-mcp",
   "iconBg": "#2EAD33",
   "keywords": [

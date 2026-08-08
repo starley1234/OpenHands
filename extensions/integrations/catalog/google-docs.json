@@ -1,7 +1,7 @@
 {
   "id": "google-docs",
   "name": "Google Docs",
-  "description": "Docs authoring and Google Workspace document automation.",
+  "description": "Авторинг документов и автоматизация документов Google Workspace.",
   "categories": [
     "Documents",
     "Knowledge base"

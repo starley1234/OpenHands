@@ -1,7 +1,7 @@
 {
   "id": "gmail",
   "name": "Gmail",
-  "description": "Mailbox search, drafting, sending, and thread triage.",
+  "description": "Поиск по почте, черновики, отправка и разбор переписки.",
   "categories": [
     "Communication",
     "Email"

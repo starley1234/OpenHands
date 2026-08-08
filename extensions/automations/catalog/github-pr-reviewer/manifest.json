@@ -1,8 +1,8 @@
 {
   "id": "github-pr-reviewer",
-  "name": "GitHub Code Review Agent",
-  "category": "Code review",
-  "description": "Watch for a configurable label on GitHub pull requests, inspect full PR and repository context, and post an AI review comment once per label event.",
+  "name": "Агент код-ревью GitHub",
+  "category": "Ревью кода",
+  "description": "Следит за заданной меткой на пулл-реквестах GitHub, изучает полный контекст PR и репозитория и публикует комментарий ИИ-ревью для каждого события метки.",
   "requires": {
     "integrations": {
       "github": {

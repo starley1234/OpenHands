@@ -1,7 +1,7 @@
 {
   "name": "release-notes",
   "version": "1.0.0",
-  "description": "Generate consistent, well-structured release notes from git history with categorized changelog, contributor attribution, and semver tag support.",
+  "description": "Генерация единообразных, структурированных release-notes из истории git: категоризированный changelog, атрибуция авторов и поддержка семантических версий.",
   "author": {
     "name": "OpenHands",
     "email": "contact@all-hands.dev"

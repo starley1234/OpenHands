@@ -1,8 +1,8 @@
 {
   "id": "github-repo-monitor",
-  "name": "GitHub repository monitor",
-  "category": "Developer tools",
-  "description": "Watch a repository for @OpenHands mentions in issues and PR comments, start a conversation, and post the agent's reply back to GitHub.",
+  "name": "Монитор репозитория GitHub",
+  "category": "Инструменты разработчика",
+  "description": "Следит за упоминаниями @OpenHands в задачах и комментариях PR репозитория, запускает диалог с контекстом сообщения.",
   "requires": {
     "integrations": {
       "github": {

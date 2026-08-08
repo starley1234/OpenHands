@@ -1,8 +1,8 @@
 {
   "id": "upstream-fork-sync",
-  "name": "Upstream fork sync",
-  "category": "Developer tools",
-  "description": "Keep a long-lived fork current with its upstream by re-running a nightly job that fetches upstream changes, rebases local customizations on top, verifies the software still works, and replaces the running version when it does.",
+  "name": "Синхронизация форка с апстримом",
+  "category": "Инструменты разработчика",
+  "description": "Поддерживает долгоживущий форк актуальным относительно апстрима, перезапуская ночную задачу, которая подтягивает изменения.",
   "requires": {
     "integrations": {
       "github": {

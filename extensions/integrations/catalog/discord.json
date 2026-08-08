@@ -1,7 +1,7 @@
 {
   "id": "discord",
   "name": "Discord",
-  "description": "Guilds, channels, messages, and community operations.",
+  "description": "Серверы, каналы, сообщения и операции сообщества.",
   "categories": [
     "Communication",
     "Community"

@@ -1,7 +1,7 @@
 {
   "id": "superhuman-mail",
   "name": "Superhuman Mail",
-  "description": "Search, read, draft, and send email via Superhuman's hosted MCP server.",
+  "description": "Ищите, читайте, составляйте и отправляйте письма через хостируемый MCP-сервер Superhuman.",
   "categories": [
     "Communication",
     "Email"

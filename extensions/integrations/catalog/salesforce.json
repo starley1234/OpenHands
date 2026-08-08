@@ -1,7 +1,7 @@
 {
   "id": "salesforce",
   "name": "Salesforce",
-  "description": "CRM records, accounts, opportunities, and sales operations.",
+  "description": "Записи CRM, аккаунты, возможности и операции продаж.",
   "categories": [
     "CRM",
     "Sales"

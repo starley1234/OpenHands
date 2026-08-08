@@ -1,7 +1,7 @@
 {
   "id": "google-calendar",
   "name": "Google Calendar",
-  "description": "Calendar search, event scheduling, and meeting coordination.",
+  "description": "Поиск по календарю, планирование событий и координация встреч.",
   "categories": [
     "Calendar",
     "Scheduling"

@@ -1,7 +1,7 @@
 {
   "id": "bitbucket",
   "name": "Bitbucket",
-  "description": "Repositories, pull requests, and Atlassian engineering workflows.",
+  "description": "Репозитории, пулл-реквесты и инженерные рабочие процессы Atlassian.",
   "categories": [
     "Engineering",
     "Source control"

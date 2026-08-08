@@ -1,7 +1,7 @@
 {
   "id": "google-drive",
   "name": "Google Drive",
-  "description": "File search, metadata, folders, and document discovery.",
+  "description": "Поиск файлов, метаданные, папки и обнаружение документов.",
   "categories": [
     "Storage",
     "Documents"

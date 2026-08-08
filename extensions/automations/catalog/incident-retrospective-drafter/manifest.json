@@ -1,8 +1,8 @@
 {
   "id": "incident-retrospective-drafter",
-  "name": "Incident retrospective drafter",
-  "category": "Reliability",
-  "description": "Collect incident chatter and issue updates, then draft a timeline and follow-up checklist.",
+  "name": "Составитель ретроспективы инцидента",
+  "category": "Надёжность",
+  "description": "Собирает обсуждение инцидента и обновления по задачам, затем готовит таймлайн и чек-лист дальнейших действий.",
   "requires": {
     "integrations": {
       "slack": {

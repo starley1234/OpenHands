@@ -1,7 +1,7 @@
 {
   "id": "slack",
   "name": "Slack",
-  "description": "Read channels, post messages, and search workspace history from your agent.",
+  "description": "Читайте каналы, публикуйте сообщения и ищите историю рабочего пространства из агента.",
   "categories": [
     "Communication",
     "Operations"

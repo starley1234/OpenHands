@@ -1,8 +1,8 @@
 {
   "id": "linear-triage-assistant",
-  "name": "Linear issue triage assistant",
-  "category": "Project management",
-  "description": "Classify new Linear issues, suggest labels, find duplicates, and ask clarifying questions.",
+  "name": "Ассистент триажа Linear",
+  "category": "Управление проектами",
+  "description": "Классифицирует новые задачи Linear, предлагает метки, находит дубликаты и задаёт уточняющие вопросы.",
   "requires": {
     "integrations": {
       "linear": {

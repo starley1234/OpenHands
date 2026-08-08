@@ -1,7 +1,7 @@
 {
   "id": "github",
   "name": "GitHub",
-  "description": "Search code, manage issues and pull requests, and inspect repos via the GitHub API.",
+  "description": "Ищите код, управляйте задачами и пулл-реквестами, просматривайте репозитории через GitHub API.",
   "categories": [
     "Engineering",
     "Source control"

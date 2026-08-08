@@ -1,7 +1,7 @@
 {
   "id": "supabase",
   "name": "Supabase",
-  "description": "Query and manage your Supabase project, including database, auth, and storage.",
+  "description": "Запрашивайте и управляйте проектом Supabase, включая базу данных, авторизацию и хранилище.",
   "categories": [
     "Database",
     "Developer tools"

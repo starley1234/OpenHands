@@ -1,7 +1,7 @@
 {
   "id": "obsidian",
   "name": "Obsidian",
-  "description": "Read and edit Markdown notes inside an Obsidian vault on the local disk.",
+  "description": "Читайте и редактируйте заметки Markdown в хранилище Obsidian на локальном диске.",
   "docsUrl": "https://github.com/MarkusPfundstein/mcp-obsidian",
   "iconBg": "#7C3AED",
   "logoUrl": "https://cdn.simpleicons.org/obsidian/FFFFFF",

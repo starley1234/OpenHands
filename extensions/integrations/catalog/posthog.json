@@ -1,7 +1,7 @@
 {
   "id": "posthog",
   "name": "PostHog",
-  "description": "Product analytics, feature flags, and session insights.",
+  "description": "Продуктовая аналитика, фиче-флаги и инсайты по сессиям.",
   "categories": [
     "Analytics",
     "Product"

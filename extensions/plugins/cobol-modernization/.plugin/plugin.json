@@ -1,7 +1,7 @@
 {
   "name": "cobol-modernization",
   "version": "1.0.0",
-  "description": "End-to-end COBOL to Java migration workflow. Handles build setup, mainframe dependency removal, and code migration with test validation.",
+  "description": "Сквозной рабочий процесс миграции COBOL → Java: настройка сборки, удаление зависимостей от мейнфрейма и миграция кода с проверкой тестами.",
   "author": {
     "name": "OpenHands",
     "email": "contact@all-hands.dev"

@@ -1,7 +1,7 @@
 {
   "id": "sentry",
   "name": "Sentry",
-  "description": "Triage issues, inspect events, and run Seer fixes against your Sentry org.",
+  "description": "Триаж проблем, просмотр событий и запуск исправлений Seer в вашей организации Sentry.",
   "categories": [
     "Observability",
     "Engineering"

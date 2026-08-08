@@ -1,7 +1,7 @@
 {
   "id": "netlify",
   "name": "Netlify",
-  "description": "Sites, builds, deploy previews, and web operations.",
+  "description": "Сайты, сборки, деплой-превью и веб-операции.",
   "categories": [
     "Deployment",
     "Developer tools"

@@ -1,7 +1,7 @@
 {
   "id": "brave-search",
   "name": "Brave Search",
-  "description": "Privacy-first web and local search using the Brave Search API.",
+  "description": "Приватный веб- и локальный поиск через API Brave Search.",
   "docsUrl": "https://github.com/brave/brave-search-mcp-server",
   "iconBg": "#FB542B",
   "logoUrl": "https://cdn.simpleicons.org/brave/FFFFFF",

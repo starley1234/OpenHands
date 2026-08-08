@@ -1,8 +1,8 @@
 {
   "id": "slack-channel-monitor",
-  "name": "Slack channel monitor",
-  "category": "Team communication",
-  "description": "Watch Slack channels for @openhands mentions, open a conversation with the message context, reply when the agent finishes, and continue the same conversation from triggered Slack thread follow-ups.",
+  "name": "Монитор канала Slack",
+  "category": "Командное общение",
+  "description": "Следит за упоминаниями @openhands в каналах Slack, открывает диалог с контекстом сообщения.",
   "requires": {
     "integrations": {
       "slack": {

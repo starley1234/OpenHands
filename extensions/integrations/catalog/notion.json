@@ -1,7 +1,7 @@
 {
   "id": "notion",
   "name": "Notion",
-  "description": "Read and edit Notion pages, databases, and blocks via Notion's MCP server.",
+  "description": "Читайте и редактируйте страницы, базы данных и блоки Notion через MCP-сервер Notion.",
   "categories": [
     "Knowledge base",
     "Documentation"

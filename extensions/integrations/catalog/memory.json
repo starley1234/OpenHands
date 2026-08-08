@@ -1,7 +1,7 @@
 {
   "id": "memory",
   "name": "Memory",
-  "description": "Persistent key-value memory for the agent across conversations.",
+  "description": "Постоянная память «ключ-значение» для агента между диалогами.",
   "docsUrl": "https://github.com/modelcontextprotocol/servers/tree/main/src/memory",
   "iconBg": "#7C3AED",
   "keywords": [

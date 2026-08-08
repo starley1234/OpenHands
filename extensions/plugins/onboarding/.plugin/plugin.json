@@ -1,7 +1,7 @@
 {
   "name": "onboarding",
   "version": "1.0.0",
-  "description": "Assess repository agent-readiness across five pillars, propose high-impact fixes, and generate repo-specific AGENTS.md files",
+  "description": "Оценка готовности репозитория к работе агента по пяти направлениям, предложение ключевых улучшений и генерация AGENTS.md для репозитория.",
   "author": {
     "name": "OpenHands",
     "email": "contact@all-hands.dev"

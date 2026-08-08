@@ -1,7 +1,7 @@
 {
   "id": "intercom",
   "name": "Intercom",
-  "description": "Customer support, conversations, inboxes, and CRM context.",
+  "description": "Поддержка клиентов, диалоги, входящие и контекст CRM.",
   "categories": [
     "Support",
     "CRM"

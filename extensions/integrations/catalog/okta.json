@@ -1,7 +1,7 @@
 {
   "id": "okta",
   "name": "Okta",
-  "description": "Identity, users, applications, and access administration.",
+  "description": "Идентификация, пользователи, приложения и администрирование доступа.",
   "categories": [
     "Identity",
     "Enterprise"

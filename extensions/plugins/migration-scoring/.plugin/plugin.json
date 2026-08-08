@@ -1,7 +1,7 @@
 {
   "name": "migration-scoring",
   "version": "1.0.0",
-  "description": "Evaluate code migration quality with coverage, correctness, and style scoring. Generates executive reports with actionable recommendations.",
+  "description": "Оценка качества миграции кода по покрытию, корректности и стилю. Формирует исполнительные отчёты с практическими рекомендациями.",
   "author": {
     "name": "OpenHands",
     "email": "contact@all-hands.dev"

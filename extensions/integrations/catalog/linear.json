@@ -1,7 +1,7 @@
 {
   "id": "linear",
   "name": "Linear",
-  "description": "Browse and update Linear issues, cycles, and projects from the agent.",
+  "description": "Просматривайте и обновляйте задачи, циклы и проекты Linear из агента.",
   "categories": [
     "Project management",
     "Engineering"

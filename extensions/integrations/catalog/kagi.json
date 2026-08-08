@@ -1,7 +1,7 @@
 {
   "id": "kagi",
   "name": "Kagi Search",
-  "description": "Paid, privacy-first search with high signal-to-noise \u2014 great for research.",
+  "description": "Платный, приватный поиск с высоким соотношением сигнала к шуму — отлично для исследований.",
   "docsUrl": "https://github.com/kagisearch/kagimcp",
   "iconBg": "#FFB319",
   "logoUrl": "https://cdn.simpleicons.org/kagi/000000",

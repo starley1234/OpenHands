@@ -1,7 +1,7 @@
 {
   "id": "filesystem",
   "name": "Filesystem",
-  "description": "Give the agent secure, scoped filesystem access outside the workspace.",
+  "description": "Дайте агенту безопасный, ограниченный доступ к файловой системе вне рабочего пространства.",
   "docsUrl": "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem",
   "iconBg": "var(--oh-interactive-hover)",
   "keywords": [

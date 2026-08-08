@@ -1,7 +1,7 @@
 {
   "id": "deepwiki",
   "name": "DeepWiki",
-  "description": "Ask grounded questions about any public GitHub repository via Devin's DeepWiki MCP.",
+  "description": "Задавайте обоснованные вопросы о любом публичном репозитории GitHub через DeepWiki MCP.",
   "docsUrl": "https://docs.devin.ai/work-with-devin/deepwiki-mcp",
   "iconBg": "var(--oh-color-base)",
   "keywords": [

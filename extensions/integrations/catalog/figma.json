@@ -1,7 +1,7 @@
 {
   "id": "figma",
   "name": "Figma",
-  "description": "Read Figma frames, components, and styles to ground UI work in your designs.",
+  "description": "Читайте фреймы, компоненты и стили Figma, чтобы опираться на дизайн в работе с UI.",
   "categories": [
     "Design",
     "Frontend"

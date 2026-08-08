@@ -1,7 +1,7 @@
 {
   "id": "datadog",
   "name": "Datadog",
-  "description": "Logs, metrics, monitors, incidents, and observability workflows.",
+  "description": "Логи, метрики, мониторы, инциденты и рабочие процессы наблюдаемости.",
   "categories": [
     "Observability",
     "Operations"

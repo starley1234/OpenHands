@@ -1,7 +1,7 @@
 {
   "id": "quickbooks",
   "name": "QuickBooks",
-  "description": "Accounting, invoices, customers, and financial operations via the QuickBooks Online MCP server.",
+  "description": "Бухгалтерия, счета, клиенты и финансовые операции через QuickBooks Online.",
   "categories": [
     "Finance",
     "Accounting"

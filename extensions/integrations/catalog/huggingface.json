@@ -1,7 +1,7 @@
 {
   "id": "huggingface",
   "name": "Hugging Face",
-  "description": "Search models, datasets, and Spaces on the Hugging Face Hub from your agent.",
+  "description": "Ищите модели, датасеты и Spaces на Hugging Face Hub из агента.",
   "docsUrl": "https://huggingface.co/docs/huggingface_hub/en/guides/mcp",
   "iconBg": "#FFD21E",
   "logoUrl": "https://cdn.simpleicons.org/huggingface/000000",

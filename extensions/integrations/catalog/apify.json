@@ -1,7 +1,7 @@
 {
   "id": "apify",
   "name": "Apify Actors",
-  "description": "Run any of Apify's 5,000+ Actors (scrapers, automations) from the agent.",
+  "description": "Запускайте любые из 5000+ акторов Apify (скрейперы, автоматизации) прямо из агента.",
   "docsUrl": "https://docs.apify.com/platform/integrations/mcp",
   "iconBg": "#10b981",
   "keywords": [

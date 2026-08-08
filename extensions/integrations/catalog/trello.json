@@ -1,7 +1,7 @@
 {
   "id": "trello",
   "name": "Trello",
-  "description": "Boards, cards, checklists, and lightweight project planning.",
+  "description": "Доски, карточки, чек-листы и лёгкое планирование проектов.",
   "categories": [
     "Project management",
     "Operations"

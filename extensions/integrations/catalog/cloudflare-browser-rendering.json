@@ -1,7 +1,7 @@
 {
   "id": "cloudflare-browser-rendering",
   "name": "Cloudflare Browser Rendering",
-  "description": "Fetch and screenshot pages using Cloudflare's hosted browser rendering.",
+  "description": "Получайте и делайте скриншоты страниц через облачный рендеринг браузера Cloudflare.",
   "docsUrl": "https://developers.cloudflare.com/agents/model-context-protocol/",
   "iconBg": "#F38020",
   "logoUrl": "https://cdn.simpleicons.org/cloudflare/FFFFFF",

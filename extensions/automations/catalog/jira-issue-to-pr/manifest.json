@@ -1,8 +1,8 @@
 {
   "id": "jira-issue-to-pr",
-  "name": "Jira issue to GitHub PR",
-  "category": "Project management",
-  "description": "Watch a Jira Cloud project for issues with a configurable label and automatically open a GitHub pull request for each new issue found. The target GitHub repo is read from the ticket body - no repo parameter required at deploy time.",
+  "name": "Задача Jira в PR GitHub",
+  "category": "Управление проектами",
+  "description": "Следит за проектом Jira Cloud на предмет задач с заданной меткой и автоматически открывает PR в GitHub.",
   "requires": {
     "integrations": {
       "jira": {

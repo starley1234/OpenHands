@@ -1,7 +1,7 @@
 {
   "id": "mongodb",
   "name": "MongoDB",
-  "description": "Query MongoDB collections, inspect schemas, and run aggregation pipelines.",
+  "description": "Запрашивайте коллекции MongoDB, смотрите схемы и запускайте агрегационные пайплайны.",
   "docsUrl": "https://www.mongodb.com/docs/mcp-server/",
   "iconBg": "#00684A",
   "logoUrl": "https://cdn.simpleicons.org/mongodb/FFFFFF",
