@@ -1006,7 +1006,12 @@ function CloudLoginColumn({
     <div className="flex w-full min-w-0 flex-col items-center gap-3">
       {showBranding ? (
         <div className="flex flex-col items-center gap-1">
-          <OpenHandsLogoWhite width={56} height={56} aria-hidden />
+          <OpenHandsLogoWhite
+            width={56}
+            height={56}
+            aria-hidden
+            className="[&_path:not([fill=transparent])]:fill-current"
+          />
 
           <h4
             className={modalTitleLgMediumClassName}
@@ -1379,6 +1384,7 @@ function AddBackendChooser({
               width={32}
               height={32}
               data-testid="add-backend-option-cloud-logo"
+              className="[&_path:not([fill=transparent])]:fill-current"
             />
           }
           onSelect={setSelectedOption}

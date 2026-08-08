@@ -24,9 +24,8 @@ ARG AGENT_SERVER_IMAGE
 ARG AUTOMATION_VERSION
 
 # ── Stage 1: Build frontend ──────────────────────────────────────────────────
-# Build context is the repo ROOT (../ from frontend/), so paths are prefixed
-# with `frontend/`. This lets the final stage also build the local
-# software-agent-sdk backend.
+# Build context is the repo ROOT, so paths are prefixed with `frontend/`.
+# This lets the final stage also build the local software-agent-sdk backend.
 FROM node:24-slim AS frontend-build
 
 WORKDIR /build
@@ -191,7 +190,7 @@ COPY extensions/ /opt/agent-canvas/extensions/
 ENV EXTENSIONS_REPO=/opt/agent-canvas/extensions
 
 # Copy the entrypoint
-COPY frontend/docker/entrypoint.sh /opt/agent-canvas/entrypoint.sh
+COPY docker/entrypoint.sh /opt/agent-canvas/entrypoint.sh
 # Normalize line endings: if the working copy was checked out with CRLF
 # (common on Windows / WSL with core.autocrlf=true), the `#!/usr/bin/env bash`
 # shebang becomes `bash\r` and the container dies with

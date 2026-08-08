@@ -143,7 +143,18 @@ docker run -it --rm \
 
 ## 5. Пример `docker-compose.yml`
 
-Удобный способ держать настройки в репозитории:
+В этом репозитории готовый `docker-compose.yml` лежит **в корне** проекта (рядом с ним —
+шаблон `.env.example` и сборка `docker/Dockerfile`). Он собирает твой локальный код
+(фронтенд + `software-agent-sdk` + вендоренный каталог `extensions/`), а не публичный образ.
+Просто скопируй `.env.example` в `.env` в корне, заполни и запусти из корня:
+
+```sh
+cp .env.example .env
+docker compose up -d
+```
+
+Ниже — минимальный пример, если ты хочешь собрать свой compose с нуля (публичный образ
+`ghcr.io/openhands/agent-canvas`):
 
 ```yaml
 services:
@@ -338,9 +349,10 @@ rm -rf extensions && cp -r /tmp/ext extensions && rm -rf extensions/.git
 ## 7. Сборка своего образа (опционально)
 
 Если вы изменили код этого репозитория (например, нашу новую светлую тему) и хотите собрать
-образ с изменениями:
+образ с изменениями — из каталога `frontend/` (там живёт скрипт сборки):
 
 ```sh
+cd frontend
 node scripts/docker-build.mjs --tag ghcr.io/<you>/agent-canvas:my-custom
 ```
 

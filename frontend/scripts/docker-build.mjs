@@ -50,7 +50,7 @@ const cmd = [
   "docker",
   "build",
   "-f",
-  "frontend/docker/Dockerfile",
+  "docker/Dockerfile",
   "--build-arg",
   `AGENT_SERVER_IMAGE=${agentServerImage}`,
   "--build-arg",

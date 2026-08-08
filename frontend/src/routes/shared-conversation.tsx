@@ -84,7 +84,11 @@ export default function SharedConversation() {
             className="flex-shrink-0"
             aria-label={t(I18nKey.BRANDING$OPENHANDS_LOGO)}
           >
-            <OpenHandsLogo width={46} height={30} />
+            <OpenHandsLogo
+              width={46}
+              height={30}
+              className="[&_path:not([fill=transparent])]:fill-current"
+            />
           </Link>
           <div className="flex-1 min-w-0">
             <h1 className="text-xl font-medium mb-2">

@@ -218,7 +218,7 @@ function FilesTab() {
             <RefreshIcon
               width={12.75}
               height={15}
-              color="#ffffff"
+              color="currentColor"
               className={isFetchingGitChanges ? "animate-spin" : ""}
             />
           </button>
