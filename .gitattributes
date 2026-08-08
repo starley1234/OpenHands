@@ -1,0 +1,13 @@
+# Force LF line endings for text/executable files so they work on Windows/WSL
+# even when core.autocrlf is enabled. A CRLF shebang breaks `#!/usr/bin/env bash`.
+*.sh     text eol=lf
+*.mjs    text eol=lf
+*.cjs    text eol=lf
+*.js     text eol=lf
+*.ts     text eol=lf
+*.tsx    text eol=lf
+*.json   text eol=lf
+*.md     text eol=lf
+*.py     text eol=lf
+*.yml    text eol=lf
+*.yaml   text eol=lf
