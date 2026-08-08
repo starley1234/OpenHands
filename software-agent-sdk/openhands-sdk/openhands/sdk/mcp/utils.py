@@ -148,6 +148,27 @@ def _require_native_mcp_config(
     return dict(mcp_config)
 
 
+def _is_tool_disabled(advertised: str, disabled: frozenset[str]) -> bool:
+    """Whether an advertised MCP tool should be withheld.
+
+    Matches a disabled name exactly, or when the advertised name is a
+    server-prefixed variant of a disabled name (or vice-versa). Some MCP
+    servers advertise tools with a server-name prefix (e.g.
+    ``openscad_render_png_base64``) while the user disabled the tool by its
+    base name (``render_png_base64``), and the reverse can also happen if the
+    catalog / test probe strips the prefix. The match is anchored on a ``_``
+    boundary so ``render`` never accidentally withholds ``render_png``.
+    """
+    if advertised in disabled:
+        return True
+    for disabled_name in disabled:
+        if disabled_name.endswith("_" + advertised) or advertised.endswith(
+            "_" + disabled_name
+        ):
+            return True
+    return False
+
+
 async def log_handler(message: LogMessage):
     """
     Handles incoming logs from the MCP server and forwards them
@@ -198,23 +219,26 @@ async def _refresh_tools(
             "MCP server advertised tools: %s",
             ", ".join(sorted(server_names)) or "none",
         )
-        hidden = [name for name in server_names if name in disabled]
+        hidden = [
+            name for name in server_names if _is_tool_disabled(name, disabled)
+        ]
         if hidden:
             logger.info(
                 "MCP server withholding disabled tools: %s",
                 ", ".join(sorted(hidden)),
             )
-            mcp_type_tools = [
-                t for t in mcp_type_tools if t.name not in disabled
-            ]
+            withheld = {
+                t.name for t in mcp_type_tools if _is_tool_disabled(t.name, disabled)
+            }
+            mcp_type_tools = [t for t in mcp_type_tools if t.name not in withheld]
             logger.info(
                 "MCP server available tools after withholding: %s",
                 ", ".join(sorted(t.name for t in mcp_type_tools)) or "none",
             )
         else:
             # Configured disabled names but none matched the advertised tool
-            # list — likely a name mismatch (e.g. prefixed tool names) or a
-            # stale entry. Surface it so it isn't silently ignored.
+            # list — likely a stale entry. Surface it so it isn't silently
+            # ignored.
             logger.warning(
                 "MCP disabled tool names (%s) matched none of the %d advertised "
                 "tools (%s)",

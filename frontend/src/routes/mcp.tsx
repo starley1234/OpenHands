@@ -100,7 +100,18 @@ export default function MCPPage() {
   ) => {
     const current = new Set(server.disabled_tools ?? []);
     if (enabled) {
-      current.delete(toolName);
+      // Re-enabling a tool clears both its exact entry and any server-prefixed
+      // (or base) variant so the SDK's suffix-aware withholding can't keep it
+      // hidden behind a differently-named entry.
+      for (const name of [...current]) {
+        if (
+          name === toolName ||
+          name.endsWith(`_${toolName}`) ||
+          toolName.endsWith(`_${name}`)
+        ) {
+          current.delete(name);
+        }
+      }
     } else {
       current.add(toolName);
     }

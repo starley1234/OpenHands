@@ -27,10 +27,24 @@ export function McpServerToolsSection({
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  const disabledSet = React.useMemo(
-    () => new Set(server.disabled_tools ?? []),
+  const disabledList = React.useMemo(
+    () => server.disabled_tools ?? [],
     [server.disabled_tools],
   );
+  const disabledSet = React.useMemo(() => new Set(disabledList), [disabledList]);
+
+  // Some MCP servers advertise tool names with a server-name prefix (e.g.
+  // `openscad_render_png_base64`), while the disabled list may hold the base
+  // name (`render_png_base64`) — or the reverse if the probe stripped it.
+  // Mirror the SDK's matching so the checkbox reflects what the runtime will
+  // actually withhold: exact, or one name being the `_`-suffixed variant of
+  // the other.
+  const isEffectivelyDisabled = (toolName: string) =>
+    disabledSet.has(toolName) ||
+    disabledList.some(
+      (name) =>
+        name.endsWith(`_${toolName}`) || toolName.endsWith(`_${name}`),
+    );
 
   const handleToggle = async () => {
     if (open) {
@@ -95,7 +109,7 @@ export function McpServerToolsSection({
           ) : (
             <div className="max-h-48 overflow-y-auto">
               {tools.map((toolName) => {
-                const isEnabled = !disabledSet.has(toolName);
+                const isEnabled = !isEffectivelyDisabled(toolName);
                 return (
                   <label
                     key={toolName}
