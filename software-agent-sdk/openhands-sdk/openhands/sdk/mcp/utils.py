@@ -191,6 +191,13 @@ async def _refresh_tools(
     # the runtime tools/list_changed reconciliation.
     disabled = getattr(client, "_disabled_tool_names", frozenset())
     if disabled:
+        # Log the full advertised list too so it's unambiguous which tools the
+        # server actually exposes and whether disabled names line up (some
+        # servers prefix tool names with the server name, e.g. openscad_*).
+        logger.info(
+            "MCP server advertised tools: %s",
+            ", ".join(sorted(server_names)) or "none",
+        )
         hidden = [name for name in server_names if name in disabled]
         if hidden:
             logger.info(
@@ -200,6 +207,10 @@ async def _refresh_tools(
             mcp_type_tools = [
                 t for t in mcp_type_tools if t.name not in disabled
             ]
+            logger.info(
+                "MCP server available tools after withholding: %s",
+                ", ".join(sorted(t.name for t in mcp_type_tools)) or "none",
+            )
         else:
             # Configured disabled names but none matched the advertised tool
             # list — likely a name mismatch (e.g. prefixed tool names) or a
