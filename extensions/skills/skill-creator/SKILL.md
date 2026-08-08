@@ -1,30 +1,30 @@
 ---
 name: skill-creator
-description: This skill should be used when the user wants to "create a skill", "write a new skill", "improve skill description", "organize skill content", or needs guidance on skill structure, progressive disclosure, or skill development best practices.
+description: Этот навык следует использовать, когда пользователь хочет «создать навык», «написать новый навык», «улучшить описание навыка», «организовать содержимое навыка» или ему нужны рекомендации по структуре навыков, прогрессивному раскрытию или лучшим практикам разработки навыков.
 ---
 
 # Skill Creator
 
-This skill provides guidance for creating effective skills.
-Windows PowerShell equivalents for the Unix shell commands used in examples are in `references/windows.md`.
+Этот навык даёт рекомендации по созданию эффективных навыков.
+Эквиваленты для Windows PowerShell команд Unix shell, используемых в примерах, — в `references/windows.md`.
 
-## About Skills
+## О навыках
 
-Skills are modular, self-contained packages that extend OpenHands's capabilities by providing
-specialized knowledge, workflows, and tools. Think of them as "onboarding guides" for specific
-domains or tasks—they transform OpenHands from a general-purpose agent into a specialized agent
-equipped with procedural knowledge that no model can fully possess.
+Навыки — это модульные, автономные пакеты, расширяющие возможности OpenHands, предоставляя
+специализированные знания, рабочие процессы и инструменты. Думай о них как о «гидах по онбордингу» для
+конкретных доменов или задач — они превращают OpenHands из агента общего назначения в специализированного
+агента, оснащённого процедурными знаниями, которыми не обладает ни одна модель.
 
-### What Skills Provide
+### Что дают навыки
 
-1. Specialized workflows - Multi-step procedures for specific domains
-2. Tool integrations - Instructions for working with specific file formats or APIs
-3. Domain expertise - Company-specific knowledge, schemas, business logic
-4. Bundled resources - Scripts, references, and assets for complex and repetitive tasks
+1. Специализированные рабочие процессы — многошаговые процедуры для конкретных доменов
+2. Интеграции инструментов — инструкции по работе с конкретными форматами файлов или API
+3. Доменная экспертиза — специфичные для компании знания, схемы, бизнес-логика
+4. Встроенные ресурсы — скрипты, справочники и ассеты для сложных и повторяющихся задач
 
-### Anatomy of a Skill
+### Анатомия навыка
 
-Every skill consists of a required SKILL.md file and optional bundled resources:
+Каждый навык состоит из обязательного файла SKILL.md и опциональных встроенных ресурсов:
 
 ```
 skill-name/
@@ -39,131 +39,131 @@ skill-name/
     └── assets/           - Files used in output (templates, icons, fonts, etc.)
 ```
 
-#### SKILL.md (required)
+#### SKILL.md (обязательный)
 
-**Metadata Quality:** The `name` and `description` in YAML frontmatter determine when OpenHands will use the skill. Be specific about what the skill does and when to use it. Use the third-person (e.g. "This skill should be used when..." instead of "Use this skill when...").
+**Качество метаданных:** Поля `name` и `description` в YAML frontmatter определяют, когда OpenHands будет использовать навык. Будь конкретен о том, что делает навык и когда его использовать. Используй третье лицо (например, «This skill should be used when...» вместо «Use this skill when...»).
 
-**Slash commands vs keyword triggers:** SKILL.md frontmatter supports an optional `triggers:` field for keyword-based activation (e.g., `triggers: [docker, container]`). For **slash commands** (e.g., `/codereview`, `/init`), prefer creating a `commands/command-name.md` file in the plugin's `commands/` directory instead of using slash triggers in SKILL.md. Slash triggers still work for backward compatibility but are deprecated in favor of the `commands/` approach. See the [Plugins guide](https://docs.openhands.dev/sdk/guides/plugins) for details.
+**Слэш-команды против ключевых триггеров:** Frontmatter SKILL.md поддерживает опциональное поле `triggers:` для активации по ключевым словам (например, `triggers: [docker, container]`). Для **слэш-команд** (например, `/codereview`, `/init`) предпочитай создание файла `commands/command-name.md` в каталоге `commands/` плагина вместо использования слэш-триггеров в SKILL.md. Слэш-триггеры всё ещё работают для обратной совместимости, но считаются устаревшими в пользу подхода `commands/`. См. [руководство по плагинам](https://docs.openhands.dev/sdk/guides/plugins) для деталей.
 
-#### Bundled Resources (optional)
+#### Встроенные ресурсы (опционально)
 
-##### Scripts (`scripts/`)
+##### Скрипты (`scripts/`)
 
-Executable code (Python/Bash/etc.) for tasks that require deterministic reliability or are repeatedly rewritten.
+Исполняемый код (Python/Bash и т.д.) для задач, требующих детерминированной надёжности или повторяемого переписывания.
 
-- **When to include**: When the same code is being rewritten repeatedly or deterministic reliability is needed
-- **Example**: `scripts/rotate_pdf.py` for PDF rotation tasks
-- **Benefits**: Token efficient, deterministic, may be executed without loading into context
-- **Note**: Scripts may still need to be read by OpenHands for patching or environment-specific adjustments
-- **Python dependencies**: Use `uv` instead of `pip` or `pip3` for all Python dependency installs. `uv` is cross-platform, faster, and avoids the `pip`/`pip3` naming inconsistency across environments. Example: `uv venv .venv --quiet && uv pip install --quiet <package>`
+- **Когда включать**: Когда один и тот же код переписывается повторно или нужна детерминированная надёжность
+- **Пример**: `scripts/rotate_pdf.py` для задач поворота PDF
+- **Преимущества**: Экономия токенов, детерминизм, может выполняться без загрузки в контекст
+- **Примечание**: OpenHands всё равно может понадобиться прочитать скрипты для патчинга или корректировок под окружение
+- **Python-зависимости**: Для всех установок Python-зависимостей используй `uv` вместо `pip` или `pip3`. `uv` кроссплатформен, быстрее и избегает несоответствия имён `pip`/`pip3` в разных средах. Пример: `uv venv .venv --quiet && uv pip install --quiet <package>`
 
-##### References (`references/`)
+##### Справочники (`references/`)
 
-Documentation and reference material intended to be loaded as needed into context to inform OpenHands's process and thinking.
+Документация и справочные материалы, предназначенные для загрузки в контекст по мере необходимости, чтобы информировать процесс и мышление OpenHands.
 
-- **When to include**: For documentation that OpenHands should reference while working
-- **Examples**: `references/finance.md` for financial schemas, `references/mnda.md` for company NDA template, `references/policies.md` for company policies, `references/api_docs.md` for API specifications
-- **Use cases**: Database schemas, API documentation, domain knowledge, company policies, detailed workflow guides
-- **Benefits**: Keeps SKILL.md lean, loaded only when OpenHands determines it's needed
-- **Best practice**: If files are large (>10k words), include grep search patterns in SKILL.md
-- **Avoid duplication**: Information should live in either SKILL.md or references files, not both. Prefer references files for detailed information unless it's truly core to the skill—this keeps SKILL.md lean while making information discoverable without hogging the context window. Keep only essential procedural instructions and workflow guidance in SKILL.md; move detailed reference material, schemas, and examples to references files.
+- **Когда включать**: Для документации, на которую OpenHands должен ссылаться при работе
+- **Примеры**: `references/finance.md` для финансовых схем, `references/mnda.md` для шаблона NDA компании, `references/policies.md` для политик компании, `references/api_docs.md` для спецификаций API
+- **Случаи использования**: Схемы баз данных, API-документация, доменные знания, политики компании, подробные руководства по рабочим процессам
+- **Преимущества**: Держит SKILL.md лёгким, загружается только когда OpenHands определит, что это нужно
+- **Лучшая практика**: Если файлы большие (>10k слов), включай паттерны grep-поиска в SKILL.md
+- **Избегай дублирования**: Информация должна жить либо в SKILL.md, либо в файлах references, не в обоих. Предпочитай файлы references для детальной информации, если только она не является действительно основной для навыка — это держит SKILL.md лёгким, делая информацию обнаруживаемой без захвата окна контекста. Оставляй в SKILL.md только существенные процедурные инструкции и руководство по рабочим процессам; переноси детальный справочный материал, схемы и примеры в файлы references.
 
-##### Assets (`assets/`)
+##### Ассеты (`assets/`)
 
-Files not intended to be loaded into context, but rather used within the output OpenHands produces.
+Файлы, не предназначенные для загрузки в контекст, а используемые в выводе, который создаёт OpenHands.
 
-- **When to include**: When the skill needs files that will be used in the final output
-- **Examples**: `assets/logo.png` for brand assets, `assets/slides.pptx` for PowerPoint templates, `assets/frontend-template/` for HTML/React boilerplate, `assets/font.ttf` for typography
-- **Use cases**: Templates, images, icons, boilerplate code, fonts, sample documents that get copied or modified
-- **Benefits**: Separates output resources from documentation, enables OpenHands to use files without loading them into context
+- **Когда включать**: Когда навыку нужны файлы, которые будут использоваться в финальном выводе
+- **Примеры**: `assets/logo.png` для бренд-ассетов, `assets/slides.pptx` для шаблонов PowerPoint, `assets/frontend-template/` для HTML/React-заготовок, `assets/font.ttf` для типографики
+- **Случаи использования**: Шаблоны, изображения, иконки, код-заготовки, шрифты, образцы документов, которые копируются или изменяются
+- **Преимущества**: Отделяет выходные ресурсы от документации, позволяет OpenHands использовать файлы без загрузки их в контекст
 
-### Progressive Disclosure Design Principle
+### Принцип проектирования прогрессивного раскрытия
 
-Skills use a three-level loading system to manage context efficiently:
+Навыки используют трёхуровневую систему загрузки для эффективного управления контекстом:
 
-1. **Metadata (name + description)** - Always in context (~100 words)
-2. **SKILL.md body** - When skill triggers (<5k words)
-3. **Bundled resources** - As needed by OpenHands (Unlimited*)
+1. **Метаданные (name + description)** — всегда в контексте (~100 слов)
+2. **Тело SKILL.md** — когда навык срабатывает (<5k слов)
+3. **Встроенные ресурсы** — по мере необходимости OpenHands (без ограничений*)
 
-*Unlimited because scripts can be executed without reading into context window.
+*Без ограничений, потому что скрипты можно выполнять без чтения в окно контекста.
 
-## Skill Creation Process
+## Процесс создания навыка
 
-To create a skill, follow the "Skill Creation Process" in order, skipping steps only if there is a clear reason why they are not applicable.
+Чтобы создать навык, следуй «Процессу создания навыка» по порядку, пропуская шаги только если есть явная причина, почему они неприменимы.
 
-### Step 1: Understanding the Skill with Concrete Examples
+### Шаг 1: Понимание навыка на конкретных примерах
 
-Skip this step only when the skill's usage patterns are already clearly understood. It remains valuable even when working with an existing skill.
+Пропускай этот шаг только когда паттерны использования навыка уже чётко понятны. Он остаётся ценным даже при работе с существующим навыком.
 
-To create an effective skill, clearly understand concrete examples of how the skill will be used. This understanding can come from either direct user examples or generated examples that are validated with user feedback.
+Чтобы создать эффективный навык, чётко понимай конкретные примеры того, как навык будет использоваться. Это понимание может прийти либо из прямых примеров пользователя, либо из сгенерированных примеров, проверенных фидбеком пользователя.
 
-For example, when building an image-editor skill, relevant questions include:
+Например, при создании навыка редактора изображений релевантные вопросы включают:
 
-- "What functionality should the image-editor skill support? Editing, rotating, anything else?"
-- "Can you give some examples of how this skill would be used?"
-- "I can imagine users asking for things like 'Remove the red-eye from this image' or 'Rotate this image'. Are there other ways you imagine this skill being used?"
-- "What would a user say that should trigger this skill?"
+- «Какую функциональность должен поддерживать навык редактора изображений? Редактирование, поворот, что-то ещё?»
+- «Можешь привести несколько примеров, как этот навык будет использоваться?»
+- «Я могу представить, как пользователи просят что-то вроде "Убери красные глаза с этого изображения" или "Поверни это изображение". Есть ли другие способы, которыми ты представляешь использование этого навыка?»
+- «Что пользователь скажет, что должно запускать этот навык?»
 
-To avoid overwhelming users, avoid asking too many questions in a single message. Start with the most important questions and follow up as needed for better effectiveness.
+Чтобы не перегружать пользователей, избегай слишком многих вопросов в одном сообщении. Начни с самых важных вопросов и задавай дополнительные по мере необходимости для лучшей эффективности.
 
-Conclude this step when there is a clear sense of the functionality the skill should support.
+Заверши этот шаг, когда есть чёткое представление о функциональности, которую навык должен поддерживать.
 
-### Step 2: Planning the Reusable Skill Contents
+### Шаг 2: Планирование переиспользуемого содержимого навыка
 
-To turn concrete examples into an effective skill, analyze each example by:
+Чтобы превратить конкретные примеры в эффективный навык, проанализируй каждый пример:
 
-1. Considering how to execute on the example from scratch
-2. Identifying what scripts, references, and assets would be helpful when executing these workflows repeatedly
+1. Подумай, как выполнить пример с нуля
+2. Определи, какие скрипты, справочники и ассеты были бы полезны при повторном выполнении этих рабочих процессов
 
-Example: When building a `pdf-editor` skill to handle queries like "Help me rotate this PDF," the analysis shows:
+Пример: При создании навыка `pdf-editor` для запросов вроде «Помоги мне повернуть этот PDF» анализ показывает:
 
-1. Rotating a PDF requires re-writing the same code each time
-2. A `scripts/rotate_pdf.py` script would be helpful to store in the skill
+1. Поворот PDF требует каждый раз переписывать один и тот же код
+2. Скрипт `scripts/rotate_pdf.py` был бы полезен для хранения в навыке
 
-Example: When designing a `frontend-webapp-builder` skill for queries like "Build me a todo app" or "Build me a dashboard to track my steps," the analysis shows:
+Пример: При проектировании навыка `frontend-webapp-builder` для запросов вроде «Собери мне todo-приложение» или «Собери мне дашборд для отслеживания шагов» анализ показывает:
 
-1. Writing a frontend webapp requires the same boilerplate HTML/React each time
-2. An `assets/hello-world/` template containing the boilerplate HTML/React project files would be helpful to store in the skill
+1. Написание фронтенд-приложения требует каждый раз одной и той же HTML/React-заготовки
+2. Шаблон `assets/hello-world/`, содержащий файлы проекта HTML/React-заготовки, был бы полезен для хранения в навыке
 
-Example: When building a `big-query` skill to handle queries like "How many users have logged in today?" the analysis shows:
+Пример: При создании навыка `big-query` для запросов вроде «Сколько пользователей вошло сегодня?» анализ показывает:
 
-1. Querying BigQuery requires re-discovering the table schemas and relationships each time
-2. A `references/schema.md` file documenting the table schemas would be helpful to store in the skill
+1. Запрос к BigQuery требует каждый раз повторного обнаружения схем таблиц и связей
+2. Файл `references/schema.md`, документирующий схемы таблиц, был бы полезен для хранения в навыке
 
-To establish the skill's contents, analyze each concrete example to create a list of the reusable resources to include: scripts, references, and assets.
+Чтобы установить содержимое навыка, проанализируй каждый конкретный пример, чтобы создать список переиспользуемых ресурсов для включения: скрипты, справочники и ассеты.
 
-### Step 3: Create Skill Structure
+### Шаг 3: Создание структуры навыка
 
-Create the skill directory structure:
+Создай структуру каталога навыка:
 
 ```bash
 mkdir -p skill-name/{references,scripts,assets}
 touch skill-name/SKILL.md
 ```
 
-Alternatively, use the `init_skill.py` script to generate a template:
+Или используй скрипт `init_skill.py` для генерации шаблона:
 
 ```bash
 scripts/init_skill.py <skill-name> --path <output-directory>
 ```
 
-The script creates a skill directory with SKILL.md template and example resource directories.
+Скрипт создаёт каталог навыка с шаблоном SKILL.md и каталогами примеров ресурсов.
 
-### Step 4: Edit the Skill
+### Шаг 4: Редактирование навыка
 
-When editing the (newly-created or existing) skill, remember that the skill is being created for another instance of OpenHands to use. Focus on including information that would be beneficial and non-obvious to OpenHands. Consider what procedural knowledge, domain-specific details, or reusable assets would help another OpenHands instance execute these tasks more effectively.
+При редактировании (нового или существующего) навыка помни, что навык создаётся для использования другим экземпляром OpenHands. Сосредоточься на включении информации, которая была бы полезной и неочевидной для OpenHands. Подумай, какие процедурные знания, специфичные для домена детали или переиспользуемые ассеты помогли бы другому экземпляру OpenHands эффективнее выполнять эти задачи.
 
-#### Start with Reusable Skill Contents
+#### Начни с переиспользуемого содержимого навыка
 
-To begin implementation, start with the reusable resources identified above: `scripts/`, `references/`, and `assets/` files. Note that this step may require user input. For example, when implementing a `brand-guidelines` skill, the user may need to provide brand assets or templates to store in `assets/`, or documentation to store in `references/`.
+Для начала реализации начни с переиспользуемых ресурсов, определённых выше: файлов `scripts/`, `references/` и `assets/`. Учти, что этот шаг может потребовать ввода пользователя. Например, при реализации навыка `brand-guidelines` пользователю может понадобиться предоставить бренд-ассеты или шаблоны для хранения в `assets/`, или документацию для хранения в `references/`.
 
-Also, delete any example files and directories not needed for the skill. Create only the directories you actually need (references/, scripts/, assets/).
+Также удали любые примеры файлов и каталогов, не нужные для навыка. Создавай только каталоги, которые реально нужны (references/, scripts/, assets/).
 
-#### Update SKILL.md
+#### Обновление SKILL.md
 
-**Writing Style:** Write the entire skill using **imperative/infinitive form** (verb-first instructions), not second person. Use objective, instructional language (e.g., "To accomplish X, do Y" rather than "You should do X" or "If you need to do X"). This maintains consistency and clarity for AI consumption.
+**Стиль письма:** Пиши весь навык в **повелительной/инфинитивной форме** (инструкции, начинающиеся с глагола), а не от второго лица. Используй объективный, инструктивный язык (например, «Чтобы достичь X, сделай Y» вместо «Тебе следует сделать X» или «Если тебе нужно сделать X»). Это обеспечивает согласованность и ясность для потребления ИИ.
 
-**Description (Frontmatter):** Use third-person format with specific trigger phrases:
+**Описание (Frontmatter):** Используй формат третьего лица с конкретными фразами-триггерами:
 
 ```yaml
 ---
@@ -172,31 +172,31 @@ description: This skill should be used when the user asks to "specific phrase 1"
 ---
 ```
 
-**Good description examples:**
+**Хорошие примеры описания:**
 ```yaml
 description: This skill should be used when the user asks to "create a hook", "add a PreToolUse hook", "validate tool use", "implement prompt-based hooks", or mentions hook events (PreToolUse, PostToolUse, Stop).
 ```
 
-**Bad description examples:**
+**Плохие примеры описания:**
 ```yaml
 description: Use this skill when working with hooks.  # Wrong person, vague
 description: Load when user needs hook help.  # Not third person
 description: Provides hook guidance.  # No trigger phrases
 ```
 
-To complete SKILL.md body, answer the following questions:
+Чтобы завершить тело SKILL.md, ответь на следующие вопросы:
 
-1. What is the purpose of the skill, in a few sentences?
-2. When should the skill be used? (Include this in frontmatter description with specific triggers)
-3. In practice, how should OpenHands use the skill? All reusable skill contents developed above should be referenced so that OpenHands knows how to use them.
+1. Какова цель навыка, в нескольких предложениях?
+2. Когда навык следует использовать? (Включи это в описание frontmatter с конкретными триггерами)
+3. Как на практике OpenHands должен использовать навык? Все разработанные переиспользуемые содержимые должны быть упомянуты, чтобы OpenHands знал, как их использовать.
 
-**Keep SKILL.md lean:** Target 1,500-2,000 words for the body. Move detailed content to references/:
-- Detailed patterns → `references/patterns.md`
-- Advanced techniques → `references/advanced.md`
-- Migration guides → `references/migration.md`
-- API references → `references/api-reference.md`
+**Держи SKILL.md лёгким:** Цель — 1500–2000 слов для тела. Переноси детальное содержимое в references/:
+- Детальные паттерны → `references/patterns.md`
+- Продвинутые техники → `references/advanced.md`
+- Руководства по миграции → `references/migration.md`
+- API-справочники → `references/api-reference.md`
 
-**Reference resources in SKILL.md:**
+**Ссылайся на ресурсы в SKILL.md:**
 ```markdown
 ## Additional Resources
 
@@ -212,189 +212,189 @@ Working examples in `examples/`:
 - **`example-script.sh`** - Working example
 ```
 
-### Step 5: Validate and Test
+### Шаг 5: Валидация и тестирование
 
-1. **Check structure**: Skill directory contains SKILL.md
-2. **Validate SKILL.md**: Has frontmatter with name and description
-3. **Check trigger phrases**: Description includes specific user queries
-4. **Verify writing style**: Body uses imperative/infinitive form, not second person
-5. **Test progressive disclosure**: SKILL.md is lean (~1,500-2,000 words), detailed content in references/
-6. **Check references**: All referenced files exist
-7. **Validate scripts**: Scripts are executable and work correctly
+1. **Проверь структуру**: Каталог навыка содержит SKILL.md
+2. **Проверь SKILL.md**: Есть frontmatter с name и description
+3. **Проверь фразы-триггеры**: Описание включает конкретные запросы пользователя
+4. **Проверь стиль письма**: Тело использует повелительную/инфинитивную форму, не второе лицо
+5. **Протестируй прогрессивное раскрытие**: SKILL.md лёгкий (~1500–2000 слов), детальное содержимое в references/
+6. **Проверь справочники**: Все упомянутые файлы существуют
+7. **Проверь скрипты**: Скрипты исполняемы и работают корректно
 
-Use the validation script to check basic requirements:
+Используй скрипт валидации для проверки базовых требований:
 ```bash
 scripts/quick_validate.py <path/to/skill-folder>
 ```
 
-### Step 6: Iterate
+### Шаг 6: Итерация
 
-After testing the skill, users may request improvements. Often this happens right after using the skill, with fresh context of how the skill performed.
+После тестирования навыка пользователи могут запросить улучшения. Часто это происходит сразу после использования навыка, со свежим контекстом того, как навык отработал.
 
-**Iteration workflow:**
-1. Use the skill on real tasks
-2. Notice struggles or inefficiencies
-3. Identify how SKILL.md or bundled resources should be updated
-4. Implement changes and test again
+**Рабочий процесс итерации:**
+1. Используй навык на реальных задачах
+2. Заметь трудности или неэффективности
+3. Определи, как SKILL.md или встроенные ресурсы следует обновить
+4. Внеси изменения и протестируй снова
 
-**Common improvements:**
-- Strengthen trigger phrases in description
-- Move long sections from SKILL.md to references/
-- Add missing examples or scripts
-- Clarify ambiguous instructions
-- Add edge case handling
+**Частые улучшения:**
+- Усиль фразы-триггеры в описании
+- Перенеси длинные разделы из SKILL.md в references/
+- Добавь недостающие примеры или скрипты
+- Уточни неоднозначные инструкции
+- Добавь обработку крайних случаев
 
-## Progressive Disclosure in Practice
+## Прогрессивное раскрытие на практике
 
-### What Goes in SKILL.md
+### Что идёт в SKILL.md
 
-**Include (always loaded when skill triggers):**
-- Core concepts and overview
-- Essential procedures and workflows
-- Quick reference tables
-- Pointers to references/examples/scripts
-- Most common use cases
+**Включай (всегда загружается при срабатывании навыка):**
+- Основные концепции и обзор
+- Существенные процедуры и рабочие процессы
+- Таблицы быстрой справки
+- Указатели на references/examples/scripts
+- Наиболее частые случаи использования
 
-**Keep under 3,000 words, ideally 1,500-2,000 words**
+**Держи под 3000 слов, в идеале 1500–2000 слов**
 
-### What Goes in references/
+### Что идёт в references/
 
-**Move to references/ (loaded as needed):**
-- Detailed patterns and advanced techniques
-- Comprehensive API documentation
-- Migration guides
-- Edge cases and troubleshooting
-- Extensive examples and walkthroughs
+**Переноси в references/ (загружается по мере необходимости):**
+- Детальные паттерны и продвинутые техники
+- Полная API-документация
+- Руководства по миграции
+- Крайние случаи и устранение неполадок
+- Обширные примеры и пошаговые руководства
 
-**Each reference file can be large (2,000-5,000+ words)**
+**Каждый справочный файл может быть большим (2000–5000+ слов)**
 
-### What Goes in scripts/
+### Что идёт в scripts/
 
-**Utility scripts:**
-- Validation tools
-- Testing helpers
-- Parsing utilities
-- Automation scripts
+**Утилитарные скрипты:**
+- Инструменты валидации
+- Тестовые помощники
+- Утилиты парсинга
+- Скрипты автоматизации
 
-**Should be executable and documented**
+**Должны быть исполняемыми и документированными**
 
-## Writing Style Requirements
+## Требования к стилю письма
 
-### Imperative/Infinitive Form
+### Повелительная/инфинитивная форма
 
-Write using verb-first instructions, not second person:
+Пиши инструкции, начинающиеся с глагола, а не от второго лица:
 
-**Correct (imperative):**
+**Корректно (повелительное):**
 ```
 To create a hook, define the event type.
 Configure the MCP server with authentication.
 Validate settings before use.
 ```
 
-**Incorrect (second person):**
+**Некорректно (второе лицо):**
 ```
 You should create a hook by defining the event type.
 You need to configure the MCP server.
 You must validate settings before use.
 ```
 
-### Third-Person in Description
+### Третье лицо в описании
 
-The frontmatter description must use third person:
+Описание frontmatter должно использовать третье лицо:
 
-**Correct:**
+**Корректно:**
 ```yaml
 description: This skill should be used when the user asks to "create X", "configure Y"...
 ```
 
-**Incorrect:**
+**Некорректно:**
 ```yaml
 description: Use this skill when you want to create X...
 description: Load this skill when user asks...
 ```
 
-### Objective, Instructional Language
+### Объективный, инструктивный язык
 
-Focus on what to do, not who should do it:
+Сосредоточься на том, что делать, а не кто должен это делать:
 
-**Correct:**
+**Корректно:**
 ```
 Parse the frontmatter using sed.
 Extract fields with grep.
 Validate values before use.
 ```
 
-**Incorrect:**
+**Некорректно:**
 ```
 You can parse the frontmatter...
 OpenHands should extract fields...
 The user might validate values...
 ```
 
-## Validation Checklist
+## Чек-лист валидации
 
-Before finalizing a skill:
+Перед финализацией навыка:
 
-**Structure:**
-- [ ] SKILL.md file exists with valid YAML frontmatter
-- [ ] Frontmatter has `name` and `description` fields
-- [ ] Markdown body is present and substantial
-- [ ] Referenced files actually exist
+**Структура:**
+- [ ] Файл SKILL.md существует с валидным YAML frontmatter
+- [ ] Frontmatter имеет поля `name` и `description`
+- [ ] Markdown-тело присутствует и содержательно
+- [ ] Упомянутые файлы реально существуют
 
-**Description Quality:**
-- [ ] Uses third person ("This skill should be used when...")
-- [ ] Includes specific trigger phrases users would say
-- [ ] Lists concrete scenarios ("create X", "configure Y")
-- [ ] Not vague or generic
+**Качество описания:**
+- [ ] Использует третье лицо («This skill should be used when...»)
+- [ ] Включает конкретные фразы-триггеры, которые скажут пользователи
+- [ ] Перечисляет конкретные сценарии («create X», «configure Y»)
+- [ ] Не расплывчатое и не общее
 
-**Content Quality:**
-- [ ] SKILL.md body uses imperative/infinitive form
-- [ ] Body is focused and lean (1,500-2,000 words ideal, <5k max)
-- [ ] Detailed content moved to references/
-- [ ] Examples are complete and working
-- [ ] Scripts are executable and documented
+**Качество содержимого:**
+- [ ] Тело SKILL.md использует повелительную/инфинитивную форму
+- [ ] Тело сфокусировано и лёгкое (в идеале 1500–2000 слов, максимум <5k)
+- [ ] Детальное содержимое перенесено в references/
+- [ ] Примеры полные и рабочие
+- [ ] Скрипты исполняемы и документированы
 
-**Progressive Disclosure:**
-- [ ] Core concepts in SKILL.md
-- [ ] Detailed docs in references/
-- [ ] Utilities in scripts/
-- [ ] SKILL.md references these resources
+**Прогрессивное раскрытие:**
+- [ ] Основные концепции в SKILL.md
+- [ ] Детальная документация в references/
+- [ ] Утилиты в scripts/
+- [ ] SKILL.md ссылается на эти ресурсы
 
-**Testing:**
-- [ ] Skill triggers on expected user queries
-- [ ] Content is helpful for intended tasks
-- [ ] No duplicated information across files
-- [ ] References load when needed
+**Тестирование:**
+- [ ] Навык срабатывает на ожидаемых запросах пользователя
+- [ ] Содержимое полезно для целевых задач
+- [ ] Нет дублированной информации между файлами
+- [ ] Справочники загружаются при необходимости
 
-## Common Mistakes to Avoid
+## Частые ошибки, которых следует избегать
 
-### Mistake 1: Weak Trigger Description
+### Ошибка 1: Слабое описание триггера
 
-❌ **Bad:**
+❌ **Плохо:**
 ```yaml
 description: Provides guidance for working with hooks.
 ```
 
-**Why bad:** Vague, no specific trigger phrases, not third person
+**Почему плохо:** Расплывчато, нет конкретных фраз-триггеров, не третье лицо
 
-✅ **Good:**
+✅ **Хорошо:**
 ```yaml
 description: This skill should be used when the user asks to "create a hook", "add a PreToolUse hook", "validate tool use", or mentions hook events. Provides comprehensive hooks API guidance.
 ```
 
-**Why good:** Third person, specific phrases, concrete scenarios
+**Почему хорошо:** Третье лицо, конкретные фразы, конкретные сценарии
 
-### Mistake 2: Too Much in SKILL.md
+### Ошибка 2: Слишком много в SKILL.md
 
-❌ **Bad:**
+❌ **Плохо:**
 ```
 skill-name/
 └── SKILL.md  (8,000 words - everything in one file)
 ```
 
-**Why bad:** Bloats context when skill loads, detailed content always loaded
+**Почему плохо:** Раздувает контекст при загрузке навыка, детальное содержимое всегда загружается
 
-✅ **Good:**
+✅ **Хорошо:**
 ```
 skill-name/
 ├── SKILL.md  (1,800 words - core essentials)
@@ -403,31 +403,31 @@ skill-name/
     └── advanced.md (3,700 words)
 ```
 
-**Why good:** Progressive disclosure, detailed content loaded only when needed
+**Почему хорошо:** Прогрессивное раскрытие, детальное содержимое загружается только при необходимости
 
-### Mistake 3: Second Person Writing
+### Ошибка 3: Письмо от второго лица
 
-❌ **Bad:**
+❌ **Плохо:**
 ```markdown
 You should start by reading the configuration file.
 You need to validate the input.
 You can use the grep tool to search.
 ```
 
-**Why bad:** Second person, not imperative form
+**Почему плохо:** Второе лицо, не повелительная форма
 
-✅ **Good:**
+✅ **Хорошо:**
 ```markdown
 Start by reading the configuration file.
 Validate the input before processing.
 Use the grep tool to search for patterns.
 ```
 
-**Why good:** Imperative form, direct instructions
+**Почему хорошо:** Повелительная форма, прямые инструкции
 
-### Mistake 4: Missing Resource References
+### Ошибка 4: Отсутствие ссылок на ресурсы
 
-❌ **Bad:**
+❌ **Плохо:**
 ```markdown
 # SKILL.md
 
@@ -436,9 +436,9 @@ Use the grep tool to search for patterns.
 [No mention of references/ or examples/]
 ```
 
-**Why bad:** OpenHands doesn't know references exist
+**Почему плохо:** OpenHands не знает, что references существуют
 
-✅ **Good:**
+✅ **Хорошо:**
 ```markdown
 # SKILL.md
 
@@ -454,20 +454,20 @@ Use the grep tool to search for patterns.
 - **`scripts/validate.sh`** - Validation utility
 ```
 
-**Why good:** OpenHands knows where to find additional information
+**Почему хорошо:** OpenHands знает, где найти дополнительную информацию
 
-## Quick Reference
+## Быстрая справка
 
-### Minimal Skill
+### Минимальный навык
 
 ```
 skill-name/
 └── SKILL.md
 ```
 
-Good for: Simple knowledge, no complex resources needed
+Хорош для: Простых знаний, не требующих сложных ресурсов
 
-### Standard Skill (Recommended)
+### Стандартный навык (рекомендуется)
 
 ```
 skill-name/
@@ -478,9 +478,9 @@ skill-name/
     └── helper.py
 ```
 
-Good for: Most skills with detailed documentation
+Хорош для: Большинства навыков с детальной документацией
 
-### Complete Skill
+### Полный навык
 
 ```
 skill-name/
@@ -494,53 +494,53 @@ skill-name/
     └── template.txt
 ```
 
-Good for: Complex domains with validation utilities
+Хорош для: Сложных доменов с утилитами валидации
 
-## Best Practices Summary
+## Сводка лучших практик
 
-✅ **DO:**
-- Use third-person in description ("This skill should be used when...")
-- Include specific trigger phrases ("create X", "configure Y")
-- Keep SKILL.md lean (1,500-2,000 words)
-- Use progressive disclosure (move details to references/)
-- Write in imperative/infinitive form
-- Reference supporting files clearly
-- Provide working examples
-- Create utility scripts for common operations
-- Use `uv` for Python dependency installs in scripts (`uv venv .venv --quiet && uv pip install --quiet <pkg>`)
+✅ **ДЕЛАЙ:**
+- Используй третье лицо в описании («This skill should be used when...»)
+- Включай конкретные фразы-триггеры («create X», «configure Y»)
+- Держи SKILL.md лёгким (1500–2000 слов)
+- Используй прогрессивное раскрытие (переноси детали в references/)
+- Пиши в повелительной/инфинитивной форме
+- Явно ссылайся на вспомогательные файлы
+- Давай рабочие примеры
+- Создавай утилитарные скрипты для частых операций
+- Используй `uv` для установок Python-зависимостей в скриптах (`uv venv .venv --quiet && uv pip install --quiet <pkg>`)
 
-❌ **DON'T:**
-- Use second person anywhere
-- Have vague trigger conditions
-- Put everything in SKILL.md (>3,000 words without references/)
-- Write in second person ("You should...")
-- Leave resources unreferenced
-- Include broken or incomplete examples
-- Skip validation
-- Use `pip` or `pip3` directly — `uv` is the cross-platform standard
+❌ **НЕ ДЕЛАЙ:**
+- Не используй второе лицо нигде
+- Не имей расплывчатых условий триггеров
+- Не помещай всё в SKILL.md (>3000 слов без references/)
+- Не пиши от второго лица («You should...»)
+- Не оставляй ресурсы без ссылок
+- Не включай сломанные или неполные примеры
+- Не пропускай валидацию
+- Не используй `pip` или `pip3` напрямую — `uv` — кроссплатформенный стандарт
 
-## Additional Resources
+## Дополнительные ресурсы
 
-### Reference Files
+### Справочные файлы
 
-For detailed patterns and techniques, consult:
-- **`references/workflows.md`** - Sequential workflows and conditional logic patterns
-- **`references/output-patterns.md`** - Template and example patterns for specific output formats
+Для детальных паттернов и техник обратись к:
+- **`references/workflows.md`** — Последовательные рабочие процессы и паттерны условной логики
+- **`references/output-patterns.md`** — Шаблоны и примеры для конкретных форматов вывода
 
-## Implementation Workflow
+## Рабочий процесс реализации
 
-To create a skill:
+Чтобы создать навык:
 
-1. **Understand use cases**: Identify concrete examples of skill usage
-2. **Plan resources**: Determine what scripts/references/assets needed
-3. **Create structure**: `mkdir -p skill-name/{references,scripts,assets}`
-4. **Write SKILL.md**:
-   - Frontmatter with third-person description and trigger phrases
-   - Lean body (1,500-2,000 words) in imperative form
-   - Reference supporting files
-5. **Add resources**: Create references/, scripts/, assets/ as needed
-6. **Validate**: Check description, writing style, organization
-7. **Test**: Verify skill loads on expected triggers
-8. **Iterate**: Improve based on usage
+1. **Пойми случаи использования**: Определи конкретные примеры использования навыка
+2. **Спланируй ресурсы**: Определи, какие скрипты/справочники/ассеты нужны
+3. **Создай структуру**: `mkdir -p skill-name/{references,scripts,assets}`
+4. **Напиши SKILL.md**:
+   - Frontmatter с описанием в третьем лице и фразами-триггерами
+   - Лёгкое тело (1500–2000 слов) в повелительной форме
+   - Ссылки на вспомогательные файлы
+5. **Добавь ресурсы**: Создай references/, scripts/, assets/ по мере необходимости
+6. **Проверь**: Проверь описание, стиль письма, организацию
+7. **Протестируй**: Проверь, что навык загружается на ожидаемых триггерах
+8. **Итерируй**: Улучшай на основе использования
 
-Focus on strong trigger descriptions, progressive disclosure, and imperative writing style for effective skills that load when needed and provide targeted guidance.
+Сосредоточься на сильных описаниях триггеров, прогрессивном раскрытии и повелительном стиле письма для эффективных навыков, которые загружаются при необходимости и дают целевую помощь.
