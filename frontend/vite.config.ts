@@ -53,14 +53,27 @@ const EXTENSIONS_SKILLS_DIR = resolve(
   dirname(_require.resolve("@openhands/extensions/package.json")),
   "skills",
 );
-const VENDORED_EXTENSIONS_DIR = resolve(process.cwd(), "..", "extensions");
-const VENDORED_EXTENSIONS_SKILLS_DIR = resolve(
-  VENDORED_EXTENSIONS_DIR,
-  "skills",
+// The vendored OpenHands/extensions catalog lives at ../extensions relative to
+// this config (repo root) during local dev, but in the Docker frontend build
+// stage WORKDIR=/build while the catalog is copied to /extensions. Probe both
+// locations (plus an explicit EXTENSIONS_SKILLS_DIR override) so the UI uses
+// the Russian-localized catalog in every build environment, falling back to the
+// npm package only when none is present.
+const VENDORED_EXTENSIONS_CANDIDATES = [
+  process.env.EXTENSIONS_SKILLS_DIR,
+  resolve(process.cwd(), "..", "extensions"),
+  "/extensions",
+].filter(Boolean) as string[];
+const VENDORED_EXTENSIONS_SKILLS_DIR = VENDORED_EXTENSIONS_CANDIDATES.map((dir) =>
+  resolve(dir, "skills"),
+).find(
+  (dir) =>
+    existsSync(dir) && existsSync(join(dir, "index.js")),
 );
-const hasVendoredExtensions =
-  existsSync(VENDORED_EXTENSIONS_SKILLS_DIR) &&
-  existsSync(join(VENDORED_EXTENSIONS_SKILLS_DIR, "index.js"));
+const VENDORED_EXTENSIONS_DIR = VENDORED_EXTENSIONS_SKILLS_DIR
+  ? dirname(VENDORED_EXTENSIONS_SKILLS_DIR)
+  : resolve(process.cwd(), "..", "extensions");
+const hasVendoredExtensions = Boolean(VENDORED_EXTENSIONS_SKILLS_DIR);
 const effectiveExtensionsSkillsDir = hasVendoredExtensions
   ? VENDORED_EXTENSIONS_SKILLS_DIR
   : EXTENSIONS_SKILLS_DIR;

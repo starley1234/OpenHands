@@ -38,6 +38,11 @@ RUN npm ci
 # Copy everything needed for the build
 COPY frontend/ .
 
+# Vendored OpenHands/extensions catalog (skills, marketplaces, integrations).
+# vite.config.ts probes /extensions (among others) for the catalog so the UI
+# uses the Russian-localized skills instead of the English npm package.
+COPY extensions/ /extensions/
+
 # Build the static frontend.
 # VITE_POSTHOG_API_KEY is a public client key baked into the bundle. CI passes
 # production for tagged releases and staging for PR/main images.
