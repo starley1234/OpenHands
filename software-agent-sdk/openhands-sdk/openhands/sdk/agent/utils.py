@@ -26,7 +26,13 @@ from openhands.sdk.context.view import View
 from openhands.sdk.conversation.types import ConversationTokenCallbackType
 from openhands.sdk.event.base import LLMConvertibleEvent
 from openhands.sdk.event.condenser import Condensation
-from openhands.sdk.llm import LLM, LLMResponse, Message
+from openhands.sdk.llm import (
+    LLM,
+    LLMResponse,
+    ImageContent,
+    Message,
+    TextContent,
+)
 from openhands.sdk.tool import Action, ToolDefinition
 
 
@@ -593,6 +599,62 @@ def prepare_llm_messages(
 ) -> list[Message] | Condensation: ...
 
 
+def _relocate_tool_images(messages: list[Message]) -> list[Message]:
+    """Move ``ImageContent`` out of ``role=tool`` messages into a ``user`` turn.
+
+    Some providers (e.g. LM Studio and other local OpenAI-compatible
+    endpoints) only accept ``image_url`` content parts in ``role=user``
+    messages, not in ``role=tool``. A tool like ``file_editor view`` on an
+    image returns an ``ImageContent`` observation, which lands in a tool
+    message; when serialized that produces a request the endpoint rejects
+    with ``Invalid 'content': 'content' field must be a string or an array
+    of objects``.
+
+    This pass keeps each tool message's text but strips any images out of it
+    and appends a synthetic ``user`` message carrying those images (labelled
+    as the tool result) right after the tool turn, so vision-capable models
+    still see the rendered image while the tool message stays text-only and
+    compatible with every provider.
+    """
+    result: list[Message] = []
+    for message in messages:
+        if message.role != "tool":
+            result.append(message)
+            continue
+
+        images: list[ImageContent] = []
+        text_blocks: list[TextContent] = []
+        for item in message.content:
+            if isinstance(item, ImageContent):
+                images.append(item)
+            else:
+                text_blocks.append(item)
+
+        tool_msg = message.model_copy(update={"content": text_blocks})
+        result.append(tool_msg)
+
+        if images:
+            # Carry the images in a user turn so local OpenAI-compatible
+            # endpoints accept them. Reference the tool result so the model
+            # knows which tool produced them.
+            label = message.name or "tool"
+            result.append(
+                Message(
+                    role="user",
+                    content=[
+                        TextContent(
+                            text=(
+                                f"[Image result from tool '{label}' — shown for "
+                                "visual comparison.]"
+                            )
+                        ),
+                        *images,
+                    ],
+                )
+            )
+    return result
+
+
 def prepare_llm_messages(
     view: View,
     condenser: CondenserBase | None = None,
@@ -644,6 +706,10 @@ def prepare_llm_messages(
     # Add any additional messages (e.g., user question for ask_agent)
     if additional_messages:
         messages.extend(additional_messages)
+
+    # LM Studio and other local OpenAI-compatible endpoints reject image_url
+    # parts in role=tool messages; move them into a following user turn.
+    messages = _relocate_tool_images(messages)
 
     return messages
 
@@ -730,6 +796,10 @@ async def aprepare_llm_messages(
 
     if additional_messages:
         messages.extend(additional_messages)
+
+    # LM Studio and other local OpenAI-compatible endpoints reject image_url
+    # parts in role=tool messages; move them into a following user turn.
+    messages = _relocate_tool_images(messages)
 
     return messages
 
