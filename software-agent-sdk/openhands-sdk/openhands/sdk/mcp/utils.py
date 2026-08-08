@@ -200,6 +200,17 @@ async def _refresh_tools(
             mcp_type_tools = [
                 t for t in mcp_type_tools if t.name not in disabled
             ]
+        else:
+            # Configured disabled names but none matched the advertised tool
+            # list — likely a name mismatch (e.g. prefixed tool names) or a
+            # stale entry. Surface it so it isn't silently ignored.
+            logger.warning(
+                "MCP disabled tool names (%s) matched none of the %d advertised "
+                "tools (%s)",
+                ", ".join(sorted(disabled)),
+                len(server_names),
+                ", ".join(sorted(server_names)) or "none",
+            )
 
     reconciled: list[MCPToolDefinition] = []
     added: list[MCPToolDefinition] = []
@@ -339,6 +350,24 @@ def create_mcp_tools(
     for server in mcp_config.values():
         if server.disabled_tools:
             disabled_tool_names.update(server.disabled_tools)
+    per_server_disabled = {
+        name: sorted(server.disabled_tools)
+        for name, server in mcp_config.items()
+        if server.disabled_tools
+    }
+    if per_server_disabled:
+        logger.info(
+            "MCP: withholding %d tool(s) across enabled server(s) per server=%s: %s",
+            len(disabled_tool_names),
+            per_server_disabled,
+            ", ".join(sorted(disabled_tool_names)),
+        )
+    else:
+        logger.info(
+            "MCP: no tools disabled across %d enabled server(s): %s",
+            len(mcp_config),
+            ", ".join(sorted(mcp_config)),
+        )
     if requested and not mcp_config:
         raise ValueError(
             "All configured MCP servers are disabled: "
