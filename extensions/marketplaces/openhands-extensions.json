@@ -5,7 +5,7 @@
     "email": "contact@all-hands.dev"
   },
   "metadata": {
-    "description": "Official skills and plugins for OpenHands \u2014 the open-source AI software engineer.",
+    "description": "Official skills and plugins for OpenHands — the open-source AI software engineer.",
     "maintainer": "OpenHands",
     "homepage": "https://github.com/OpenHands/extensions"
   },
@@ -13,7 +13,7 @@
     {
       "name": "agent-creator",
       "source": "./skills/agent-creator",
-      "description": "Create file-based sub-agents as Markdown files \u2014 no Python code required. Guides the user through a structured interview and generates a ready-to-deploy .md agent file following the OpenHands SDK specification.",
+      "description": "Создание файловых субагентов в виде Markdown-файлов — без написания Python-кода. Ведёт пользователя через структурированный опрос и генерирует готовый к развёртыванию .md-файл агента по спецификации OpenHands SDK.",
       "category": "agent-authoring",
       "keywords": [
         "agent",
@@ -27,7 +27,7 @@
     {
       "name": "add-skill",
       "source": "./skills/add-skill",
-      "description": "Add (import) an OpenHands skill from a GitHub repository into the current workspace.",
+      "description": "Добавить (импортировать) навык OpenHands из GitHub-репозитория в текущее рабочее пространство.",
       "category": "agent-authoring",
       "keywords": [
         "skill",
@@ -39,7 +39,7 @@
     {
       "name": "agent-memory",
       "source": "./skills/agent-memory",
-      "description": "Persist and retrieve repository-specific knowledge using AGENTS.md files. Use when you want to save important information about a codebase (build commands, code style, workflows) for future sessions.",
+      "description": "Сохранять и извлекать знания о репозитории с помощью файлов AGENTS.md. Используй, когда хочешь запомнить договорённости и контекст проекта.",
       "category": "agent-authoring",
       "keywords": [
         "memory",
@@ -51,7 +51,7 @@
     {
       "name": "agent-sdk-builder",
       "source": "./skills/agent-sdk-builder",
-      "description": "Guided workflow for building custom AI agents using the OpenHands Software Agent SDK. Use when you want to create a new agent through an interactive interview process that gathers requirements and generates implementation plans.",
+      "description": "Пошаговый процесс создания собственных ИИ-агентов с помощью OpenHands Software Agent SDK. Используй при разработке кастомных агентов.",
       "category": "agent-authoring",
       "keywords": [
         "agent",
@@ -63,7 +63,7 @@
     {
       "name": "code-simplifier",
       "source": "./skills/code-simplifier",
-      "description": "Simplifies and refines code across three dimensions - code reuse, code quality, and efficiency - while preserving all functionality. Analyzes recently modified code and provides actionable improvement suggestions.",
+      "description": "Упрощает и улучшает код по трём направлениям — переиспользование, качество и эффективность. Используй при рефакторинге.",
       "category": "code-quality",
       "keywords": [
         "simplify",
@@ -78,7 +78,7 @@
     {
       "name": "openhands-automation",
       "source": "./skills/openhands-automation",
-      "description": "Create and manage OpenHands automations - scheduled tasks that run in sandboxes. Use the prompt preset to create automations from natural language, or manage existing automations.",
+      "description": "Создание и управление автоматизациями OpenHands — запланированными задачами, выполняемыми в песочницах. Используй при настройке автоматизаций.",
       "category": "automations",
       "keywords": [
         "automation",
@@ -91,7 +91,7 @@
     {
       "name": "agent-canvas-environment",
       "source": "./skills/agent-canvas-environment",
-      "description": "Work effectively inside a local Agent Canvas environment, including local agent-server auth, safe workspace hygiene, and local conversation delegation.",
+      "description": "Эффективная работа в локальной среде Agent Canvas, включая локальный agent-server и автоматизации.",
       "category": "agent-authoring",
       "keywords": [
         "agent-canvas",
@@ -104,7 +104,7 @@
     {
       "name": "openhands-sdk",
       "source": "./skills/openhands-sdk",
-      "description": "Reference skill for the OpenHands Software Agent SDK - build AI agents with custom tools, LLM configuration, conversations, sub-agent delegation, MCP integration, security, and persistence.",
+      "description": "Справочный навык по OpenHands Software Agent SDK — создание ИИ-агентов с собственными инструментами.",
       "category": "agent-authoring",
       "keywords": [
         "sdk",
@@ -118,7 +118,7 @@
     {
       "name": "azure-devops",
       "source": "./skills/azure-devops",
-      "description": "Interact with Azure DevOps repositories, pull requests, and APIs using the AZURE_DEVOPS_TOKEN environment variable. Use when working with code hosted on Azure DevOps or managing Azure DevOps resources.",
+      "description": "Взаимодействие с Azure DevOps: репозитории, пул-реквесты и API через переменную окружения AZURE_DEVOPS_TOKEN.",
       "category": "code-hosting",
       "keywords": [
         "azure",
@@ -130,7 +130,7 @@
     {
       "name": "bitbucket",
       "source": "./skills/bitbucket",
-      "description": "Bitbucket integration hub. Detects whether the repository is on Bitbucket Cloud or Bitbucket Data Center and directs you to the matching detailed skill (bitbucket-cloud or bitbucket-data-center). Use for any Bitbucket repository or pull request task.",
+      "description": "Интеграционный хаб Bitbucket. Определяет, находится ли репозиторий на Bitbucket Cloud или Bitbucket Data Center, и выбирает нужный токен.",
       "category": "code-hosting",
       "keywords": [
         "bitbucket",
@@ -141,7 +141,7 @@
     {
       "name": "bitbucket-cloud",
       "source": "./skills/bitbucket-cloud",
-      "description": "Bitbucket Cloud (bitbucket.org) specifics — authenticate with BITBUCKET_TOKEN, use the REST API v2, workspace/repo_slug repositories, and the create_bitbucket_pr tool. Loaded on demand by the bitbucket skill once a Cloud environment is detected.",
+      "description": "Особенности Bitbucket Cloud (bitbucket.org) — аутентификация через BITBUCKET_TOKEN, использование REST API.",
       "category": "code-hosting",
       "keywords": [
         "bitbucket",
@@ -153,7 +153,7 @@
     {
       "name": "bitbucket-data-center",
       "source": "./skills/bitbucket-data-center",
-      "description": "Bitbucket Data Center (self-hosted Bitbucket Server) specifics — authenticate with BITBUCKET_DATA_CENTER_TOKEN, use the REST API 1.0, PROJECT/repo_slug repositories, scm/ git remotes, and the create_bitbucket_data_center_pr tool. Loaded on demand by the bitbucket skill once a Data Center environment is detected.",
+      "description": "Особенности Bitbucket Data Center (самохостинговый Bitbucket Server) — аутентификация через BITBUCKET_TOKEN.",
       "category": "code-hosting",
       "keywords": [
         "bitbucket",
@@ -166,7 +166,7 @@
     {
       "name": "city-weather",
       "source": "./plugins/city-weather",
-      "description": "Get current weather, time, and precipitation forecast for any city using the free Open-Meteo API. Provides slash command /city-weather:now <city>.",
+      "description": "Получение текущей погоды, времени и прогноза осадков для любого города через бесплатный API Open-Meteo.",
       "category": "utilities",
       "keywords": [
         "weather",
@@ -180,7 +180,7 @@
     {
       "name": "code-review",
       "source": "./skills/code-review",
-      "description": "Rigorous code review focusing on data structures, simplicity, security, pragmatism, and risk/safety evaluation. Provides brutally honest, actionable feedback on pull requests or merge requests, including a risk assessment for every review. Use when reviewing code changes.",
+      "description": "Строгий ревью кода с фокусом на структуры данных, простоту, безопасность, прагматичность и корректность.",
       "category": "code-quality",
       "keywords": [
         "code-review",
@@ -193,7 +193,7 @@
     {
       "name": "datadog",
       "source": "./skills/datadog",
-      "description": "Query and analyze Datadog logs, metrics, APM traces, and monitors using the Datadog API. Use when debugging production issues, monitoring application performance, or investigating alerts.",
+      "description": "Запросы и анализ логов, метрик, APM-трейсов и мониторов Datadog через Datadog API. Используй при работе с Datadog.",
       "category": "integrations",
       "keywords": [
         "datadog",
@@ -206,7 +206,7 @@
     {
       "name": "deno",
       "source": "./skills/deno",
-      "description": "Common project operations using Deno (tasks, run/test/lint/fmt, and dependency management).",
+      "description": "Типовые операции с проектом на Deno (задачи, run/test/lint/fmt и управление зависимостями).",
       "category": "environment",
       "keywords": [
         "deno",
@@ -218,7 +218,7 @@
     {
       "name": "discord",
       "source": "./skills/discord",
-      "description": "Build and automate Discord integrations (bots, webhooks, slash commands, and REST API workflows). Use when the user mentions Discord, a Discord server/guild, channels, webhooks, bot tokens, slash commands/application commands, discord.js, or discord.py.",
+      "description": "Создание и автоматизация интеграций Discord (боты, вебхуки, слэш-команды и работа с REST API).",
       "category": "integrations",
       "keywords": [
         "discord",
@@ -230,7 +230,7 @@
     {
       "name": "docker",
       "source": "./skills/docker",
-      "description": "Run Docker commands within a container environment, including starting the Docker daemon and managing containers. Use when building, running, or managing Docker containers and images.",
+      "description": "Выполнение Docker-команд в среде контейнера, включая запуск демона Docker и управление контейнерами.",
       "category": "environment",
       "keywords": [
         "docker",
@@ -241,7 +241,7 @@
     {
       "name": "flarglebargle",
       "source": "./skills/flarglebargle",
-      "description": "A test skill that responds to the magic word 'flarglebargle' with a compliment. Use for testing skill activation and trigger functionality.",
+      "description": "Тестовый навык, отвечающий на волшебное слово «flarglebargle» комплиментом. Используй для тестирования.",
       "category": "other",
       "keywords": [
         "test",
@@ -251,7 +251,7 @@
     {
       "name": "frontend-design",
       "source": "./skills/frontend-design",
-      "description": "Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications. Generates creative, polished code and UI design that avoids generic AI aesthetics.",
+      "description": "Создание выразительных, готовых к продакшену интерфейсов с высоким качеством дизайна. Используй при вёрстке.",
       "category": "design",
       "keywords": [
         "frontend",
@@ -266,7 +266,7 @@
     {
       "name": "github",
       "source": "./skills/github",
-      "description": "Interact with GitHub repositories, pull requests, issues, and workflows using the GITHUB_TOKEN environment variable and GitHub CLI. Use when working with code hosted on GitHub or managing GitHub resources.",
+      "description": "Взаимодействие с репозиториями GitHub, пул-реквестами, задачами и воркфлоу через переменную окружения GITHUB_TOKEN.",
       "category": "code-hosting",
       "keywords": [
         "github",
@@ -279,7 +279,7 @@
     {
       "name": "github-actions",
       "source": "./skills/github-actions",
-      "description": "Create, debug, and test GitHub Actions workflows and custom actions. Use when building CI/CD pipelines, automating workflows, or troubleshooting GitHub Actions.",
+      "description": "Создание, отладка и тестирование воркфлоу GitHub Actions и кастомных действий. Используй при настройке CI/CD.",
       "category": "code-hosting",
       "keywords": [
         "github-actions",
@@ -292,7 +292,7 @@
     {
       "name": "github-pr-review",
       "source": "./skills/github-pr-review",
-      "description": "Post structured PR reviews to GitHub with inline comments/suggestions in a single API call.",
+      "description": "Публикация структурированных ревью PR в GitHub с инлайн-комментариями и предложениями одним вызовом API.",
       "category": "code-hosting",
       "keywords": [
         "github",
@@ -304,7 +304,7 @@
     {
       "name": "github-repo-monitor",
       "source": "./skills/github-repo-monitor",
-      "description": "Create a cron automation that polls a GitHub repository for issue and PR comments containing a configurable trigger phrase (@OpenHands by default). Starts an OpenHands conversation with full issue/PR context, posts acknowledgement comments with a conversation link, and summarises results back to the issue/PR when the agent finishes.",
+      "description": "Создание cron-автоматизации, которая опрашивает GitHub-репозиторий на предмет комментариев в задачах и PR, содержащих заданные триггеры.",
       "category": "automations",
       "keywords": [
         "github",
@@ -320,7 +320,7 @@
     {
       "name": "gitlab",
       "source": "./skills/gitlab",
-      "description": "Interact with GitLab repositories, merge requests, and APIs using the GITLAB_TOKEN environment variable. Use when working with code hosted on GitLab or managing GitLab resources.",
+      "description": "Взаимодействие с репозиториями GitLab, merge-реквестами и API через переменную окружения GITLAB_TOKEN.",
       "category": "code-hosting",
       "keywords": [
         "gitlab",
@@ -331,7 +331,7 @@
     {
       "name": "jupyter",
       "source": "./skills/jupyter",
-      "description": "Read, modify, execute, and convert Jupyter notebooks programmatically. Use when working with .ipynb files for data science workflows, including editing cells, clearing outputs, or converting to other formats.",
+      "description": "Чтение, изменение, выполнение и конвертация Jupyter-ноутбуков программно. Используй при работе с ноутбуками.",
       "category": "environment",
       "keywords": [
         "jupyter",
@@ -343,7 +343,7 @@
     {
       "name": "kubernetes",
       "source": "./skills/kubernetes",
-      "description": "Set up and manage local Kubernetes clusters using KIND (Kubernetes IN Docker). Use when testing Kubernetes applications locally or developing cloud-native workloads.",
+      "description": "Настройка и управление локальными Kubernetes-кластерами с помощью KIND (Kubernetes IN Docker). Используй при тестировании.",
       "category": "environment",
       "keywords": [
         "kubernetes",
@@ -355,7 +355,7 @@
     {
       "name": "learn-from-code-review",
       "source": "./skills/learn-from-code-review",
-      "description": "Distill code review feedback from GitHub PRs into reusable skills and guidelines. Use when users ask to learn from code reviews, extract review patterns, or generate coding standards from historical PR feedback.",
+      "description": "Преобразование фидбека ревью кода из GitHub PR в переиспользуемые навыки и рекомендации. Используй при обучении.",
       "category": "code-quality",
       "keywords": [
         "code-review",
@@ -368,7 +368,7 @@
     {
       "name": "linear",
       "source": "./skills/linear",
-      "description": "Interact with Linear project management - query issues, update status, create tickets using the Linear GraphQL API.",
+      "description": "Взаимодействие с Linear — запрос задач, обновление статусов, создание тикетов через Linear API.",
       "category": "integrations",
       "keywords": [
         "linear",
@@ -381,7 +381,7 @@
     {
       "name": "magic-test",
       "source": "./plugins/magic-test",
-      "description": "A simple test plugin for verifying plugin loading. Triggers on magic words (alakazam, abracadabra) and returns a specific phrase to confirm plugins are working.",
+      "description": "Простой тестовый плагин для проверки загрузки плагинов. Активируется магическими словами (alakazam, abra...).",
       "category": "testing",
       "keywords": [
         "test",
@@ -394,7 +394,7 @@
     {
       "name": "notion",
       "source": "./skills/notion",
-      "description": "Create, search, and update Notion pages/databases using the Notion API. Use for documenting work, generating runbooks, and automating knowledge base updates.",
+      "description": "Создание, поиск и обновление страниц/баз Notion через Notion API. Используй для документации.",
       "category": "integrations",
       "keywords": [
         "notion",
@@ -405,7 +405,7 @@
     {
       "name": "npm",
       "source": "./skills/npm",
-      "description": "Handle npm package installation in non-interactive environments by piping confirmations. Use when installing Node.js packages that require user confirmation prompts.",
+      "description": "Установка npm-пакетов в неинтерактивных средах путём автоматического подтверждения запросов. Используй при установке зависимостей.",
       "category": "environment",
       "keywords": [
         "npm",
@@ -416,7 +416,7 @@
     {
       "name": "onboarding",
       "source": "./plugins/onboarding",
-      "description": "Assess repository agent-readiness across five pillars, propose high-impact fixes, and generate repo-specific AGENTS.md files.",
+      "description": "Оценка готовности репозитория к работе агента по пяти направлениям, предложение высокоэффективных улучшений и генерация итогового отчёта.",
       "category": "productivity",
       "keywords": [
         "onboarding",
@@ -429,7 +429,7 @@
     {
       "name": "openhands",
       "source": "./plugins/openhands",
-      "description": "Unified OpenHands plugin \u2014 bundles Cloud CLI, REST API (openhands-api), and Automations (openhands-automation) into a single plugin.",
+      "description": "Объединённый плагин OpenHands — включает Cloud CLI, REST API (openhands-api) и автоматизации.",
       "category": "openhands",
       "keywords": [
         "openhands",
@@ -442,7 +442,7 @@
     {
       "name": "openhands-api",
       "source": "./skills/openhands-api",
-      "description": "Use the OpenHands Cloud REST API (V1) and agent-server APIs to create and manage Cloud or local backend conversations, including multi-conversation delegation workflows. Includes minimal Python and TypeScript clients under scripts/.",
+      "description": "Использование OpenHands Cloud REST API (V1) и API agent-server для создания облачных и локальных разговоров и управления ими.",
       "category": "agent-authoring",
       "keywords": [
         "openhands",
@@ -458,7 +458,7 @@
     {
       "name": "pdflatex",
       "source": "./skills/pdflatex",
-      "description": "Install and use pdflatex to compile LaTeX documents into PDFs on Linux. Use when generating academic papers, research publications, or any documents written in LaTeX.",
+      "description": "Установка и использование pdflatex для компиляции LaTeX-документов в PDF на Linux. Используй при генерации PDF.",
       "category": "environment",
       "keywords": [
         "latex",
@@ -470,7 +470,7 @@
     {
       "name": "pr-review",
       "source": "./plugins/pr-review",
-      "description": "Automated PR code review \u2014 analyzes diffs and posts inline review comments via the GitHub API.",
+      "description": "Автоматический ревью PR — анализ изменений и публикация инлайн-комментариев через GitHub API.",
       "category": "code-quality",
       "keywords": [
         "pr-review",
@@ -482,7 +482,7 @@
     {
       "name": "qa-changes",
       "source": "./plugins/qa-changes",
-      "description": "Validate pull request changes by actually running the code \u2014 setting up the environment, exercising changed behavior, and posting a structured QA report.",
+      "description": "Проверка изменений пул-реквеста запуском кода — настройка окружения, выполнение тестов и валидация результата.",
       "category": "quality-assurance",
       "keywords": [
         "qa",
@@ -495,7 +495,7 @@
     {
       "name": "prd",
       "source": "./skills/prd",
-      "description": "Generate a Product Requirements Document (PRD) for a new feature through an interactive clarifying-question workflow. Use when planning a feature, starting a new project, or when asked to create a PRD.",
+      "description": "Создание документа требований к продукту (PRD) для новой функции через интерактивный опрос с уточняющими вопросами. Используй при планировании функции, старте проекта или создании спецификации.",
       "category": "writing",
       "keywords": [
         "prd",
@@ -508,7 +508,7 @@
     {
       "name": "release-notes",
       "source": "./plugins/release-notes",
-      "description": "Generate consistent, well-structured release notes from git history. Produces categorized changelog with breaking changes, features, fixes, and contributor attribution.",
+      "description": "Генерация согласованных, хорошо структурированных заметок о релизе из git-истории с категоризацией изменений.",
       "category": "productivity",
       "keywords": [
         "release-notes",
@@ -520,7 +520,7 @@
     {
       "name": "security",
       "source": "./skills/security",
-      "description": "Security best practices for secure coding, authentication, authorization, and data protection. Use when developing features that handle sensitive data, user authentication, or require security review.",
+      "description": "Рекомендации по безопасному коду: безопасное программирование, аутентификация, авторизация и защита данных.",
       "category": "code-quality",
       "keywords": [
         "security",
@@ -532,7 +532,7 @@
     {
       "name": "skill-creator",
       "source": "./skills/skill-creator",
-      "description": "Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations.",
+      "description": "Руководство по созданию эффективных навыков. Используй, когда пользователь хочет создать новый навык.",
       "category": "agent-authoring",
       "keywords": [
         "skill",
@@ -543,7 +543,7 @@
     {
       "name": "slack-channel-monitor",
       "source": "./skills/slack-channel-monitor",
-      "description": "Create a cron automation that polls up to 10 Slack channels every minute and starts an OpenHands conversation when a configurable trigger phrase is detected. Forwards thread replies to running conversations and posts summaries back to Slack when the agent finishes.",
+      "description": "Создание cron-автоматизации, которая опрашивает до 10 каналов Slack каждую минуту и запускает разговор OpenHands при совпадении.",
       "category": "automations",
       "keywords": [
         "slack",
@@ -558,7 +558,7 @@
     {
       "name": "ssh",
       "source": "./skills/ssh",
-      "description": "Establish and manage SSH connections to remote machines, including key generation, configuration, and file transfers. Use when connecting to remote servers, executing remote commands, or transferring files via SCP.",
+      "description": "Настройка и управление SSH-подключениями к удалённым машинам: генерация ключей, конфигурация и подключение.",
       "category": "environment",
       "keywords": [
         "ssh",
@@ -570,7 +570,7 @@
     {
       "name": "swift-linux",
       "source": "./skills/swift-linux",
-      "description": "Install and configure Swift programming language on Debian Linux for server-side development. Use when building Swift applications on Linux or setting up a Swift development environment.",
+      "description": "Установка и настройка языка Swift на Debian Linux для серверной разработки.",
       "category": "environment",
       "keywords": [
         "swift",
@@ -581,7 +581,7 @@
     {
       "name": "theme-factory",
       "source": "./skills/theme-factory",
-      "description": "Toolkit for styling artifacts with a theme. These artifacts can be slides, docs, reportings, HTML landing pages, etc. There are 10 pre-set themes with colors/fonts that you can apply to any artifact that has been creating, or can generate a new theme on-the-fly.",
+      "description": "Набор инструментов для стилизации артефактов темой: слайды, документы, отчёты и другие материалы.",
       "category": "design",
       "keywords": [
         "theme",
@@ -594,7 +594,7 @@
     {
       "name": "uv",
       "source": "./skills/uv",
-      "description": "Common project, dependency, and environment operations using uv.",
+      "description": "Типовые операции с проектом, зависимостями и окружением с помощью uv.",
       "category": "environment",
       "keywords": [
         "uv",
@@ -606,7 +606,7 @@
     {
       "name": "upstream-fork-sync",
       "source": "./skills/upstream-fork-sync",
-      "description": "Keep a long-lived fork in sync with its upstream. Creates a cron automation that fetches upstream changes, rebases local customizations on top, verifies the software works, and replaces the running version when the rebase is clean.",
+      "description": "Поддержание долгоживущего форка в синхронизации с апстримом. Создаёт cron-автоматизацию для периодического обновления.",
       "category": "integrations",
       "keywords": [
         "fork",
@@ -620,7 +620,7 @@
     {
       "name": "vercel",
       "source": "./skills/vercel",
-      "description": "Deploy and manage applications on Vercel, including preview deployments and deployment protection.",
+      "description": "Развёртывание и управление приложениями на Vercel, включая превью-развёртывания и управление deployment.",
       "category": "integrations",
       "keywords": [
         "vercel",
@@ -632,7 +632,7 @@
     {
       "name": "vulnerability-remediation",
       "source": "./plugins/vulnerability-remediation",
-      "description": "Automated security vulnerability scanning and AI-powered remediation. Scans repositories, skips when no issues found, and creates PRs with fixes.",
+      "description": "Автоматическое сканирование уязвимостей безопасности и их устранение с помощью ИИ. Сканирует репозитории и создаёт исправления.",
       "category": "security",
       "keywords": [
         "security",
@@ -645,7 +645,7 @@
     {
       "name": "iterate",
       "source": "./skills/iterate",
-      "description": "Iterate on a GitHub pull request \u2014 drive it through CI, code review, and QA until merge-ready. Monitors state, fixes failures, addresses review feedback, retries flaky checks, and pushes fixes in one continuous loop.",
+      "description": "Итеративная работа с GitHub PR — проведение через CI, ревью кода и QA до готовности к слиянию.",
       "category": "code-quality",
       "keywords": [
         "github",
@@ -659,7 +659,7 @@
     {
       "name": "evidence-based-citations",
       "source": "./skills/evidence-based-citations",
-      "description": "Back factual claims and field values with official, verifiable sources. Use when the user asks to fill fields, answer questions, or make claims that must be supported by an exact quote and an official link.",
+      "description": "Подкрепление фактических утверждений и значений полей официальными проверяемыми источниками. Используй, когда пользователь запрашивает достоверность.",
       "category": "writing",
       "keywords": [
         "evidence",
@@ -673,7 +673,7 @@
     {
       "name": "github-pr-reviewer",
       "source": "./skills/github-pr-reviewer",
-      "description": "Create an automation that reviews GitHub pull requests when they are opened or updated. Inspects the diff, changed files, tests, and existing discussion via GitHub MCP, then posts a concise review highlighting risks, security issues, missing tests, and next steps.",
+      "description": "Создание автоматизации, которая ревьюит GitHub PR при их открытии или обновлении.",
       "category": "automations",
       "keywords": [
         "github",
@@ -687,7 +687,7 @@
     {
       "name": "incident-retrospective",
       "source": "./skills/incident-retrospective",
-      "description": "Create an automation that drafts incident retrospectives by gathering incident-channel messages from Slack, collecting linked tickets from Linear, and publishing a retrospective draft to Notion with timeline, impact summary, root-cause hypotheses, and action items.",
+      "description": "Создание автоматизации, которая готовит ретроспективы инцидентов, собирая сообщения канала инцидента.",
       "category": "automations",
       "keywords": [
         "incident",
@@ -702,7 +702,7 @@
     {
       "name": "linear-triage",
       "source": "./skills/linear-triage",
-      "description": "Create an automation that triages new Linear issues by inspecting title, description, team, and recent related issues. Suggests labels, priority, likely owner, and potential duplicates, then posts a clarifying comment.",
+      "description": "Создание автоматизации, которая триажирует новые задачи Linear, анализируя заголовок, описание и команду.",
       "category": "automations",
       "keywords": [
         "linear",
@@ -717,7 +717,7 @@
     {
       "name": "research-brief",
       "source": "./skills/research-brief",
-      "description": "Create a recurring automation that researches a topic using Tavily web search and publishes a structured brief to Notion with executive summary, key findings, implications, and source citations.",
+      "description": "Создание регулярной автоматизации, которая исследует тему с помощью веб-поиска Tavily и публикует результат.",
       "category": "automations",
       "keywords": [
         "research",
@@ -731,7 +731,7 @@
     {
       "name": "slack-standup-digest",
       "source": "./skills/slack-standup-digest",
-      "description": "Create an automation that generates an async standup digest from Slack. Searches selected channels for messages since the previous workday, groups updates by project, highlights blockers and decisions, and posts a summary to a target channel.",
+      "description": "Создание автоматизации, которая генерирует асинхронную сводку стендапа из Slack. Ищет выбранные каналы.",
       "category": "automations",
       "keywords": [
         "slack",
@@ -746,7 +746,7 @@
     {
       "name": "technical-writing",
       "source": "./skills/technical-writing",
-      "description": "Write and revise technical explanations in flowing, direct, conversational prose that stays concise without becoming fragmented or vague.",
+      "description": "Написание и правка технических объяснений живым, прямым, разговорным и лаконичным стилем.",
       "category": "writing",
       "keywords": [
         "technical-writing"
@@ -755,7 +755,7 @@
     {
       "name": "plain-english-content",
       "source": "./skills/plain-english-content",
-      "description": "Write and edit clear, accessible prose in a plain English content style: active voice, front-loaded content, sentence case, and accessible formatting.",
+      "description": "Написание и редактирование ясного, доступного текста в стиле plain English: активный залог, короткие предложения.",
       "category": "writing",
       "keywords": [
         "plain-english"
@@ -764,7 +764,7 @@
     {
       "name": "jira-issue-to-pr",
       "source": "./skills/jira-issue-to-pr",
-      "description": "Deploy a cron-based OpenHands automation that watches a Jira Cloud project for issues labeled with a configurable label (default: create-pr) and spawns an agent conversation to create a GitHub pull request for each new issue found. The target GitHub repo is read from the ticket body - no repo parameter required at deploy time.",
+      "description": "Развёртывание cron-автоматизации OpenHands, которая следит за задачами Jira Cloud с меткой для автоматического создания PR.",
       "category": "automations",
       "keywords": [
         "jira",

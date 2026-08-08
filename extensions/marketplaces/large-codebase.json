@@ -13,7 +13,7 @@
     {
       "name": "add-javadoc",
       "source": "./skills/add-javadoc",
-      "description": "Add comprehensive JavaDoc documentation to Java classes and methods. Use when documenting Java code, adding API documentation, or improving code documentation.",
+      "description": "Добавление подробной JavaDoc-документации к Java-классам и методам. Используй при документировании Java-кода.",
       "category": "code-quality",
       "keywords": [
         "javadoc",
@@ -25,7 +25,7 @@
     {
       "name": "cobol-modernization",
       "source": "./plugins/cobol-modernization",
-      "description": "End-to-end COBOL to Java migration workflow. Handles build setup, mainframe dependency removal, and code migration with test validation.",
+      "description": "Полный процесс миграции COBOL в Java: настройка сборки, основной код и сопутствующие изменения.",
       "category": "development",
       "keywords": [
         "cobol",
@@ -38,7 +38,7 @@
     {
       "name": "migration-scoring",
       "source": "./plugins/migration-scoring",
-      "description": "Evaluate code migration quality with coverage, correctness, and style scoring. Generates executive reports with actionable recommendations.",
+      "description": "Оценка качества миграции кода по покрытию, корректности и стилю с итоговым баллом.",
       "category": "code-quality",
       "keywords": [
         "migration",
@@ -51,7 +51,7 @@
     {
       "name": "spark-version-upgrade",
       "source": "./skills/spark-version-upgrade",
-      "description": "Upgrade Apache Spark applications between major versions (2.x→3.x, 3.x→4.x). Covers build files, deprecated APIs, configuration changes, SQL/DataFrame updates, and test validation.",
+      "description": "Обновление приложений Apache Spark между мажорными версиями (2.x→3.x, 3.x→4.x) с учётом изменений API.",
       "category": "environment",
       "keywords": [
         "spark",

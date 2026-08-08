@@ -709,17 +709,40 @@ def _fetch_catalog_entries(marketplace_path: str) -> list[_CatalogEntry]:
     This is the slow path: it does a git fetch + reads the marketplace JSON.
     Results are cached by the caller.
 
+    When ``EXTENSIONS_REPO`` points at an existing local directory (a vendored
+    copy, e.g. this project's ``extensions/`` baked into the image), the catalog
+    is read straight from that directory with no network. Otherwise it falls
+    back to the git clone/fetch path.
+
     Returns:
         List of (name, description, source) tuples, or an empty list on error.
     """
-    cache_dir = get_skills_cache_dir()
-    repo_path = update_skills_repository(
-        PUBLIC_SKILLS_REPO, PUBLIC_SKILLS_REF, cache_dir
-    )
+    from openhands.sdk.skills.skill import resolve_marketplace_path
+
+    repo_path: Path | None = None
+    local_repo = Path(PUBLIC_SKILLS_REPO)
+    if local_repo.is_dir():
+        repo_path = local_repo
+        logger.info(f"Using local public skills repository for catalog: {repo_path}")
+    else:
+        cache_dir = get_skills_cache_dir()
+        repo_path = update_skills_repository(
+            PUBLIC_SKILLS_REPO, PUBLIC_SKILLS_REF, cache_dir
+        )
 
     if repo_path is None:
         logger.warning("Failed to access public skills repository")
         return []
+
+    # The repo renamed its manifest: auto-resolve the default to a present one
+    # (openhands-extensions.json) so a vendored local copy still works.
+    if not (repo_path / marketplace_path).exists():
+        resolved = resolve_marketplace_path(repo_path)
+        if resolved != marketplace_path:
+            logger.info(
+                f"Marketplace '{marketplace_path}' not found; using '{resolved}'"
+            )
+            marketplace_path = resolved
 
     marketplace_file = repo_path / marketplace_path
     if not marketplace_file.exists():

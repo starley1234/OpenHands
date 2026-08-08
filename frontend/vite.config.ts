@@ -3,7 +3,14 @@
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 import { readFile } from "node:fs/promises";
-import { resolve, dirname, relative, isAbsolute } from "node:path";
+import { existsSync } from "node:fs";
+import {
+  resolve,
+  dirname,
+  relative,
+  isAbsolute,
+  join,
+} from "node:path";
 import { defineConfig, loadEnv } from "vite";
 import svgr from "vite-plugin-svgr";
 import { reactRouter } from "@react-router/dev/vite";
@@ -38,10 +45,25 @@ const normalizeBasePath = (value?: string) => {
 // real filesystem paths to the Python agent-server (which uses them to
 // resolve bundled skill resources like scripts/ and references/).
 const _require = createRequire(import.meta.url);
+// Use the vendored OpenHands/extensions catalog in this repo (../extensions)
+// instead of the npm `@openhands/extensions` package, so our Russian
+// localizations of skills (SKILL.md + generated skills/index.js) are what the
+// UI and the agent see. The npm package is still declared for type/fallback.
 const EXTENSIONS_SKILLS_DIR = resolve(
   dirname(_require.resolve("@openhands/extensions/package.json")),
   "skills",
 );
+const VENDORED_EXTENSIONS_DIR = resolve(process.cwd(), "..", "extensions");
+const VENDORED_EXTENSIONS_SKILLS_DIR = resolve(
+  VENDORED_EXTENSIONS_DIR,
+  "skills",
+);
+const hasVendoredExtensions =
+  existsSync(VENDORED_EXTENSIONS_SKILLS_DIR) &&
+  existsSync(join(VENDORED_EXTENSIONS_SKILLS_DIR, "index.js"));
+const effectiveExtensionsSkillsDir = hasVendoredExtensions
+  ? VENDORED_EXTENSIONS_SKILLS_DIR
+  : EXTENSIONS_SKILLS_DIR;
 const PUBLIC_LOCALES_DIR = resolve(process.cwd(), "public", "locales");
 
 const appBuildConfig = {
@@ -121,7 +143,7 @@ export default defineConfig(({ mode }) => {
       // machine's node_modules path; agent-server-adapter falls back to
       // "public" when the value is falsy.
       __EXTENSIONS_SKILLS_DIR__: JSON.stringify(
-        isLibraryBuild ? "" : EXTENSIONS_SKILLS_DIR,
+        isLibraryBuild ? "" : effectiveExtensionsSkillsDir,
       ),
     },
     plugins: [
@@ -189,6 +211,19 @@ export default defineConfig(({ mode }) => {
     ],
     resolve: {
       tsconfigPaths: true,
+      // Route only the skills subpath of @openhands/extensions to our vendored,
+      // Russian-localized catalog when present, so the UI skill list and the
+      // agent see our SKILL.md / generated index.js instead of the English npm
+      // snapshot. Other subpaths (automations, testing, integrations) keep
+      // resolving from the npm package, which is structurally identical.
+      alias: hasVendoredExtensions
+        ? [
+            {
+              find: "@openhands/extensions/skills",
+              replacement: join(VENDORED_EXTENSIONS_SKILLS_DIR, "index.js"),
+            },
+          ]
+        : [],
     },
     css: {
       postcss: {
