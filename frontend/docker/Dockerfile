@@ -178,6 +178,13 @@ COPY frontend/tools/ /opt/agent-canvas/tools/
 # Copy generated defaults.env (from config/defaults.json via config-gen stage)
 COPY --from=config-gen /tmp/defaults.env /opt/agent-canvas/defaults.env
 
+# Copy the vendored OpenHands/extensions catalog (skills, marketplaces,
+# integrations, plugins). The agent-server loads public skills from this local
+# directory (EXTENSIONS_REPO below) instead of cloning from GitHub at runtime —
+# no network, deterministic, and already Russian-localized where customized.
+COPY extensions/ /opt/agent-canvas/extensions/
+ENV EXTENSIONS_REPO=/opt/agent-canvas/extensions
+
 # Copy the entrypoint
 COPY frontend/docker/entrypoint.sh /opt/agent-canvas/entrypoint.sh
 # Normalize line endings: if the working copy was checked out with CRLF
