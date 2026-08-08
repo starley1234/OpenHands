@@ -224,16 +224,33 @@ export default defineConfig(({ mode }) => {
     ],
     resolve: {
       tsconfigPaths: true,
-      // Route only the skills subpath of @openhands/extensions to our vendored,
-      // Russian-localized catalog when present, so the UI skill list and the
-      // agent see our SKILL.md / generated index.js instead of the English npm
-      // snapshot. Other subpaths (automations, testing, integrations) keep
-      // resolving from the npm package, which is structurally identical.
+      // Route the catalog subpaths of @openhands/extensions to our vendored,
+      // Russian-localized catalog when present, so the UI skill list, MCP
+      // marketplace, automations, and plugins see our localized SKILL.md and
+      // catalog JSON instead of the English npm snapshot. The vendored
+      // catalog is structurally identical, so only string values differ.
+      // Other subpaths (e.g. testing) keep resolving from the npm package.
       alias: hasVendoredExtensions
         ? [
             {
               find: "@openhands/extensions/skills",
               replacement: join(VENDORED_EXTENSIONS_SKILLS_DIR, "index.js"),
+            },
+            {
+              find: "@openhands/extensions/integrations",
+              replacement: join(
+                VENDORED_EXTENSIONS_DIR,
+                "integrations",
+                "index.js",
+              ),
+            },
+            {
+              find: "@openhands/extensions/automations",
+              replacement: join(
+                VENDORED_EXTENSIONS_DIR,
+                "automations",
+                "index.js",
+              ),
             },
           ]
         : [],
