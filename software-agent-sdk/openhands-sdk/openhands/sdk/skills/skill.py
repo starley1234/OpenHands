@@ -1135,7 +1135,31 @@ PUBLIC_SKILLS_REPO = os.environ.get(
     "EXTENSIONS_REPO", "https://github.com/OpenHands/extensions"
 )
 PUBLIC_SKILLS_REF = os.environ.get("EXTENSIONS_REF", "main")
-DEFAULT_MARKETPLACE_PATH = "marketplaces/default.json"
+# The official OpenHands/extensions repo renamed its marketplace manifest from
+# `default.json` to `openhands-extensions.json`. Resolve the first one present
+# so both the legacy default and the current name work (and so a vendored local
+# repo picks the right manifest without extra config).
+_MARKETPLACE_CANDIDATES = (
+    "marketplaces/openhands-extensions.json",
+    "marketplaces/default.json",
+)
+
+
+def resolve_marketplace_path(repo_path: Path) -> str:
+    """Return the first marketplace manifest path present in ``repo_path``.
+
+    Falls back to the historical default when none of the known candidates
+    exist (so loading "all skills" still works on older snapshots).
+    """
+    for candidate in _MARKETPLACE_CANDIDATES:
+        if (repo_path / candidate).exists():
+            return candidate
+    return "marketplaces/default.json"
+
+
+DEFAULT_MARKETPLACE_PATH = os.environ.get(
+    "EXTENSIONS_MARKETPLACE", "marketplaces/default.json"
+)
 
 # Process-level cache for load_public_skills. Conversation creation re-validates
 # AgentContext several times and each validation re-runs load_public_skills
@@ -1274,9 +1298,19 @@ def load_public_skills(
     is_pinned = False
 
     try:
-        # Get or update the local repository
-        cache_dir = get_skills_cache_dir()
-        repo_path = update_skills_repository(repo_url, ref, cache_dir)
+        # A local path (no scheme, points at an existing directory) is used
+        # directly — no git clone/fetch. This is how a self-hosted / vendored
+        # copy of OpenHands/extensions (e.g. this repo's `extensions/` dir) is
+        # wired in without network access. A git URL (http/https/ssh/git@) or a
+        # missing path falls through to the clone/cache path below.
+        local_repo = Path(repo_url)
+        if local_repo.is_dir():
+            repo_path = local_repo
+            logger.info(f"Using local public skills repository: {repo_path}")
+        else:
+            # Get or update the local repository
+            cache_dir = get_skills_cache_dir()
+            repo_path = update_skills_repository(repo_url, ref, cache_dir)
 
         if repo_path is None:
             logger.warning("Failed to access public skills repository")
@@ -1296,16 +1330,33 @@ def load_public_skills(
         if marketplace_path is None:
             marketplace_skill_names = None
         else:
+            # Auto-resolve ONLY the default manifest: the repo renamed
+            # `default.json` → `openhands-extensions.json`, and a vendored local
+            # copy may carry only the new name. An explicitly-configured custom
+            # marketplace path is honored verbatim (a missing one still yields
+            # empty, not a silent substitution to a different manifest).
+            effective_marketplace = marketplace_path
+            if (
+                effective_marketplace == DEFAULT_MARKETPLACE_PATH
+                and not (repo_path / effective_marketplace).exists()
+            ):
+                resolved = resolve_marketplace_path(repo_path)
+                if resolved != effective_marketplace:
+                    logger.info(
+                        f"Marketplace '{effective_marketplace}' not found; "
+                        f"using '{resolved}'"
+                    )
+                    effective_marketplace = resolved
             marketplace_skill_names = load_marketplace_skill_names(
-                repo_path, marketplace_path
+                repo_path, effective_marketplace
             )
             if (
                 marketplace_skill_names is None
-                and marketplace_path != DEFAULT_MARKETPLACE_PATH
+                and effective_marketplace != DEFAULT_MARKETPLACE_PATH
             ):
                 logger.warning(
                     "Configured marketplace path could not be loaded: %s",
-                    marketplace_path,
+                    effective_marketplace,
                 )
                 return all_skills
 

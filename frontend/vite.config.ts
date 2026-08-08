@@ -3,7 +3,14 @@
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 import { readFile } from "node:fs/promises";
-import { resolve, dirname, relative, isAbsolute } from "node:path";
+import { existsSync } from "node:fs";
+import {
+  resolve,
+  dirname,
+  relative,
+  isAbsolute,
+  join,
+} from "node:path";
 import { defineConfig, loadEnv } from "vite";
 import svgr from "vite-plugin-svgr";
 import { reactRouter } from "@react-router/dev/vite";
@@ -38,10 +45,38 @@ const normalizeBasePath = (value?: string) => {
 // real filesystem paths to the Python agent-server (which uses them to
 // resolve bundled skill resources like scripts/ and references/).
 const _require = createRequire(import.meta.url);
+// Use the vendored OpenHands/extensions catalog in this repo (../extensions)
+// instead of the npm `@openhands/extensions` package, so our Russian
+// localizations of skills (SKILL.md + generated skills/index.js) are what the
+// UI and the agent see. The npm package is still declared for type/fallback.
 const EXTENSIONS_SKILLS_DIR = resolve(
   dirname(_require.resolve("@openhands/extensions/package.json")),
   "skills",
 );
+// The vendored OpenHands/extensions catalog lives at ../extensions relative to
+// this config (repo root) during local dev, but in the Docker frontend build
+// stage WORKDIR=/build while the catalog is copied to /extensions. Probe both
+// locations (plus an explicit EXTENSIONS_SKILLS_DIR override) so the UI uses
+// the Russian-localized catalog in every build environment, falling back to the
+// npm package only when none is present.
+const VENDORED_EXTENSIONS_CANDIDATES = [
+  process.env.EXTENSIONS_SKILLS_DIR,
+  resolve(process.cwd(), "..", "extensions"),
+  "/extensions",
+].filter(Boolean) as string[];
+const VENDORED_EXTENSIONS_SKILLS_DIR = VENDORED_EXTENSIONS_CANDIDATES.map((dir) =>
+  resolve(dir, "skills"),
+).find(
+  (dir) =>
+    existsSync(dir) && existsSync(join(dir, "index.js")),
+);
+const VENDORED_EXTENSIONS_DIR = VENDORED_EXTENSIONS_SKILLS_DIR
+  ? dirname(VENDORED_EXTENSIONS_SKILLS_DIR)
+  : resolve(process.cwd(), "..", "extensions");
+const hasVendoredExtensions = Boolean(VENDORED_EXTENSIONS_SKILLS_DIR);
+const effectiveExtensionsSkillsDir = hasVendoredExtensions
+  ? VENDORED_EXTENSIONS_SKILLS_DIR
+  : EXTENSIONS_SKILLS_DIR;
 const PUBLIC_LOCALES_DIR = resolve(process.cwd(), "public", "locales");
 
 const appBuildConfig = {
@@ -121,7 +156,7 @@ export default defineConfig(({ mode }) => {
       // machine's node_modules path; agent-server-adapter falls back to
       // "public" when the value is falsy.
       __EXTENSIONS_SKILLS_DIR__: JSON.stringify(
-        isLibraryBuild ? "" : EXTENSIONS_SKILLS_DIR,
+        isLibraryBuild ? "" : effectiveExtensionsSkillsDir,
       ),
     },
     plugins: [
@@ -189,6 +224,19 @@ export default defineConfig(({ mode }) => {
     ],
     resolve: {
       tsconfigPaths: true,
+      // Route only the skills subpath of @openhands/extensions to our vendored,
+      // Russian-localized catalog when present, so the UI skill list and the
+      // agent see our SKILL.md / generated index.js instead of the English npm
+      // snapshot. Other subpaths (automations, testing, integrations) keep
+      // resolving from the npm package, which is structurally identical.
+      alias: hasVendoredExtensions
+        ? [
+            {
+              find: "@openhands/extensions/skills",
+              replacement: join(VENDORED_EXTENSIONS_SKILLS_DIR, "index.js"),
+            },
+          ]
+        : [],
     },
     css: {
       postcss: {

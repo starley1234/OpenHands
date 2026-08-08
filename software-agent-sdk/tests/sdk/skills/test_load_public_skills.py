@@ -971,3 +971,82 @@ def test_load_public_skills_does_not_cache_empty_results(mock_repo_dir, tmp_path
     assert first == []
     assert {s.name for s in second} == {"git", "docker", "testing"}
     assert update_mock.call_count == 2
+
+
+def test_resolve_marketplace_path_prefers_openhands_extensions(tmp_path):
+    """resolve_marketplace_path prefers the renamed manifest when present."""
+    marketplaces = tmp_path / "marketplaces"
+    marketplaces.mkdir()
+    (marketplaces / "openhands-extensions.json").write_text("{}")
+    (marketplaces / "default.json").write_text("{}")
+
+    from openhands.sdk.skills.skill import resolve_marketplace_path
+
+    assert (
+        resolve_marketplace_path(tmp_path) == "marketplaces/openhands-extensions.json"
+    )
+
+
+def test_resolve_marketplace_path_falls_back_to_default(tmp_path):
+    """resolve_marketplace_path falls back to default.json when only it exists."""
+    marketplaces = tmp_path / "marketplaces"
+    marketplaces.mkdir()
+    (marketplaces / "default.json").write_text("{}")
+
+    from openhands.sdk.skills.skill import resolve_marketplace_path
+
+    assert resolve_marketplace_path(tmp_path) == "marketplaces/default.json"
+
+
+def test_load_public_skills_from_local_dir_uses_repo_directly(mock_repo_dir):
+    """Passing a local directory as EXTENSIONS_REPO must load skills directly.
+
+    A vendored local copy (no git) should not attempt a git clone/fetch — it
+    reads skills straight from the directory. ``update_skills_repository`` must
+    not be called.
+    """
+    with patch(
+        "openhands.sdk.skills.skill.update_skills_repository",
+    ) as update_mock:
+        skills = load_public_skills(repo_url=str(mock_repo_dir))
+        update_mock.assert_not_called()
+
+    assert len(skills) == 3
+    assert {s.name for s in skills} == {"git", "docker", "testing"}
+
+
+def test_load_public_skills_local_dir_resolves_renamed_marketplace(tmp_path):
+    """A local repo with only openhands-extensions.json loads that manifest."""
+    skills_dir = tmp_path / "skills"
+    skills_dir.mkdir(parents=True)
+    (skills_dir / "git").mkdir()
+    (skills_dir / "git" / "SKILL.md").write_text(
+        "---\nname: git\ndescription: Git skill\n---\nGit content."
+    )
+    (skills_dir / "docker").mkdir()
+    (skills_dir / "docker" / "SKILL.md").write_text(
+        "---\nname: docker\ndescription: Docker skill\n---\nDocker content."
+    )
+    marketplaces = tmp_path / "marketplaces"
+    marketplaces.mkdir()
+    (marketplaces / "openhands-extensions.json").write_text(
+        json.dumps(
+            {
+                "name": "openhands-extensions",
+                "owner": {"name": "OpenHands", "email": "test@test.com"},
+                "metadata": {"description": "Test", "version": "1.0.0"},
+                "plugins": [
+                    {"name": "git", "source": "./skills/git", "description": "Git"},
+                    {"name": "docker", "source": "./skills/docker", "description": "D"},
+                ],
+            }
+        )
+    )
+
+    with patch(
+        "openhands.sdk.skills.skill.update_skills_repository",
+    ) as update_mock:
+        skills = load_public_skills(repo_url=str(tmp_path))
+        update_mock.assert_not_called()
+
+    assert {s.name for s in skills} == {"git", "docker"}

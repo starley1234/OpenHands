@@ -66,6 +66,14 @@ services:
       HTTPS_PROXY: "${HTTPS_PROXY:-${HTTP_PROXY}}"
       ALL_PROXY: "${ALL_PROXY:-${HTTP_PROXY}}"
       NO_PROXY: "${NO_PROXY:-localhost,127.0.0.1}"
+      # ── Навыки/расширения (OpenHands/extensions, вендоренный каталог в образе) ──
+      # По умолчанию агент читает навыки из локального каталога
+      # /opt/agent-canvas/extensions (зашит в образ, без сети). Если нужен другой
+      # источник (например своя папка на хосте) — переопредели через .env.
+      EXTENSIONS_REPO: "${EXTENSIONS_REPO:-/opt/agent-canvas/extensions}"
+      # Маркетплейс-манифест внутри каталога (по умолчанию выбирается сам:
+      # openhands-extensions.json, иначе default.json).
+      # EXTENSIONS_MARKETPLACE: "marketplaces/openhands-extensions.json"
       # ── Безопасность: свой ключ вместо автогенерации ──
       LOCAL_BACKEND_API_KEY: "${LOCAL_BACKEND_API_KEY:-}"
       # ── При необходимости — внешний URL (если публикуешь наружу) ──

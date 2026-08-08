@@ -1002,3 +1002,80 @@ class TestMarketplaceCatalogCache:
             service_get_marketplace_catalog()
 
         assert mock_fetch.call_count == 2  # fetched again after expiry
+
+
+class TestFetchCatalogEntriesLocalDir:
+    """Tests for _fetch_catalog_entries using a local (vendored) repo."""
+
+    def _make_local_repo(self, tmp_path: Path) -> Path:
+        """Build a local repo dir with a marketplace + skills + .plugin manifest."""
+        skills_dir = tmp_path / "skills"
+        (skills_dir / "git").mkdir(parents=True)
+        (skills_dir / "git" / "SKILL.md").write_text(
+            "---\nname: git\ndescription: Git skill\n---\nGit content."
+        )
+        marketplaces = tmp_path / "marketplaces"
+        marketplaces.mkdir()
+        (marketplaces / "openhands-extensions.json").write_text(
+            json.dumps(
+                {
+                    "name": "openhands-extensions",
+                    "owner": {"name": "OpenHands", "email": "test@test.com"},
+                    "metadata": {"description": "Test", "version": "1.0.0"},
+                    "plugins": [
+                        {"name": "git", "source": "./skills/git", "description": "Git"}
+                    ],
+                }
+            )
+        )
+        # .plugin/marketplace.json is what Marketplace.load() looks for.
+        plugin_dir = tmp_path / ".plugin"
+        plugin_dir.mkdir()
+        (plugin_dir / "marketplace.json").write_text(
+            '{"name": "openhands-extensions", "owner": {"name": "OpenHands", "email": "t@t.com"}, '
+            '"metadata": {"description": "Test", "version": "1.0.0"}, '
+            '"plugins": [{"name": "git", "source": "./skills/git", "description": "Git"}]}'
+        )
+        return tmp_path
+
+    def test_fetch_uses_local_dir_when_repo_is_path(self, tmp_path):
+        """When PUBLIC_SKILLS_REPO points at a local dir, no git fetch is done."""
+        repo = self._make_local_repo(tmp_path)
+
+        with (
+            patch(
+                "openhands.agent_server.skills_service.update_skills_repository",
+            ) as mock_update,
+            patch(
+                "openhands.agent_server.skills_service.PUBLIC_SKILLS_REPO",
+                str(repo),
+            ),
+        ):
+            from openhands.agent_server.skills_service import _fetch_catalog_entries
+
+            entries = _fetch_catalog_entries("marketplaces/openhands-extensions.json")
+
+        mock_update.assert_not_called()
+        assert len(entries) == 1
+        assert entries[0][0] == "git"
+        assert entries[0][1] == "Git"
+        assert entries[0][2].endswith("skills/git")
+
+    def test_fetch_resolves_renamed_marketplace_for_default(self, tmp_path):
+        """Default marketplace path auto-resolves to the renamed manifest."""
+        repo = self._make_local_repo(tmp_path)
+
+        with patch(
+            "openhands.agent_server.skills_service.PUBLIC_SKILLS_REPO",
+            str(repo),
+        ):
+            from openhands.agent_server.skills_service import _fetch_catalog_entries
+
+            # Default path (marketplaces/default.json) absent → resolves to the
+            # renamed openhands-extensions.json present in the local repo.
+            entries = _fetch_catalog_entries("marketplaces/default.json")
+
+        assert len(entries) == 1
+        assert entries[0][0] == "git"
+        assert entries[0][1] == "Git"
+        assert entries[0][2].endswith("skills/git")
