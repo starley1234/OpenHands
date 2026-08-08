@@ -76,7 +76,27 @@ class MCPToolExecutor(ToolExecutor):
         server error such as HTTP 503), attempt to reconnect once before
         failing. This prevents a single transient error from permanently
         disabling all MCP tools for the remainder of the conversation.
+
+        A tool the user disabled is withheld from the tool list at connection
+        time, but a reference can still reach this executor: the agent may
+        keep a name from an earlier turn in a long conversation, a runtime
+        ``tools/list_changed`` reconciliation may briefly race the disabled
+        set, or the LLM may hallucinate a call. This hard guard refuses to
+        run the tool regardless of how the call arrived.
         """
+        # Defense-in-depth: never execute a tool the user disabled. Withholding
+        # it from the tool list is the primary defense; this catches lingering
+        # or fabricated references and returns a clear error instead of running.
+        if self.tool_name in self.client._disabled_tool_names:
+            return MCPToolObservation.from_text(
+                text=(
+                    f"Tool '{self.tool_name}' has been disabled by the user and "
+                    "cannot be called. Choose a different tool, or re-enable it "
+                    "in the MCP settings for this server."
+                ),
+                is_error=True,
+                tool_name=self.tool_name,
+            )
         if not self.client.is_connected():
             if self.client._closed:
                 return MCPToolObservation.from_text(
