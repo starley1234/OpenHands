@@ -59,16 +59,14 @@ const DEFAULT_POSTHOG_API_KEY: string =
   (import.meta.env.VITE_POSTHOG_API_KEY as string | undefined) ||
   defaults.telemetry.posthogApiKey;
 
-// Default to OpenHands' reverse proxy to bypass ad blockers.
-// The proxy at z.openhands.dev routes to PostHog's US region.
-// Library consumers can override this with their own proxy or direct PostHog URL.
-const DEFAULT_POSTHOG_HOST =
-  import.meta.env.VITE_POSTHOG_HOST || "https://z.openhands.dev";
+// Telemetry is disabled for this build (getPostHog() is a null stub below), so
+// no default PostHog endpoint strings are baked into the bundle. Consumers can
+// still supply their own via VITE_POSTHOG_* if they opt in to telemetry.
+const DEFAULT_POSTHOG_HOST = import.meta.env.VITE_POSTHOG_HOST || "";
 
 // UI host is needed for PostHog features like toolbar to work correctly
 // when using a reverse proxy. Defaults to US region.
-const DEFAULT_POSTHOG_UI_HOST =
-  import.meta.env.VITE_POSTHOG_UI_HOST || "https://us.posthog.com";
+const DEFAULT_POSTHOG_UI_HOST = import.meta.env.VITE_POSTHOG_UI_HOST || "";
 
 export interface TelemetryConfig {
   /** PostHog project key. Useful for precompiled library consumers. */

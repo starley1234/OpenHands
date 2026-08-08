@@ -563,4 +563,59 @@ describe("useCreateConversation", () => {
       ).toBe("claude"),
     );
   });
+
+  it("honors an explicitly picked agent profile even when its llm_profile_ref dangles", async () => {
+    // Selecting a profile in the "+" menu → "Switch agent profile" is a
+    // deliberate pick and must launch from that profile so the recreated
+    // conversation gets `launched_agent_profile` stamped (the switcher then
+    // names what the user chose). The dangling-llm_profile_ref downgrade is
+    // only for the implicit home-launch path (active_agent_profile_id), so an
+    // explicit `agentProfileId` must NOT be cleared here.
+    useLlmProfilesMock.mockReturnValue({
+      data: { active_profile: "standalone-active" },
+    });
+    listAgentProfilesMock.mockResolvedValue({
+      profiles: [
+        {
+          id: "profile-custom",
+          name: "My Profile",
+          agent_kind: "openhands",
+          revision: 2,
+          llm_profile_ref: "ghost-ref", // absent from the LLM-profile list
+          mcp_server_refs: null,
+        },
+      ],
+      active_agent_profile_id: "profile-default",
+    });
+    listLlmProfilesMock.mockResolvedValue({
+      profiles: [], // ghost-ref does not exist → implicit path would downgrade
+      active_profile: "standalone-active",
+    });
+    const createConversationSpy = vi
+      .spyOn(AgentServerConversationService, "createConversation")
+      .mockResolvedValue({
+        id: "task-id",
+        app_conversation_id: "conv-explicit",
+        agent_server_url: "http://agent-server.local",
+      } as never);
+
+    const { result } = renderHook(() => useCreateConversation(), {
+      wrapper: ({ children }) => (
+        <QueryClientProvider client={new QueryClient()}>
+          {children}
+        </QueryClientProvider>
+      ),
+    });
+
+    await result.current.mutateAsync({
+      query: "hello",
+      agentProfileId: "profile-custom",
+    });
+
+    const call = createConversationSpy.mock.lastCall;
+    // Launched from the explicitly picked profile, not downgraded to the
+    // active (default) profile.
+    expect(call?.[9]).toBe("profile-custom");
+    expect(call?.[10]).toBe("openhands");
+  });
 });

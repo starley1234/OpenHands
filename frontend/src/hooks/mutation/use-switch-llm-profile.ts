@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import AgentServerConversationService from "#/api/conversation-service/agent-server-conversation-service.api";
 import SettingsService from "#/api/settings-service/settings-service.api";
 import {
+  AGENT_PROFILES_QUERY_KEYS,
   LLM_PROFILES_QUERY_KEYS,
   SETTINGS_QUERY_KEYS,
 } from "#/hooks/query/query-keys";
@@ -69,6 +70,15 @@ export const useSwitchLlmProfile = () => {
     onSuccess: (_data, { conversationId, profileName }, context) => {
       queryClient.invalidateQueries({
         queryKey: LLM_PROFILES_QUERY_KEYS.all,
+      });
+      // Activating an LLM profile repoints the active AgentProfile's
+      // ``llm_profile_ref`` server-side (see profiles_router.activate_profile),
+      // so the conversation launched from that agent profile runs the newly
+      // selected model instead of a stale one. Invalidate the agent-profiles
+      // cache too so the conversation's stamped ``active_profile`` and the
+      // profile list reflect the synced ref.
+      queryClient.invalidateQueries({
+        queryKey: AGENT_PROFILES_QUERY_KEYS.all,
       });
       if (conversationId) {
         invalidateConversationQueries(queryClient, conversationId);

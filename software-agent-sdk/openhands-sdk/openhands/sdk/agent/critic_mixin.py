@@ -32,6 +32,12 @@ AUTONOMOUS_ITERATION_KEY = "autonomous_continuation_iteration"
 # Default max autonomous continuation steps before the agent is allowed to
 # finish (prevents infinite loops).
 AUTONOMOUS_DEFAULT_MAX = 8
+# Key storing a durable per-conversation flag that autonomous mode is active.
+# Set the first time the [AUTONOMOUS] marker is seen and kept in agent_state so
+# it survives LLM history condensation (which can summarize away the original
+# user message that carried the marker) and only falls back to scanning the
+# event stream on a resumed/older conversation.
+AUTONOMOUS_ENABLED_KEY = "autonomous_enabled"
 
 
 class CriticMixin:
@@ -170,20 +176,39 @@ class CriticMixin:
         Returns:
             (should_continue, followup) when autonomous mode applies, else None.
         """
-        marker_seen = False
-        for event in conversation.state.active_branch():
-            if isinstance(event, MessageEvent) and event.source == "user":
-                text = content_to_str(event.llm_message.content) or ""
-                if AUTONOMOUS_MARKER in text:
-                    marker_seen = True
-                    break
-        if not marker_seen:
-            return None
-
         state = conversation.state
+
+        # Durable flag first (set once when the marker was first seen). Kept in
+        # agent_state so LLM history condensation — which may summarize away the
+        # original [AUTONOMOUS] user message — cannot silently turn autonomous
+        # mode off mid-task. Only fall back to scanning the event stream for a
+        # conversation that predates the flag (e.g. resumed old session).
+        autonomous_enabled = state.agent_state.get(AUTONOMOUS_ENABLED_KEY)
+        if not autonomous_enabled:
+            marker_seen = False
+            for event in state.active_branch():
+                if isinstance(event, MessageEvent) and event.source == "user":
+                    # content_to_str returns a LIST of strings; join before the
+                    # substring check, otherwise `in` does list-membership
+                    # (equality) instead of substring and the [AUTONOMOUS]
+                    # marker is never detected → autonomous mode never turns on.
+                    text = " ".join(content_to_str(event.llm_message.content)) or ""
+                    if AUTONOMOUS_MARKER in text:
+                        marker_seen = True
+                        break
+            if not marker_seen:
+                return None
+            # Persist the flag so it survives later condensation.
+            state.agent_state = {
+                **state.agent_state,
+                AUTONOMOUS_ENABLED_KEY: True,
+            }
         steps = state.agent_state.get(AUTONOMOUS_ITERATION_KEY, 0)
+        # Resolution: explicit per-conversation agent_state override > the
+        # agent's configured autonomous_max_steps (set via settings → UI) >
+        # the module-level default.
         max_steps = int(state.agent_state.get("autonomous_max_steps", 0) or 0) or (
-            AUTONOMOUS_DEFAULT_MAX
+            getattr(self, "autonomous_max_steps", None) or AUTONOMOUS_DEFAULT_MAX
         )
 
         if steps >= max_steps:

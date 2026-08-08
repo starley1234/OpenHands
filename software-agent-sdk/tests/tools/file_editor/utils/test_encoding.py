@@ -419,6 +419,59 @@ def test_write_failure_leaves_original_file_intact(temp_non_utf8_file, monkeypat
     assert leftovers == [], f"stray temp files left behind: {leftovers}"
 
 
+def test_write_falls_back_to_direct_write_when_rename_denied(tmp_path, monkeypatch):
+    """Regression: on WSL /mnt/d (drvfs) the temp file is created but the atomic
+    rename-over-existing is denied with EPERM (PermissionError). The editor must
+    fall back to a direct write so the edit lands instead of failing."""
+    test_file = tmp_path / "book.md"
+    test_file.write_text("Chapter 1\n")
+
+    def boom(src, dst):
+        raise PermissionError(
+            f"[Errno 1] Operation not permitted: {src!r}"
+        )
+
+    monkeypatch.setattr(os, "replace", boom)
+
+    result = file_editor(
+        command="str_replace",
+        path=str(test_file),
+        old_str="Chapter 1",
+        new_str="Chapter 1 + 2",
+    )
+
+    assert not result.is_error
+    assert "Chapter 1 + 2" in test_file.read_text()
+    # No stray temp file left behind.
+    leftovers = list(tmp_path.glob(".book.md.*.tmp"))
+    assert leftovers == [], f"stray temp files left behind: {leftovers}"
+
+
+def test_write_falls_back_to_direct_write_when_temp_creation_fails(
+    tmp_path, monkeypatch
+):
+    """Regression: on mounts (e.g. WSL /mnt/d drvfs) that reject creating a temp
+    file (EPERM), the editor must fall back to a direct write instead of failing."""
+    test_file = tmp_path / "book.md"
+    test_file.write_text("Chapter 1\n")
+
+    def boom(*args, **kwargs):
+        raise PermissionError(
+            "[Errno 1] Operation not permitted: '/projects/book.md.xyz.tmp'"
+        )
+
+    monkeypatch.setattr("tempfile.NamedTemporaryFile", boom)
+
+    result = file_editor(
+        command="create",
+        path=str(test_file),
+        file_text="Chapter 1\nChapter 2\n",
+    )
+
+    assert not result.is_error
+    assert test_file.read_text() == "Chapter 1\nChapter 2\n"
+
+
 def test_create_non_utf8_file():
     """Test creating a new file with non-UTF-8 content."""
     # Create a temporary path

@@ -75,6 +75,49 @@ def test_file_editor_tool_create_file():
         assert content == "Hello, World!"
 
 
+def test_file_editor_tool_create_overwrites_existing_file():
+    """`create` on an existing file overwrites instead of erroring.
+
+    A weak model in autonomous mode often re-issues `create` on a file it
+    already made ("re-create to ensure consistency"). Previously this raised a
+    hard "File already exists ... Cannot overwrite" error that stalled the run.
+    Now it overwrites the content and keeps the prior version on the undo stack.
+    """
+    with tempfile.TemporaryDirectory() as temp_dir:
+        conv_state = _create_test_conv_state(temp_dir)
+        tool = FileEditorTool.create(conv_state)[0]
+
+        test_file = os.path.join(temp_dir, "book.md")
+        # First create
+        first = FileEditorAction(
+            command="create",
+            path=test_file,
+            file_text="Chapter 1",
+        )
+        result1 = tool(first)
+        assert not result1.is_error
+        assert result1.prev_exist is False
+
+        # Re-create (overwrite) the same file
+        second = FileEditorAction(
+            command="create",
+            path=test_file,
+            file_text="Chapter 1\\nChapter 2\\nChapter 3",
+        )
+        result2 = tool(second)
+        assert not result2.is_error
+        assert result2.prev_exist is True
+        with open(test_file) as f:
+            assert f.read() == "Chapter 1\\nChapter 2\\nChapter 3"
+
+        # undo_edit should restore the prior version
+        undo = FileEditorAction(command="undo_edit", path=test_file)
+        undo_result = tool(undo)
+        assert not undo_result.is_error
+        with open(test_file) as f:
+            assert f.read() == "Chapter 1"
+
+
 def test_file_editor_tool_view_file():
     """Test that FileEditorTool can view files."""
     with tempfile.TemporaryDirectory() as temp_dir:

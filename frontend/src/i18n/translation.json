@@ -5723,6 +5723,20 @@
     "ca": "Màxim d'iteracions de refinament",
     "ru": "Максимум итераций улучшения"
   },
+  "SCHEMA$VERIFICATION$AUTONOMOUS_MAX_STEPS$DESCRIPTION": {
+    "en": "Maximum number of automatic continue steps the agent takes in autonomous mode (when the task prompt carries [AUTONOMOUS]) before it is allowed to finish. Raise for long multi-step tasks; lower to stop loops sooner.",
+    "ru": "Максимальное число автоматических шагов продолжения в автономном режиме (когда в задаче есть маркер [AUTONOMOUS]) до разрешённого завершения. Увеличьте для длинных многошаговых задач; уменьшите, чтобы быстрее останавливать циклы.",
+    "de": "Maximale Anzahl automatischer Fortsetzungsschritte im autonomen Modus (wenn die Aufgabe den Marker [AUTONOMOUS] trägt), bevor der Agent abschließen darf. Für lange mehrstufige Aufgaben erhöhen; zum schnelleren Stoppen von Schleifen senken.",
+    "fr": "Nombre maximal d'étapes de continuation automatiques en mode autonome (lorsque la tâche porte le marqueur [AUTONOMOUS]) avant que l'agent ne puisse terminer. Augmentez pour les tâches longues; réduisez pour arrêter les boucles plus tôt.",
+    "es": "Número máximo de pasos de continuación automáticos en modo autónomo (cuando la tarea lleva el marcador [AUTONOMOUS]) antes de que el agente pueda finalizar. Auméntelo para tareas largas; redúzcalo para detener bucles antes."
+  },
+  "SCHEMA$VERIFICATION$AUTONOMOUS_MAX_STEPS$LABEL": {
+    "en": "Autonomous Max Steps",
+    "ru": "Макс. шагов автономного режима",
+    "de": "Max. autonome Schritte",
+    "fr": "Étapes autonomes max.",
+    "es": "Pasos autónomos máx."
+  },
   "SCHEMA$VERIFICATION$SECTION_LABEL": {
     "en": "Verification",
     "ja": "検証",

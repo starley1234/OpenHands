@@ -270,17 +270,17 @@ def _normalize_arguments(arguments: dict[str, Any]) -> dict[str, Any]:
     # instead of a proper `"path"` key, because their JSON quoting collapsed.
     # If `path` is missing but exactly one leftover key looks like an absolute
     # path, rename it to `path` so the tool call survives.
+    hints = {
+        "old_str",
+        "new_str",
+        "insert_line",
+        "file_text",
+        "view_range",
+        "command",
+        "summary",
+        "security_risk",
+    }
     if "path" not in normalized:
-        hints = {
-            "old_str",
-            "new_str",
-            "insert_line",
-            "file_text",
-            "view_range",
-            "command",
-            "summary",
-            "security_risk",
-        }
         candidate = None
         for key, value in normalized.items():
             if key in hints:
@@ -293,9 +293,29 @@ def _normalize_arguments(arguments: dict[str, Any]) -> dict[str, Any]:
         if candidate is not None:
             normalized["path"] = str(normalized.pop(candidate)).lstrip('"')
 
+    # The model sometimes fills `path` with a stray non-path value (e.g. the
+    # security_risk "LOW") while the real absolute path lands in a leftover
+    # key whose value is an absolute path. Recover by preferring the leftover
+    # absolute path when the current `path` value is not an absolute path.
+    if "path" in normalized and not _looks_like_absolute_path(normalized["path"]):
+        candidate = None
+        for key, value in normalized.items():
+            if key == "path" or key in hints:
+                continue
+            if isinstance(value, str) and value.lstrip('"').startswith("/"):
+                candidate = value
+                break
+        if candidate is not None:
+            normalized["path"] = str(candidate).lstrip('"')
+
     # Remove any arguments that are clearly not valid (None values, etc.)
     # but keep all others to preserve tool-specific arguments
     return {k: v for k, v in normalized.items() if v is not None}
+
+
+def _looks_like_absolute_path(value: Any) -> bool:
+    """True when ``value`` is a string that begins with a path separator."""
+    return isinstance(value, str) and value.lstrip('"').startswith("/")
 
 
 def parse_tool_call_arguments(raw_arguments: str) -> dict[str, Any]:

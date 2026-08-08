@@ -280,6 +280,21 @@ const MOCK_AGENT_SETTINGS_SCHEMA: NonNullable<
           required: false,
         },
         {
+          key: "verification.autonomous_max_steps",
+          label: "Autonomous Max Steps",
+          description:
+            "Maximum number of automatic continue steps the agent takes in autonomous mode (task prompt with [AUTONOMOUS]) before it is allowed to finish.",
+          section: "verification",
+          section_label: "Verification",
+          value_type: "integer",
+          default: 8,
+          choices: [],
+          depends_on: [],
+          prominence: "minor",
+          secret: false,
+          required: false,
+        },
+        {
           key: "verification.critic_server_url",
           label: "Critic Server URL",
           description: "Override the critic service URL.",

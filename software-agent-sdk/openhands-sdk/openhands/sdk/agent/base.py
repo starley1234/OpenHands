@@ -289,6 +289,17 @@ class AgentBase(DiscriminatedUnionMixin, ABC):
         examples=[{"kind": "AgentFinishedCritic"}],
     )
 
+    autonomous_max_steps: int = Field(
+        default=8,
+        ge=1,
+        description=(
+            "Maximum number of automatic 'continue' steps issued in autonomous "
+            "mode (when the task prompt carries the [AUTONOMOUS] marker) before "
+            "the agent is allowed to finish. Guards against infinite loops."
+        ),
+        json_schema_extra={"type": "integer", "minimum": 1},
+    )
+
     tool_concurrency_limit: int = Field(
         default=1,
         ge=1,

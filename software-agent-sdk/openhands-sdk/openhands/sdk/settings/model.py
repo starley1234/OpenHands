@@ -418,6 +418,24 @@ class VerificationSettings(BaseModel):
         },
     )
 
+    # -- Autonomous mode --
+    autonomous_max_steps: int = Field(
+        default=8,
+        ge=1,
+        description=(
+            "Maximum number of automatic 'continue' steps the agent will take in "
+            "autonomous mode (when a task prompt carries the [AUTONOMOUS] marker) "
+            "before it is allowed to finish. Raise for long multi-step tasks; "
+            "lower to stop loops sooner."
+        ),
+        json_schema_extra={
+            SETTINGS_METADATA_KEY: SettingsFieldMetadata(
+                label="Autonomous max steps",
+                prominence=SettingProminence.MINOR,
+            ).model_dump()
+        },
+    )
+
     # -- Critic deployment --
     critic_server_url: str | None = Field(
         default=None,
@@ -1367,6 +1385,7 @@ class OpenHandsAgentSettings(AgentSettingsBase):
             agent_context=self.agent_context,
             condenser=condenser,
             critic=self.build_critic(),
+            autonomous_max_steps=self.verification.autonomous_max_steps,
             tool_concurrency_limit=self.tool_concurrency_limit,
         )
 

@@ -29,23 +29,33 @@ else
 fi
 
 # 1) /server_info отвечает
+# Роуты статик-сервера живут на верхнем уровне (/server_info, /api, ...), а не
+# под /canvas — /canvas/... отдаёт SPA index.html. Поэтому пробуем сначала
+# /server_info и проверяем, что ответ — настоящий JSON.
 INFO "1) Проверяю /server_info"
-if curl -sf "http://localhost:8000/canvas/server_info" -o /tmp/si.json 2>/dev/null; then
-  PASS "/server_info доступен"
-elif curl -sf "http://localhost:8000/server_info" -o /tmp/si.json 2>/dev/null; then
-  PASS "/server_info доступен (без /canvas)"
-else
-  FAIL "/server_info недоступен — проверь порт/базовый путь"
+: > /tmp/si.json
+for URL in "http://localhost:8000/server_info" "http://localhost:8000/canvas/server_info"; do
+  if curl -sf "$URL" -o /tmp/si.json 2>/dev/null \
+     && python3 -c "import json;json.load(open('/tmp/si.json'))" 2>/dev/null; then
+    PASS "/server_info доступен: $URL"
+    break
+  fi
+  : > /tmp/si.json
+done
+if ! python3 -c "import json;json.load(open('/tmp/si.json'))" 2>/dev/null; then
+  FAIL "/server_info недоступен или не JSON — проверь порт/базовый путь"
+  echo "Скрипт прерван."
+  exit 1
 fi
 
 # 2) Прокси-статус
 INFO "2) Проверяю статус прокси в /server_info"
-if [ -f /tmp/si.json ]; then
-  PROXY_ENABLED=$(python3 -c "import json;d=json.load(open('/tmp/si.json'));print(d.get('proxy_enabled','?'))" 2>/dev/null)
-  PROXY_URL=$(python3 -c "import json;d=json.load(open('/tmp/si.json'));print(d.get('proxy_url','') or '(пусто)')" 2>/dev/null)
+if [ -s /tmp/si.json ]; then
+  PROXY_ENABLED=$(python3 -c "import json;d=json.load(open('/tmp/si.json'));print('true' if d.get('proxy_enabled') else 'false')" 2>/dev/null)
+  PROXY_URL=$(python3 -c "import json;d=json.load(open('/tmp/si.json'));print(d.get('proxy_url') or '(пусто)')" 2>/dev/null)
   echo "    proxy_enabled=$PROXY_ENABLED  proxy_url=$PROXY_URL"
-  if [ "$PROXY_ENABLED" = "True" ]; then PASS "Прокси ВКЛЮЧЁН: $PROXY_URL";
-  elif [ "$PROXY_ENABLED" = "False" ]; then PASS "Прокси ВЫКЛЮЧЕН (напрямую)";
+  if [ "$PROXY_ENABLED" = "true" ]; then PASS "Прокси ВКЛЮЧЁН: $PROXY_URL";
+  elif [ "$PROXY_ENABLED" = "false" ]; then PASS "Прокси ВЫКЛЮЧЕН (напрямую)";
   else FAIL "proxy_enabled не прочитался"; fi
 else
   FAIL "нет /server_info для проверки прокси"

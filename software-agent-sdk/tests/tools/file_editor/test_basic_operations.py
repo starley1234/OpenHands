@@ -521,19 +521,37 @@ Review the changes and make sure they are as expected (correct indentation, no d
     )
 
 
-def test_insert_invalid_line(editor):
+def test_insert_out_of_range_clamps_to_end(editor):
+    # A weak model often overshoots the file's line count (here the fixture has
+    # 2 lines, model says 10). This must NOT hard-fail the run — clamp to the
+    # last line (append) instead.
     editor, test_file = editor
-    with pytest.raises(EditorToolParameterInvalidError) as exc_info:
-        editor(
-            command="insert",
-            path=str(test_file),
-            insert_line=10,
-            new_str="Invalid Insert",
-        )
-    assert "Invalid `insert_line` parameter" in str(exc_info.value.message)
-    assert "It should be within the range of allowed values:" in str(
-        exc_info.value.message
+    result = editor(
+        command="insert",
+        path=str(test_file),
+        insert_line=10,
+        new_str="Invalid Insert",
     )
+    assert isinstance(result, FileEditorObservation)
+    content = test_file.read_text()
+    assert "Invalid Insert" in content
+    # Clamped to end → the inserted line comes last.
+    assert content.rstrip().endswith("Invalid Insert")
+
+
+def test_insert_uses_file_text_when_new_str_missing(editor):
+    # A weak model sometimes calls `insert` with the content in `file_text`
+    # (the `create` field) instead of `new_str`. Recover from that.
+    editor, test_file = editor
+    result = editor(
+        command="insert",
+        path=str(test_file),
+        insert_line=1,
+        file_text="Inserted via file_text",
+    )
+    assert isinstance(result, FileEditorObservation)
+    assert not result.is_error
+    assert "Inserted via file_text" in test_file.read_text()
 
 
 def test_insert_with_empty_string(editor):
@@ -634,10 +652,21 @@ def test_validate_path_invalid(editor):
         editor(command="view", path=str(invalid_file))
 
 
-def test_create_existing_file_error(editor):
+def test_create_existing_file_overwrites(editor):
+    # `create` on an existing file is now allowed and overwrites the content
+    # (with the prior version kept on the undo stack) instead of raising. This
+    # lets weak models "re-create" a file in autonomous mode without stalling.
     editor, test_file = editor
-    with pytest.raises(EditorToolParameterInvalidError):
-        editor(command="create", path=str(test_file), file_text="New content")
+    result = editor(command="create", path=str(test_file), file_text="New content")
+    assert result.prev_exist is True
+    with open(test_file) as f:
+        assert f.read() == "New content"
+
+    # undo_edit restores the previous content
+    undo = editor(command="undo_edit", path=str(test_file))
+    assert undo is not None
+    with open(test_file) as f:
+        assert f.read() != "New content"
 
 
 def test_str_replace_missing_old_str(editor):

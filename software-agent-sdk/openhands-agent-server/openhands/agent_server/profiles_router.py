@@ -337,6 +337,32 @@ async def activate_profile(
             detail="Settings file is corrupted or encrypted with a different key",
         )
 
+    # Keep the active AgentProfile's LLM reference in sync with the newly
+    # activated LLM profile. Home-page conversation creation launches via the
+    # active agent profile (active_agent_profile_id) and resolves its
+    # ``llm_profile_ref`` server-side — if that ref points at a *different* LLM
+    # profile than the one the user just activated, the new conversation would
+    # silently run the wrong model (e.g. the picker shows deepseek but the
+    # conversation runs gemma). Repoint the active OpenHands agent profile's ref
+    # to the activated LLM profile so the two profile systems agree. No-op for
+    # ACP profiles (they carry no llm ref) and when no agent profile is active.
+    try:
+        settings = settings_store.load()
+        active_agent_profile_id = (
+            settings.active_agent_profile_id if settings else None
+        )
+        if active_agent_profile_id:
+            agent_store = get_agent_profile_store()
+            agent_name = agent_store.name_for_id(active_agent_profile_id)
+            if agent_name:
+                agent_store.set_llm_profile_ref(agent_name, name)
+                logger.info(
+                    f"Synced active agent profile '{agent_name}' llm_profile_ref "
+                    f"to '{name}'"
+                )
+    except Exception as e:  # noqa: BLE001 — sync is best-effort, never fail activation
+        logger.warning(f"Failed to sync active agent profile LLM ref: {e}")
+
     logger.info(f"Activated profile '{name}'")
     return ActivateProfileResponse(
         name=name,

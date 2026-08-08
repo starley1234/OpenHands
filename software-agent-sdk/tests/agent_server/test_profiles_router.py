@@ -1100,6 +1100,37 @@ def test_activate_profile_invalid_name(client):
     assert response.status_code in (400, 404, 422)
 
 
+def test_activate_profile_syncs_active_agent_profile_llm_ref(client, store, agent_store):
+    """Activating an LLM profile repoints the active agent profile's llm ref.
+
+    Home-page conversation creation launches via the active agent profile and
+    resolves its ``llm_profile_ref`` server-side. If that ref points at a
+    different LLM profile than the one the user just activated, the new
+    conversation silently runs the wrong model (e.g. picker shows deepseek but
+    the conversation runs gemma). This test verifies activation keeps them in
+    sync.
+    """
+    # Save the LLM profile the user will activate.
+    store.save("deepseek", LLM(model="openai/deepseek/deepseek-v4-flash"))
+    # Create a named OpenHands agent profile that currently references gemma.
+    agent = OpenHandsAgentProfile(name="my-agent", llm_profile_ref="gemma")
+    agent_store.save(agent)
+    # Point the active agent profile pointer at it.
+    client.patch("/api/settings", json={"active_agent_profile_id": str(agent.id)})
+
+    client.post("/api/profiles/deepseek/activate")
+
+    assert agent_store.load("my-agent").llm_profile_ref == "deepseek"
+
+
+def test_activate_profile_without_active_agent_profile_is_noop(client, store):
+    """Activation must not fail when no agent profile is active."""
+    store.save("simple", LLM(model="gpt-4o"))
+    # No active_agent_profile_id set — sync step is a best-effort no-op.
+    response = client.post("/api/profiles/simple/activate")
+    assert response.status_code == 200
+
+
 # ── Rename Active Profile Tests ───────────────────────────────────────────
 
 
