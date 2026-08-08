@@ -1,7 +1,7 @@
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, ClassVar, Self
 
-from pydantic import Field
+from pydantic import ConfigDict, Field
 from rich.text import Text
 
 from openhands.sdk.tool.tool import (
@@ -21,7 +21,26 @@ if TYPE_CHECKING:
 class ThinkAction(Action):
     """Action for logging a thought without making any changes."""
 
+    # Some reasoning models (e.g. a Claude-Code-style `think` tool) emit
+    # `thoughtNumber` / `totalThoughts` alongside `thought`. They carry no
+    # semantic meaning for us (we just log the thought), so we accept them as
+    # optional and ignore them rather than failing validation. Without this,
+    # pydantic's `extra="forbid"` (inherited from the Action base) rejects them
+    # with `extra_forbidden`, which makes the agent retry the same call forever.
+    model_config: ClassVar[ConfigDict] = ConfigDict(
+        extra="ignore",
+        frozen=True,
+    )
+
     thought: str = Field(description="The thought to log.")
+    thoughtNumber: int | None = Field(
+        default=None,
+        description="Optional index of this thought in a chain (some models emit it). Ignored.",
+    )
+    totalThoughts: int | None = Field(
+        default=None,
+        description="Optional total number of thoughts in the chain (some models emit it). Ignored.",
+    )
 
     @property
     def visualize(self) -> Text:
