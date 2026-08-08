@@ -102,6 +102,10 @@ export function parseMcpConfig(value: unknown): MCPConfig {
           timeout: candidate.timeout,
         }),
         ...(candidate.enabled === false && { enabled: false }),
+        ...(Array.isArray(candidate.disabled_tools) &&
+          (candidate.disabled_tools as string[]).length && {
+            disabled_tools: candidate.disabled_tools as string[],
+          }),
       };
       continue;
     }
@@ -132,6 +136,10 @@ export function parseMcpConfig(value: unknown): MCPConfig {
         keep_alive: candidate.keep_alive,
       }),
       ...(candidate.enabled === false && { enabled: false }),
+      ...(Array.isArray(candidate.disabled_tools) &&
+        (candidate.disabled_tools as string[]).length && {
+          disabled_tools: candidate.disabled_tools as string[],
+        }),
     };
   }
   return config;
@@ -336,6 +344,9 @@ export function buildMcpServerPatch(
           : {}),
       ...(env !== undefined ? { env } : {}),
       ...enabled,
+      ...(edited.disabled_tools !== undefined
+        ? { disabled_tools: edited.disabled_tools }
+        : {}),
     };
   }
 
@@ -344,6 +355,9 @@ export function buildMcpServerPatch(
     transport: edited.type === "sse" ? "sse" : "http",
     url: edited.url!,
     ...enabled,
+    ...(edited.disabled_tools !== undefined
+      ? { disabled_tools: edited.disabled_tools }
+      : {}),
   };
 
   if (edited.type === "shttp") {

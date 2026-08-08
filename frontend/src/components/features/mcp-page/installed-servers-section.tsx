@@ -22,6 +22,7 @@ interface InstalledServersSectionProps {
   query?: string;
   onEdit: (server: MCPServerConfig) => void;
   onToggleEnabled: (server: MCPServerConfig, enabled: boolean) => void;
+  onToggleTool: (server: MCPServerConfig, toolName: string, enabled: boolean) => void;
 }
 
 export function InstalledServersSection({
@@ -30,6 +31,7 @@ export function InstalledServersSection({
   query = "",
   onEdit,
   onToggleEnabled,
+  onToggleTool,
 }: InstalledServersSectionProps) {
   const { t } = useTranslation("openhands");
 
@@ -77,6 +79,7 @@ export function InstalledServersSection({
             server={server}
             onEdit={() => onEdit(server)}
             onToggleEnabled={(enabled) => onToggleEnabled(server, enabled)}
+            onToggleTool={onToggleTool}
           />
         ))}
       </div>

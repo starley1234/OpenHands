@@ -148,6 +148,27 @@ def _require_native_mcp_config(
     return dict(mcp_config)
 
 
+def _is_tool_disabled(advertised: str, disabled: frozenset[str]) -> bool:
+    """Whether an advertised MCP tool should be withheld.
+
+    Matches a disabled name exactly, or when the advertised name is a
+    server-prefixed variant of a disabled name (or vice-versa). Some MCP
+    servers advertise tools with a server-name prefix (e.g.
+    ``openscad_render_png_base64``) while the user disabled the tool by its
+    base name (``render_png_base64``), and the reverse can also happen if the
+    catalog / test probe strips the prefix. The match is anchored on a ``_``
+    boundary so ``render`` never accidentally withholds ``render_png``.
+    """
+    if advertised in disabled:
+        return True
+    for disabled_name in disabled:
+        if disabled_name.endswith("_" + advertised) or advertised.endswith(
+            "_" + disabled_name
+        ):
+            return True
+    return False
+
+
 async def log_handler(message: LogMessage):
     """
     Handles incoming logs from the MCP server and forwards them
@@ -185,6 +206,46 @@ async def _refresh_tools(
     mcp_type_tools: list[mcp.types.Tool] = await client.list_tools()
     existing_by_name = {tool.name: tool for tool in client._tools}
     server_names = {mcp_tool.name for mcp_tool in mcp_type_tools}
+
+    # Withhold tools the user disabled for this server (e.g. noisy tools from
+    # servers advertising dozens). Applied on every (re)list so it also covers
+    # the runtime tools/list_changed reconciliation.
+    disabled = getattr(client, "_disabled_tool_names", frozenset())
+    if disabled:
+        # Log the full advertised list too so it's unambiguous which tools the
+        # server actually exposes and whether disabled names line up (some
+        # servers prefix tool names with the server name, e.g. openscad_*).
+        logger.info(
+            "MCP server advertised tools: %s",
+            ", ".join(sorted(server_names)) or "none",
+        )
+        hidden = [
+            name for name in server_names if _is_tool_disabled(name, disabled)
+        ]
+        if hidden:
+            logger.info(
+                "MCP server withholding disabled tools: %s",
+                ", ".join(sorted(hidden)),
+            )
+            withheld = {
+                t.name for t in mcp_type_tools if _is_tool_disabled(t.name, disabled)
+            }
+            mcp_type_tools = [t for t in mcp_type_tools if t.name not in withheld]
+            logger.info(
+                "MCP server available tools after withholding: %s",
+                ", ".join(sorted(t.name for t in mcp_type_tools)) or "none",
+            )
+        else:
+            # Configured disabled names but none matched the advertised tool
+            # list — likely a stale entry. Surface it so it isn't silently
+            # ignored.
+            logger.warning(
+                "MCP disabled tool names (%s) matched none of the %d advertised "
+                "tools (%s)",
+                ", ".join(sorted(disabled)),
+                len(server_names),
+                ", ".join(sorted(server_names)) or "none",
+            )
 
     reconciled: list[MCPToolDefinition] = []
     added: list[MCPToolDefinition] = []
@@ -316,6 +377,32 @@ def create_mcp_tools(
     mcp_config = _require_native_mcp_config(mcp_config)
     requested = mcp_config
     mcp_config = enabled_mcp_servers(mcp_config)
+
+    # Collect tool names the user disabled across enabled servers, so the client
+    # can withhold them from the agent (some MCP servers advertise dozens of
+    # tools; hiding noisy/dangerous ones keeps the tool list manageable).
+    disabled_tool_names: set[str] = set()
+    for server in mcp_config.values():
+        if server.disabled_tools:
+            disabled_tool_names.update(server.disabled_tools)
+    per_server_disabled = {
+        name: sorted(server.disabled_tools)
+        for name, server in mcp_config.items()
+        if server.disabled_tools
+    }
+    if per_server_disabled:
+        logger.info(
+            "MCP: withholding %d tool(s) across enabled server(s) per server=%s: %s",
+            len(disabled_tool_names),
+            per_server_disabled,
+            ", ".join(sorted(disabled_tool_names)),
+        )
+    else:
+        logger.info(
+            "MCP: no tools disabled across %d enabled server(s): %s",
+            len(mcp_config),
+            ", ".join(sorted(mcp_config)),
+        )
     if requested and not mcp_config:
         raise ValueError(
             "All configured MCP servers are disabled: "
@@ -334,6 +421,8 @@ def create_mcp_tools(
     client = MCPClient(config, log_handler=log_handler, message_handler=handler)
     handler._client = client
     client._tools_reconciled_callback = on_tools_reconciled
+    if disabled_tool_names:
+        client.set_disabled_tool_names(disabled_tool_names)
 
     try:
         client.call_async_from_sync(
