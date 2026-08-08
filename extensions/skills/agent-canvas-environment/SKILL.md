@@ -1,6 +1,6 @@
 ---
 name: agent-canvas-environment
-description: Work effectively inside a local Agent Canvas environment, including local agent-server auth, frontend/backend port discovery, safe workspace hygiene, and delegating work to a new local conversation through POST /api/conversations.
+description: Эффективная работа в локальной среде Agent Canvas, включая аутентификацию локального agent-server, обнаружение портов фронтенда/бэкенда, безопасную гигиену рабочего пространства и делегирование работы в новый локальный диалог через POST /api/conversations.
 triggers:
 - agent canvas
 - agent-canvas
@@ -11,22 +11,22 @@ triggers:
 - localhost:8001
 ---
 
-# Agent Canvas Environment
+# Среда Agent Canvas
 
-Use this skill when running inside or alongside a local Agent Canvas stack, especially when the user asks to inspect the local backend, create or monitor local conversations, or delegate work to another local conversation.
+Используй этот навык при работе внутри или рядом с локальным стеком Agent Canvas, особенно когда пользователь просит проверить локальный бэкенд, создать или отслеживать локальные диалоги, или делегировать работу в другой локальный диалог.
 
-## Core rules
+## Основные правила
 
-- Treat the local Agent Canvas backend as an agent-server API, usually `http://localhost:8001`.
-- Treat the local UI as a separate frontend, usually `http://localhost:8000`.
-- Do not print session API keys. Pass them directly in `X-Session-API-Key`.
-- Trust any runtime-services block or explicit user-provided host over default ports.
-- Before mutating a repository, check `git status -sb`. If a worktree has unrelated changes, use a separate worktree or clone.
-- When delegating, write a self-contained prompt. The new conversation does not inherit the current chat context.
+- Считай локальный бэкенд Agent Canvas API агент-сервера, обычно `http://localhost:8001`.
+- Считай локальный UI отдельным фронтендом, обычно `http://localhost:8000`.
+- Не выводи на печать session API-ключи. Передавай их напрямую в `X-Session-API-Key`.
+- Доверяй любому блоку runtime-services или явно указанному пользователем хосту больше, чем портам по умолчанию.
+- Перед изменением репозитория проверяй `git status -sb`. Если в рабочем дереве есть несвязанные изменения, используй отдельное рабочее дерево или клон.
+- При делегировании пиши самодостаточный промпт. Новый диалог не наследует текущий контекст чата.
 
-## Find the session key
+## Найди session-ключ
 
-Use the first available value, without echoing it:
+Используй первое доступное значение, не выводя его:
 
 ```bash
 KEY="${SESSION_API_KEY:-${OH_SESSION_API_KEYS_0:-${LOCAL_BACKEND_API_KEY:-}}}"
@@ -36,7 +36,7 @@ fi
 test -n "$KEY" || { echo "No Agent Canvas session API key found" >&2; exit 1; }
 ```
 
-Validate backend access:
+Проверь доступ к бэкенду:
 
 ```bash
 curl -sS -o /tmp/agent-canvas-conversations.json -w '%{http_code}\n' \
@@ -44,34 +44,34 @@ curl -sS -o /tmp/agent-canvas-conversations.json -w '%{http_code}\n' \
   http://localhost:8001/api/conversations/search
 ```
 
-HTTP `200` means the backend and key work.
+HTTP `200` означает, что бэкенд и ключ работают.
 
-## Delegate to a local conversation
+## Делегирование в локальный диалог
 
-Use `POST /api/conversations` with:
+Используй `POST /api/conversations` с:
 
-- the **encrypted** `agent_settings` from `GET /api/settings` (with `X-Expose-Secrets: encrypted`), which carries the real Fernet-encrypted `llm.api_key`, the existing `agent_context`, and the agent kind — so you never handle plaintext credentials and you don't drop the caller's skill/context config
-- `secrets_encrypted: true` so the agent-server decrypts that `api_key` server-side
-- the exec tool set merged into `agent_settings.tools` (and `task_tool_set` when you enable sub-agents)
-- `tool_module_qualnames` for any non-SDK tools (e.g. `canvas_ui`)
-- `agent_context.load_public_skills`/`load_user_skills`/`load_project_skills` set to `true` if the delegated agent should inherit bundled/user/project skills
-- a fresh absolute workspace directory
+- **зашифрованными** `agent_settings` из `GET /api/settings` (с `X-Expose-Secrets: encrypted`), которые несут реальный Fernet-зашифрованный `llm.api_key`, существующий `agent_context` и тип агента — так ты никогда не работаешь с открытыми учётными данными и не теряешь конфигурацию навыков/контекста вызывающего
+- `secrets_encrypted: true`, чтобы агент-сервер расшифровал этот `api_key` на стороне сервера
+- набором exec-инструментов, объединённым в `agent_settings.tools` (и `task_tool_set`, когда включены субагенты)
+- `tool_module_qualnames` для любых не-SDK инструментов (например, `canvas_ui`)
+- `agent_context.load_public_skills`/`load_user_skills`/`load_project_skills`, установленными в `true`, если делегированный агент должен наследовать встроенные/пользовательские/проектные навыки
+- свежим абсолютным каталогом рабочего пространства
 - `initial_message.run: true`
-- `worktree: false` when the workspace is already isolated
+- `worktree: false`, когда рабочее пространство уже изолировано
 
-### Credential handling — important
+### Обработка учётных данных — важно
 
-`GET /api/settings` (default) **masks** every credential — `llm.api_key` comes back as the literal string `"**********"`. If you forward that verbatim, the new conversation authenticates with the placeholder and fails immediately with `LLMAuthenticationError` (`You must provide an API key`).
+`GET /api/settings` (по умолчанию) **маскирует** каждые учётные данные — `llm.api_key` возвращается как литеральная строка `"**********"`. Если переслать это дословно, новый диалог аутентифицируется с заглушкой и сразу падает с `LLMAuthenticationError` (`You must provide an API key`).
 
-The supported way to obtain forwardable credentials is the **`X-Expose-Secrets: encrypted`** request header. With it, `/api/settings` returns the real `llm.api_key` as a **Fernet-encrypted token** (starts with `gAAAAA`) intended to be sent back to the server with `secrets_encrypted: true`; the agent-server's `decrypt_incoming_llm_secrets` decrypts it server-side. Do **not** read `~/.openhands/profiles/*.json` directly — that is brittle (the caller may not share the backend's home directory, `active_profile` may be null, the profile store may live elsewhere).
+Поддерживаемый способ получить пересылаемые учётные данные — HTTP-заголовок **`X-Expose-Secrets: encrypted`**. С ним `/api/settings` возвращает реальный `llm.api_key` как **Fernet-зашифрованный токен** (начинается с `gAAAAA`), предназначенный для отправки обратно на сервер с `secrets_encrypted: true`; `decrypt_incoming_llm_secrets` агент-сервера расшифровывает его на стороне сервера. **Не** читай `~/.openhands/profiles/*.json` напрямую — это хрупко (вызывающий может не разделять домашний каталог бэкенда, `active_profile` может быть null, хранилище профилей может находиться в другом месте).
 
-Two working approaches:
+Два рабочих подхода:
 
-1. **`agent_profile_id` (simplest, but no tools)** — send only `agent_profile_id: "<uuid>"` (from `GET /api/agent-profiles` → the profile whose `id` equals `active_agent_profile_id` from `/api/settings`). The server resolves the LLM key + agent kind from the profile. Mutually exclusive with `agent`/`agent_settings`, and the `openhands` agent-profile schema forbids `tools`/`include_default_tools`, so the conversation gets **zero exec tools** this way. Use only when the task needs no tools.
+1. **`agent_profile_id` (проще всего, но без инструментов)** — отправь только `agent_profile_id: "<uuid>"` (из `GET /api/agent-profiles` → профиль, чей `id` равен `active_agent_profile_id` из `/api/settings`). Сервер разрешает ключ LLM и тип агента из профиля. Взаимоисключающе с `agent`/`agent_settings`, и схема агент-профиля `openhands` запрещает `tools`/`include_default_tools`, поэтому диалог получает **ноль exec-инструментов** таким способом. Используй только когда задаче инструменты не нужны.
 
-2. **Encrypted `agent_settings` (full tools, preserves context)** — start from the encrypted `/api/settings` `agent_settings` payload, drop `schema_version` and `mcp_config` (to avoid MCP-connection failures at creation time), merge in the exec tool set and `load_*_skills` flags, and send with `secrets_encrypted: true`. This is the pattern for real delegated work.
+2. **Зашифрованные `agent_settings` (полные инструменты, сохраняет контекст)** — начни с зашифрованного payload `agent_settings` из `/api/settings`, убери `schema_version` и `mcp_config` (чтобы избежать сбоев подключения MCP при создании), объедини набор exec-инструментов и флаги `load_*_skills` и отправь с `secrets_encrypted: true`. Это паттерн для реальной делегированной работы.
 
-Template (full tools, preserves context):
+Шаблон (полные инструменты, сохраняет контекст):
 
 ```bash
 set -euo pipefail
@@ -154,7 +154,7 @@ curl -sS -X POST "$BASE/api/conversations" \
   --data-binary "$PAYLOAD" | jq '{id, title, execution_status, workspace}'
 ```
 
-Verify the new conversation actually has tools and is running (not errored):
+Проверь, что новый диалог действительно имеет инструменты и работает (не в ошибке):
 
 ```bash
 CID="<conversation_id>"
@@ -164,16 +164,16 @@ curl -sS -H "X-Session-API-Key: $KEY" "$BASE/api/conversations/$CID/events/searc
   | jq '[.events[]? | select(.kind=="ConversationErrorEvent") | .code] // []'
 ```
 
-`execution_status` should be `running`/`idle`/`finished` (not `error`), `tools` should list the exec tools, and there should be no `ConversationErrorEvent`.
+`execution_status` должен быть `running`/`idle`/`finished` (не `error`), `tools` должен перечислять exec-инструменты, и не должно быть `ConversationErrorEvent`.
 
-If MCP servers configured in the profile are unreachable, conversation creation can fail with `MCP Connection Failure`; the template drops `mcp_config` from the forwarded `agent_settings` to avoid that.
+Если MCP-серверы, настроенные в профиле, недоступны, создание диалога может завершиться сбоем с `MCP Connection Failure`; шаблон убирает `mcp_config` из пересылаемых `agent_settings`, чтобы избежать этого.
 
-Report both links:
+Сообщи обе ссылки:
 
 - UI: `http://localhost:8000/conversations/<conversation_id>`
 - API: `http://localhost:8001/api/conversations/<conversation_id>`
 
-## Monitor a delegated conversation
+## Мониторинг делегированного диалога
 
 ```bash
 CID="<conversation_id>"
@@ -184,19 +184,19 @@ curl -sS -H "X-Session-API-Key: $KEY" "$BASE/api/conversations/$CID/events/searc
   | jq '.events // .items // .'
 ```
 
-Terminal statuses commonly include `idle`, `running`, `finished`, `error`, `stuck`, and `stopped`.
+Терминальные статусы обычно включают `idle`, `running`, `finished`, `error`, `stuck` и `stopped`.
 
-## Prompt checklist for delegation
+## Чек-лист промпта для делегирования
 
-Include:
+Включи:
 
-- repository owner/name and local path if relevant
-- branch, PR, issue, or Linear ticket identifiers
-- current status and known blockers
-- exact files or subsystems in scope
-- dirty-worktree warnings and paths not to touch
-- whether to push, open a PR, or only report
-- checks/tests to run
-- expected final report format
+- владельца/имя репозитория и локальный путь, если уместно
+- идентификаторы ветки, PR, задачи или тикета Linear
+- текущий статус и известные блокеры
+- точные файлы или подсистемы в области видимости
+- предупреждения о грязном рабочем дереве и пути, которых не касаться
+- нужно ли пушить, открыть PR или только отчитаться
+- проверки/тесты для запуска
+- ожидаемый формат финального отчёта
 
-Do not rely on the new conversation knowing anything from the current thread.
+Не полагайся на то, что новый диалог знает что-то из текущей ветки.

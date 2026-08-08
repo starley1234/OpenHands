@@ -1,53 +1,53 @@
 ---
 name: jupyter
-description: Read, modify, execute, and convert Jupyter notebooks programmatically. Use when working with .ipynb files for data science workflows, including editing cells, clearing outputs, or converting to other formats.
+description: Чтение, изменение, выполнение и конвертация Jupyter-ноутбуков программно. Используй при работе с файлами .ipynb для задач обработки данных, включая редактирование ячеек, очистку выводов или конвертацию в другие форматы.
 triggers:
 - ipynb
 - jupyter
 ---
 
-# Jupyter Notebook Guide
+# Руководство по Jupyter Notebook
 
-Notebooks are JSON files. Cells are in `nb['cells']`, each has `source` (list of strings) and `cell_type` ('code', 'markdown', or 'raw').
+Ноутбуки — это JSON-файлы. Ячейки находятся в `nb['cells']`, каждая имеет `source` (список строк) и `cell_type` ('code', 'markdown' или 'raw').
 
-## Modifying Notebooks
+## Изменение ноутбуков
 ```python
 import json
 with open('notebook.ipynb') as f:
     nb = json.load(f)
-# Modify nb['cells'][i]['source'], then:
+# Изменить nb['cells'][i]['source'], затем:
 with open('notebook.ipynb', 'w') as f:
     json.dump(nb, f, indent=1)
 ```
 
-## Executing & Converting
+## Выполнение и конвертация
 ```bash
-jupyter nbconvert --to notebook --execute --inplace notebook.ipynb  # Execute in place
-jupyter nbconvert --to html notebook.ipynb      # Convert to HTML
-jupyter nbconvert --to script notebook.ipynb    # Convert to Python
-jupyter nbconvert --to markdown notebook.ipynb  # Convert to Markdown
+jupyter nbconvert --to notebook --execute --inplace notebook.ipynb  # Выполнить на месте
+jupyter nbconvert --to html notebook.ipynb      # Конвертировать в HTML
+jupyter nbconvert --to script notebook.ipynb    # Конвертировать в Python
+jupyter nbconvert --to markdown notebook.ipynb  # Конвертировать в Markdown
 ```
 
-## Finding Code
+## Поиск кода
 ```bash
 grep -n "search_term" notebook.ipynb
 ```
 
-PowerShell equivalent:
+Эквивалент в PowerShell:
 
 ```powershell
 Select-String -Path notebook.ipynb -Pattern "search_term"
 ```
 
-## Cell Structure
+## Структура ячейки
 ```python
-# Code cell
+# Ячейка кода
 {"cell_type": "code", "execution_count": None, "metadata": {}, "outputs": [], "source": ["code\n"]}
-# Markdown cell
+# Markdown-ячейка
 {"cell_type": "markdown", "metadata": {}, "source": ["# Title\n"]}
 ```
 
-## Clear Outputs
+## Очистка выводов
 ```python
 for cell in nb['cells']:
     if cell['cell_type'] == 'code':

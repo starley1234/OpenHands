@@ -1,48 +1,48 @@
 ---
 name: kubernetes
-description: Set up and manage local Kubernetes clusters using KIND (Kubernetes IN Docker). Use when testing Kubernetes applications locally or developing cloud-native workloads.
+description: Настройка и управление локальными Kubernetes-кластерами с помощью KIND (Kubernetes IN Docker). Используй при локальном тестировании Kubernetes-приложений или разработке cloud-native рабочих нагрузок.
 triggers:
 - kubernetes
 - k8s
 - kube
 ---
 
-# Kubernetes Local Development with KIND
+# Локальная разработка Kubernetes с KIND
 
-## KIND Installation and Setup
+## Установка и настройка KIND
 
-KIND (Kubernetes IN Docker) is a tool for running local Kubernetes clusters using Docker containers as nodes. It's designed for testing Kubernetes applications locally.
+KIND (Kubernetes IN Docker) — это инструмент для запуска локальных Kubernetes-кластеров, использующий Docker-контейнеры в качестве узлов. Он предназначен для локального тестирования Kubernetes-приложений.
 
-IMPORTANT: Before you proceed with installation, make sure you have docker installed locally.
-Windows PowerShell equivalents for installing KIND and kubectl are in `references/windows.md`.
+ВАЖНО: Прежде чем приступать к установке, убедись, что docker установлен локально.
+Эквиваленты для Windows PowerShell по установке KIND и kubectl находятся в `references/windows.md`.
 
-### Installation
+### Установка
 
-To install KIND on a Debian/Ubuntu system:
+Для установки KIND на систему Debian/Ubuntu:
 
 ```bash
-# Download KIND binary
+# Скачать бинарник KIND
 curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.22.0/kind-linux-amd64
-# Make it executable
+# Сделать его исполняемым
 chmod +x ./kind
-# Move to a directory in your PATH
+# Переместить в каталог из PATH
 sudo mv ./kind /usr/local/bin/
 ```
 
-To install kubectl:
+Для установки kubectl:
 
 ```bash
-# Download kubectl
+# Скачать kubectl
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-# Make it executable
+# Сделать его исполняемым
 chmod +x kubectl
-# Move to a directory in your PATH
+# Переместить в каталог из PATH
 sudo mv ./kubectl /usr/local/bin/
 ```
 
-### Creating a Cluster
+### Создание кластера
 
-Create a basic KIND cluster:
+Создай базовый KIND-кластер:
 
 ```bash
 kind create cluster

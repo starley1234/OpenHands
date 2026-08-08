@@ -1,24 +1,24 @@
 ---
 name: swift-linux
-description: Install and configure Swift programming language on Debian Linux for server-side development. Use when building Swift applications on Linux or setting up a Swift development environment.
+description: Установка и настройка языка программирования Swift на Debian Linux для серверной разработки. Используй при сборке Swift-приложений на Linux или настройке окружения разработки Swift.
 triggers:
 - swift-linux
 - swift-debian
 - swift-installation
 ---
 
-# Swift Installation Guide for Debian Linux
+# Руководство по установке Swift для Debian Linux
 
-This document provides instructions for installing Swift on Debian 12 (Bookworm).
+Этот документ содержит инструкции по установке Swift на Debian 12 (Bookworm).
 
-> This setup is intended for non-UI development tasks on Swift on Linux.
-> On Windows, run these Debian commands inside WSL2 or a Linux container. For native Windows Swift, use the Windows toolchain from Swift.org instead.
+> Эта настройка предназначена для задач разработки без UI на Swift под Linux.
+> На Windows выполняй эти команды Debian внутри WSL2 или Linux-контейнера. Для нативного Windows Swift используй Windows-тулчейн со Swift.org.
 
-## Prerequisites
+## Предварительные требования
 
-Before installing Swift, you need to install the required dependencies for your system. You can find the most up-to-date list of dependencies for your specific Linux distribution and version at the [Swift.org tarball installation guide](https://www.swift.org/install/linux/tarball/).
+Перед установкой Swift нужно установить требуемые зависимости для твоей системы. Актуальный список зависимостей для твоей конкретной дистрибуции Linux и версии можно найти в [руководстве по установке из tarball на Swift.org](https://www.swift.org/install/linux/tarball/).
 
-FOR EXAMPLE, the dependencies you may need to install for Debian 12 could be:
+НАПРИМЕР, зависимости, которые могут понадобиться для Debian 12:
 
 ```bash
 sudo apt-get update
@@ -38,44 +38,44 @@ sudo apt-get install -y \
   uuid-dev
 ```
 
-## Download and Install Swift
+## Скачивание и установка Swift
 
-1. Find the latest Swift version for Debian:
+1. Найди последнюю версию Swift для Debian:
 
-   Go to the [Swift.org download page](https://www.swift.org/download/) to find the latest Swift version compatible with Debian 12 (Bookworm).
+   Перейди на [страницу загрузки Swift.org](https://www.swift.org/download/), чтобы найти последнюю версию Swift, совместимую с Debian 12 (Bookworm).
 
-   Look for a tarball named something like `swift-<VERSION>-RELEASE-debian12.tar.gz` (e.g., `swift-6.0.3-RELEASE-debian12.tar.gz`).
+   Ищи tarball с именем вроде `swift-<VERSION>-RELEASE-debian12.tar.gz` (например, `swift-6.0.3-RELEASE-debian12.tar.gz`).
 
-   The URL pattern is typically:
+   Шаблон URL обычно такой:
    ```
    https://download.swift.org/swift-<VERSION>-release/debian12/swift-<VERSION>-RELEASE/swift-<VERSION>-RELEASE-debian12.tar.gz
    ```
 
-   Where `<VERSION>` is the Swift version number (e.g., `6.0.3`).
+   Где `<VERSION>` — номер версии Swift (например, `6.0.3`).
 
-2. Download the Swift binary for Debian 12:
+2. Скачай бинарник Swift для Debian 12:
 
 ```bash
 cd /workspace
 wget https://download.swift.org/swift-6.0.3-release/debian12/swift-6.0.3-RELEASE/swift-6.0.3-RELEASE-debian12.tar.gz
 ```
 
-3. Extract the archive:
+3. Распакуй архив:
 
-> **Note**: Make sure to install Swift in the `/workspace` directory, but outside the git repository to avoid committing the Swift binaries.
+> **Примечание**: Установи Swift в каталог `/workspace`, но вне git-репозитория, чтобы не коммитить бинарники Swift.
 
-4. Add Swift to your PATH by adding the following line to your `~/.bashrc` file:
+4. Добавь Swift в PATH, добавив следующую строку в файл `~/.bashrc`:
 
 ```bash
 echo 'export PATH=/workspace/swift-6.0.3-RELEASE-debian12/usr/bin:$PATH' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-> **Note**: Make sure to update the version number in the PATH to match the version you downloaded.
+> **Примечание**: Обязательно обнови номер версии в PATH, чтобы он соответствовал скачанной версии.
 
-## Verify Installation
+## Проверка установки
 
-Verify that Swift is correctly installed by running:
+Проверь, что Swift установлен корректно, выполнив:
 
 ```bash
 swift --version

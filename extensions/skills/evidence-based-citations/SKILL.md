@@ -1,6 +1,6 @@
 ---
 name: evidence-based-citations
-description: Back factual claims and field values with official, verifiable sources. Use when the user asks to fill fields, answer questions, or make claims that must be supported by an exact quote and an official link.
+description: Подкрепление фактических утверждений и значений полей официальными, проверяемыми источниками. Используй, когда пользователь просит заполнить поля, ответить на вопросы или сделать утверждения, которые должны быть подтверждены точной цитатой и официальной ссылкой.
 triggers:
 - evidence-based
 - cite source
@@ -13,47 +13,47 @@ triggers:
 - verifiable source
 ---
 
-The user wants every field value or factual claim you produce in the current response to be backed by an official, verifiable source. Apply this skill to the response that triggered it; do not assume it stays active for the rest of the conversation unless the user clearly asks for it to.
+Пользователь хочет, чтобы каждое значение поля или фактическое утверждение в текущем ответе было подкреплено официальным, проверяемым источником. Применяй этот навык к ответу, который его запустил; не предполагай, что он остаётся активным до конца разговора, если пользователь явно об этом не попросил.
 
-## Output format
+## Формат вывода
 
-For each field or claim, respond with exactly these four labeled lines:
+Для каждого поля или утверждения отвечай ровно четырьмя помеченными строками:
 
-- **Field**: the field name (or a short description of the claim)
-- **Value**: the value you are assigning (or the claim itself)
-- **Quote**: the exact verbatim text from the source that supports the value
-- **Source**: the official URL where the quote can be found
+- **Field**: имя поля (или краткое описание утверждения)
+- **Value**: присваиваемое значение (или само утверждение)
+- **Quote**: точный дословный текст из источника, подтверждающий значение
+- **Source**: официальный URL, где можно найти цитату
 
-When there are multiple fields, repeat the block once per field. Keep blocks separated by a blank line.
+Когда полей несколько, повторяй блок один раз на поле. Разделяй блоки пустой строкой.
 
-## Source selection rules
+## Правила выбора источника
 
-1. Prefer primary sources, in this order:
-   - Official product / project documentation
-   - Standards documents (RFCs, W3C specs, ISO standards)
-   - Official API references
-   - Source code in the project's own repository
-2. Accept secondary sources (blog posts, Stack Overflow, forum threads, news articles, third-party tutorials) only as a last resort, and clearly label them as such in **Source**.
-3. The **Quote** field must contain text that actually appears at the **Source** URL. Do not paraphrase inside the quote, and do not stitch together text from different parts of the page without making the cut explicit (e.g. with ` … `).
-4. If you cannot find an official source for a value, say so explicitly:
+1. Предпочитай первоисточники в таком порядке:
+   - Официальная документация продукта/проекта
+   - Стандартные документы (RFC, спецификации W3C, стандарты ISO)
+   - Официальные API-справочники
+   - Исходный код в собственном репозитории проекта
+2. Принимай вторичные источники (блоги, Stack Overflow, форумы, новостные статьи, сторонние руководства) только как последнее средство и чётко помечай их как таковые в **Source**.
+3. Поле **Quote** должно содержать текст, который действительно присутствует по URL **Source**. Не перефразируй внутри цитаты и не склеивай текст из разных частей страницы, не обозначив обрезку (например, ` … `).
+4. Если ты не можешь найти официальный источник для значения, скажи об этом явно:
    - **Source**: `No official source found.`
-   Then either omit the value, mark it as unverified, or ask the user how to proceed. Never invent a quote or URL.
+   Затем либо опусти значение, пометь его как непроверенное, либо спроси пользователя, как действовать дальше. Никогда не выдумывай цитату или URL.
 
-## When to fetch
+## Когда загружать
 
-- If you have a browser / fetch tool available, retrieve the source page and copy the quote directly from it before responding.
-- If you do not have a fetch tool, always respond with `Source: No official source found.` rather than citing URLs from memory. LLMs cannot reliably verify URL accuracy or quote fidelity without actually fetching the page, even when a URL feels familiar.
+- Если у тебя есть инструмент браузера/загрузки, получи страницу источника и скопируй цитату прямо с неё перед ответом.
+- Если у тебя нет инструмента загрузки, всегда отвечай `Source: No official source found.` вместо цитирования URL по памяти. LLM не могут надёжно проверить точность URL или верность цитат без фактической загрузки страницы, даже если URL кажется знакомым.
 
-## Example
+## Пример
 
-> User: What HTTP status code indicates a successful request, per the HTTP semantics RFC?
+> Пользователь: Какой HTTP-код статуса указывает на успешный запрос, по семантике HTTP RFC?
 
-- **Field**: HTTP status code for a successful request (per RFC 9110)
+- **Field**: HTTP-код статуса для успешного запроса (по RFC 9110)
 - **Value**: 200 (OK)
 - **Quote**: "The 200 (OK) status code indicates that the request has succeeded."
 - **Source**: https://www.rfc-editor.org/rfc/rfc9110.html#section-15.3.1
 
-## What this skill is not
+## Чем этот навык не является
 
-- It is not a general "be careful with facts" reminder. Apply the strict four-field format only when the user has invoked this skill or is clearly asking for evidence-backed answers.
-- It does not change how you write code, edit files, or run tools. It only governs how you report values and claims back to the user.
+- Это не общее напоминание «будь осторожен с фактами». Применяй строгий четырёхполевой формат только когда пользователь вызвал этот навык или явно просит ответы с доказательствами.
+- Он не меняет то, как ты пишешь код, редактируешь файлы или запускаешь инструменты. Он управляет только тем, как ты сообщаешь значения и утверждения пользователю.

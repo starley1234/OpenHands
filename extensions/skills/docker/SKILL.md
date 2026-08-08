@@ -1,33 +1,33 @@
 ---
 name: docker
-description: Run Docker commands within a container environment, including starting the Docker daemon and managing containers. Use when building, running, or managing Docker containers and images.
+description: Выполнение Docker-команд в среде контейнера, включая запуск демона Docker и управление контейнерами. Используй при сборке, запуске или управлении Docker-контейнерами и образами.
 triggers:
 - docker
 - container
 ---
 
-# Docker Usage Guide
+# Руководство по использованию Docker
 
-## Starting Docker in Container Environments
+## Запуск Docker в контейнерных средах
 
-Please check if docker is already installed. If so, to start Docker in a container environment:
+Проверь, установлен ли docker. Если да, для запуска Docker в контейнерной среде:
 
 ```bash
-# Start Docker daemon in the background
+# Запустить демон Docker в фоне
 sudo dockerd > /tmp/docker.log 2>&1 &
 
-# Wait for Docker to initialize
+# Подождать инициализации Docker
 sleep 5
 ```
 
-On Windows, start Docker Desktop or the Docker service instead of running `sudo dockerd`; then run Docker commands from PowerShell without `sudo`.
+На Windows запусти Docker Desktop или службу Docker вместо `sudo dockerd`; затем выполняй Docker-команды из PowerShell без `sudo`.
 
-## Verifying Docker Installation
+## Проверка установки Docker
 
-To verify Docker is working correctly, run the hello-world container:
+Чтобы проверить, что Docker работает корректно, запусти контейнер hello-world:
 
 ```bash
 sudo docker run hello-world
 ```
 
-PowerShell equivalent after Docker Desktop is running: `docker run hello-world`.
+Эквивалент в PowerShell после запуска Docker Desktop: `docker run hello-world`.

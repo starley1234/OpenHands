@@ -1,26 +1,26 @@
 ---
 name: github-pr-review
-description: Post PR review comments using the GitHub API with inline comments, suggestions, and priority labels.
+description: Публикация комментариев ревью PR с помощью GitHub API с инлайн-комментариями, предложениями и метками приоритета.
 triggers:
 - /github-pr-review
 ---
 
 # GitHub PR Review
 
-Post structured code review feedback using the GitHub API with inline comments on specific lines.
-Windows PowerShell equivalents for JSON file creation, temp paths, line lookup, and fallback `curl` are in `references/windows.md`.
+Публикуй структурированный фидбек ревью кода через GitHub API с инлайн-комментариями на конкретных строках.
+Эквиваленты для Windows PowerShell по созданию JSON-файлов, временным путям, поиску строк и запасному `curl` — в `references/windows.md`.
 
-## Key Rule: One API Call
+## Ключевое правило: один вызов API
 
-Bundle ALL comments into a **single review API call**. Do not post comments individually.
+Собери ВСЕ комментарии в **один вызов API ревью**. Не публикуй комментарии по отдельности.
 
-## Posting a Review
+## Публикация ревью
 
-Use the GitHub CLI (`gh`) with a JSON input file. The `GITHUB_TOKEN` is automatically available.
+Используй GitHub CLI (`gh`) с JSON-файлом на входе. `GITHUB_TOKEN` доступен автоматически.
 
-**Important**: Always use `--input` with a JSON file instead of `-F` flags. This avoids shell quoting issues with special characters in comment bodies (quotes, backticks, newlines, etc.) and eliminates the need for complex heredoc scripts.
+**Важно**: Всегда используй `--input` с JSON-файлом вместо флагов `-F`. Это избегает проблем экранирования кавычек shell со спецсимволами в телах комментариев (кавычки, бэктики, переносы строк и т.д.) и устраняет необходимость в сложных heredoc-скриптах.
 
-### Step 1: Create a JSON file
+### Шаг 1: Создай JSON-файл
 
 ```bash
 cat > /tmp/review.json << 'EOF'
@@ -46,26 +46,26 @@ cat > /tmp/review.json << 'EOF'
 EOF
 ```
 
-### Step 2: Post the review
+### Шаг 2: Опубликуй ревью
 
 ```bash
 gh api -X POST repos/{owner}/{repo}/pulls/{pr_number}/reviews --input /tmp/review.json
 ```
 
-### Parameters
+### Параметры
 
-| Parameter | Description |
+| Параметр | Описание |
 |-----------|-------------|
-| `commit_id` | Commit SHA to comment on (use `git rev-parse HEAD`) |
-| `event` | `COMMENT`, `APPROVE`, or `REQUEST_CHANGES` |
-| `path` | File path as shown in the diff |
-| `line` | Line number in the NEW version (right side of diff) |
-| `side` | `RIGHT` for new/added lines, `LEFT` for deleted lines |
-| `body` | Comment text with priority label |
+| `commit_id` | SHA коммита для комментирования (используй `git rev-parse HEAD`) |
+| `event` | `COMMENT`, `APPROVE` или `REQUEST_CHANGES` |
+| `path` | Путь к файлу, как показано в диффе |
+| `line` | Номер строки в НОВОЙ версии (правая сторона диффа) |
+| `side` | `RIGHT` для новых/добавленных строк, `LEFT` для удалённых строк |
+| `body` | Текст комментария с меткой приоритета |
 
-### Multi-Line Comments
+### Многострочные комментарии
 
-For comments spanning multiple lines, add `start_line` to specify the range:
+Для комментариев, охватывающих несколько строк, добавь `start_line`, чтобы указать диапазон:
 
 ```json
 {
@@ -77,21 +77,21 @@ For comments spanning multiple lines, add `start_line` to specify the range:
 }
 ```
 
-**`start_line`/`line` define the range that will be REPLACED.** The suggestion block may have any number of lines — it does **not** have to match the range size. See the next section for the exact semantics; getting this wrong is how suggestions silently delete or duplicate code.
+**`start_line`/`line` определяют диапазон, который будет ЗАМЕНЁН.** Блок предложения может содержать любое количество строк — он **не** обязан соответствовать размеру диапазона. См. следующий раздел для точной семантики; ошибка здесь — причина того, как предложения молча удаляют или дублируют код.
 
-## Priority Labels
+## Метки приоритета
 
-Start each comment with a priority label. **Minimize nits** - leave minor style issues to linters.
+Начинай каждый комментарий с метки приоритета. **Минимизируй придирки** — оставь мелкие проблемы стиля линтерам.
 
-| Label | When to Use |
+| Метка | Когда использовать |
 |-------|-------------|
-| 🔴 **Critical** | Must fix: security vulnerabilities, bugs, data loss risks |
-| 🟠 **Important** | Should fix: logic errors, performance issues, missing error handling |
-| 🟡 **Suggestion** | Worth considering: significant improvements to clarity or maintainability |
+| 🔴 **Critical** | Обязательно исправить: уязвимости безопасности, баги, риски потери данных |
+| 🟠 **Important** | Стоит исправить: логические ошибки, проблемы производительности, отсутствующая обработка ошибок |
+| 🟡 **Suggestion** | Стоит рассмотреть: значительные улучшения ясности или поддерживаемости |
 
-**Do NOT post 🟢 Nit or 🟢 Acceptable comments.** If code is fine, simply don't comment on it. Inline comments that say "this looks good" or "acceptable trade-off" are noise — they create review threads that must be resolved without providing actionable value.
+**НЕ публикуй комментарии 🟢 Nit или 🟢 Acceptable.** Если код в порядке — просто не комментируй его. Инлайн-комментарии «выглядит хорошо» или «приемлемый компромисс» — это шум: они создают ветки ревью, которые нужно закрывать, без применимой ценности.
 
-**Example:**
+**Пример:**
 ```
 🟠 Important: This function doesn't handle None, which could cause an AttributeError.
 
@@ -101,9 +101,9 @@ if user is None:
 ```
 ```
 
-## GitHub Suggestions
+## Предложения GitHub
 
-For small code changes, use the suggestion syntax for one-click apply:
+Для небольших изменений кода используй синтаксис предложений для применения в один клик:
 
 ~~~
 ```suggestion
@@ -111,61 +111,61 @@ improved_code_here()
 ```
 ~~~
 
-Use suggestions for: renaming, typos, small refactors (1-5 lines), type hints, docstrings.
+Используй предложения для: переименований, опечаток, небольших рефакторингов (1-5 строк), подсказок типов, докстрингов.
 
-Avoid for: large refactors, architectural changes, ambiguous improvements.
+Избегай для: крупных рефакторингов, архитектурных изменений, неоднозначных улучшений.
 
-### How Suggestions Actually Work (READ THIS BEFORE WRITING ONE)
+### Как на самом деле работают предложения (ПРОЧТИ ЭТО ПЕРЕД НАПИСАНИЕМ)
 
-A suggestion block **replaces** the targeted range with its contents. The replaced range is:
+Блок предложения **заменяет** целевой диапазон своим содержимым. Заменяемый диапазон:
 
-- `line` only → the single line `line` (replaces 1 line)
-- `start_line` + `line` → the inclusive range `start_line..line` (replaces `line - start_line + 1` lines)
+- только `line` → одна строка `line` (заменяет 1 строку)
+- `start_line` + `line` → включающий диапазон `start_line..line` (заменяет `line - start_line + 1` строк)
 
-The suggestion content can be **any number of lines** — 0 (deletion), 1, or many. It does not have to match the range size. Whatever is between the ` ```suggestion ` and closing ` ``` ` fences becomes the new content of those lines.
+Содержимое предложения может быть **любым количеством строк** — 0 (удаление), 1 или много. Оно не обязано соответствовать размеру диапазона. Всё между ограничителями ` ```suggestion ` и закрывающими ` ``` ` становится новым содержимым этих строк.
 
-Writing the wrong combination of `start_line`/`line` and suggestion body is what causes accepted suggestions to **duplicate** or **delete** code. Use the table below as your contract:
+Неправильная комбинация `start_line`/`line` и тела предложения — причина того, что принятые предложения **дублируют** или **удаляют** код. Используй таблицу ниже как свой контракт:
 
-| Intent | `start_line` | `line` | Suggestion body must contain |
+| Намерение | `start_line` | `line` | Тело предложения должно содержать |
 |--------|--------------|--------|-------------------------------|
-| Change line N | omit | N | the new content for line N |
-| Change lines N..M | N | M | the new content for the whole block |
-| **Add** a line **after** line N (keep line N) | omit | N | line N's exact current text, then the new line(s) |
-| **Add** a line **before** line N (keep line N) | omit | N | the new line(s), then line N's exact current text |
-| **Insert** lines inside range N..M (keep N..M) | N | M | every original line in N..M plus the new lines, in the final desired order |
-| **Delete** line N | omit | N | empty body (just an empty ` ```suggestion ``` ` block) |
-| **Delete** lines N..M | N | M | empty body |
+| Изменить строку N | опусти | N | новое содержимое для строки N |
+| Изменить строки N..M | N | M | новое содержимое всего блока |
+| **Добавить** строку **после** строки N (сохрани строку N) | опусти | N | точный текущий текст строки N, затем новая строка(и) |
+| **Добавить** строку **перед** строкой N (сохрани строку N) | опусти | N | новая строка(и), затем точный текущий текст строки N |
+| **Вставить** строки внутри диапазона N..M (сохрани N..M) | N | M | каждую исходную строку N..M плюс новые строки, в финальном нужном порядке |
+| **Удалить** строку N | опусти | N | пустое тело (просто пустой блок ` ```suggestion ``` `) |
+| **Удалить** строки N..M | N | M | пустое тело |
 
-### Common Mistakes That Break Code
+### Частые ошибки, ломающие код
 
-1. **Duplicated lines.** You copy a neighboring line (N-1 or N+1) into the suggestion body as context — that line is still present in the file outside the replaced range, so accepting the suggestion inserts a second copy of it. Fix: only include lines that fall within the targeted range, plus any genuinely new content.
-2. **Disappearing lines.** You target `start_line=10, line=12` to comment on a 3-line block, but your suggestion body only contains 1 line because you "only want to change line 11". Accepting that suggestion deletes lines 10 and 12. Fix: either narrow the range to just line 11, or include lines 10 and 12 verbatim in the body.
-3. **Description does not match the suggestion.** The prose says "rename this variable" but the suggestion replaces an entire function. Or the prose says "add a None check" but the suggestion only contains the check (deleting the original code). Fix: after writing the suggestion, re-read the prose and confirm the resulting file would match it line-for-line.
+1. **Дублированные строки.** Ты копируешь соседнюю строку (N-1 или N+1) в тело предложения как контекст — эта строка всё ещё присутствует в файле вне заменяемого диапазона, поэтому принятие предложения вставляет её вторую копию. Исправление: включай только строки, попадающие в целевой диапазон, плюс действительно новое содержимое.
+2. **Исчезающие строки.** Ты целишься в `start_line=10, line=12`, чтобы прокомментировать блок из 3 строк, но тело предложения содержит только 1 строку, потому что ты «хочешь изменить только строку 11». Принятие этого предложения удаляет строки 10 и 12. Исправление: либо сузь диапазон до строки 11, либо включи строки 10 и 12 дословно в тело.
+3. **Описание не соответствует предложению.** Проза говорит «переименуй эту переменную», но предложение заменяет целую функцию. Или проза говорит «добавь проверку None», но предложение содержит только проверку (удаляя исходный код). Исправление: после написания предложения перечитай прозу и подтверди, что результирующий файл будет соответствовать ей построчно.
 
-### Mandatory Verification Before Posting
+### Обязательная проверка перед публикацией
 
-For every comment that contains a ` ```suggestion ``` ` block, do this check before adding it to the review JSON:
+Для каждого комментария, содержащего блок ` ```suggestion ``` `, выполни эту проверку перед добавлением в JSON ревью:
 
-1. Read the actual file lines that will be replaced: `sed -n '<start_line>,<line>p' <path>` (or `sed -n '<line>p' <path>` for a single-line target).
-2. Mentally apply the suggestion: drop those lines, splice in the suggestion body, and look at the result in context.
-3. Confirm the resulting code matches **exactly** what your prose description promises — no extra duplicated line above/below, no original line accidentally dropped, no off-by-one.
-4. If the change cannot be expressed cleanly as a contiguous replacement (e.g., it touches non-adjacent lines, or it depends on edits elsewhere in the file), do **not** use a suggestion block — describe the change in prose instead.
+1. Прочитай фактические строки файла, которые будут заменены: `sed -n '<start_line>,<line>p' <path>` (или `sed -n '<line>p' <path>` для однострочной цели).
+2. Мысленно примени предложение: удали эти строки, вставь тело предложения и посмотри на результат в контексте.
+3. Подтверди, что результирующий код соответствует **точно** тому, что обещает твоё прозное описание — без лишней дублированной строки сверху/снизу, без случайно удалённой исходной строки, без off-by-one.
+4. Если изменение нельзя чисто выразить как непрерывную замену (например, оно затрагивает несмежные строки или зависит от правок в других местах файла) — **не** используй блок предложения, опиши изменение прозой.
 
-If you are not 100% sure the suggestion will produce the exact code you described, drop the ` ```suggestion ``` ` block and leave a regular inline comment. A correct prose comment is always better than a one-click suggestion that silently corrupts the file.
+Если ты не уверен на 100%, что предложение даст точный код, который ты описал, убери блок ` ```suggestion ``` ` и оставь обычный инлайн-комментарий. Корректный прозный комментарий всегда лучше предложения в один клик, молча портящего файл.
 
-## Finding Line Numbers
+## Поиск номеров строк
 
 ```bash
-# From diff header: @@ -old_start,old_count +new_start,new_count @@
-# Count from new_start for added/modified lines
+# Из заголовка диффа: @@ -old_start,old_count +new_start,new_count @@
+# Считай от new_start для добавленных/изменённых строк
 
-grep -n "pattern" filename     # Find line number
-head -n 42 filename | tail -1  # Verify line content
+grep -n "pattern" filename     # Найди номер строки
+head -n 42 filename | tail -1  # Проверь содержимое строки
 ```
 
-## Fallback: curl
+## Запасной вариант: curl
 
-If `gh` is unavailable, use curl with the JSON file:
+Если `gh` недоступен, используй curl с JSON-файлом:
 
 ```bash
 curl -X POST \
@@ -175,13 +175,13 @@ curl -X POST \
   -d @/tmp/review.json
 ```
 
-## Summary
+## Резюме
 
-1. Analyze the code and identify important issues (minimize nits)
-2. Write review data to a JSON file (e.g., `/tmp/review.json`)
-3. Post **ONE** review using `gh api --input /tmp/review.json`
-4. Use priority labels (🔴🟠🟡) on every comment
-5. Do NOT post comments for code that is acceptable — only comment when action is needed
-6. Use suggestion syntax for concrete code changes, but only after verifying the resulting code matches your description (see "How Suggestions Actually Work")
-7. Keep the review body brief (details go in inline comments)
-8. If no issues: post a short approval message with no inline comments
+1. Проанализируй код и выяви важные проблемы (минимизируй придирки)
+2. Запиши данные ревью в JSON-файл (например, `/tmp/review.json`)
+3. Опубликуй ОДНО ревью через `gh api --input /tmp/review.json`
+4. Используй метки приоритета (🔴🟠🟡) на каждом комментарии
+5. НЕ публикуй комментарии для приемлемого кода — комментируй только когда нужно действие
+6. Используй синтаксис предложений для конкретных изменений кода, но только после проверки, что результирующий код соответствует твоему описанию (см. «Как на самом деле работают предложения»)
+7. Держи тело ревью кратким (детали — в инлайн-комментариях)
+8. Если проблем нет: опубликуй короткое сообщение одобрения без инлайн-комментариев

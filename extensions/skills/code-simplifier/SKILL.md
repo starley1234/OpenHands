@@ -1,91 +1,91 @@
 ---
 name: code-simplifier
-description: Simplifies and refines code for clarity, consistency, and maintainability while preserving all functionality. Analyzes recently modified code across three dimensions - code reuse, code quality, and efficiency - and provides actionable improvement suggestions. This skill should be used when the user asks to "simplify code", "refine code", "clean up code", "improve code quality", or requests a simplification review of recent changes.
+description: Упрощает и улучшает код для ясности, согласованности и поддерживаемости, сохраняя всю функциональность. Анализирует недавно изменённый код по трём направлениям — переиспользование кода, качество кода и эффективность — и даёт применимые предложения по улучшению. Этот навык следует использовать, когда пользователь просит «упростить код», «улучшить код», «почистить код», «повысить качество кода» или запрашивает ревью упрощения недавних изменений.
 triggers:
   - /simplify
 ---
 
 # Code Simplifier
 
-Analyze recently modified code and suggest refinements that improve clarity, consistency, and maintainability - without changing what the code does. The review covers three complementary aspects:
+Проанализируй недавно изменённый код и предложи улучшения, повышающие ясность, согласованность и поддерживаемость — без изменения того, что делает код. Ревью охватывает три взаимодополняющих аспекта:
 
-1. **Code Reuse** - Eliminate duplication, consolidate shared logic, leverage existing utilities.
-2. **Code Quality** - Improve naming, reduce complexity, enforce project standards from `AGENTS.md`.
-3. **Efficiency** - Fix algorithmic issues, remove unnecessary work, optimize resource usage.
+1. **Переиспользование кода** — Устрани дублирование, объедини общую логику, используй существующие утилиты.
+2. **Качество кода** — Улучши имена, снизь сложность, соблюдай стандарты проекта из `AGENTS.md`.
+3. **Эффективность** — Исправь алгоритмические проблемы, убери лишнюю работу, оптимизируй использование ресурсов.
 
-## Review Process
+## Процесс ревью
 
-### Identify the Scope
+### Определение объёма
 
-By default, focus on recently modified code. Use `git diff` or the file list from the current PR/MR to determine the changed files. When the user specifies a different scope, follow their instruction:
+По умолчанию сосредотачивайся на недавно изменённом коде. Используй `git diff` или список файлов из текущего PR/MR, чтобы определить изменённые файлы. Когда пользователь указывает другой объём, следуй его инструкции:
 
-- **Specific files**: "simplify `src/auth.py`" - review only the named files
-- **Directory**: "simplify the `utils/` folder" - review all files in that directory
-- **Full repo**: "simplify the whole project" - review the entire codebase
-- **PR/MR**: "simplify this PR" - review only files changed in the current PR/MR
+- **Конкретные файлы**: «упрости `src/auth.py`» — просмотри только указанные файлы
+- **Каталог**: «упрости папку `utils/`» — просмотри все файлы в этом каталоге
+- **Весь репозиторий**: «упрости весь проект» — просмотри всю кодовую базу
+- **PR/MR**: «упрости этот PR» — просмотри только файлы, изменённые в текущем PR/MR
 
-### Sub-Agent Delegation (Preferred)
+### Делегирование субагентам (предпочтительно)
 
-When sub-agent capability is available, delegate each review aspect to a separate sub-agent for parallel, focused analysis:
+Когда доступна возможность субагентов, делегируй каждый аспект ревью отдельному субагенту для параллельного, сфокусированного анализа:
 
-1. **Code Reuse Review Agent** - Read `references/code-reuse-review.md` and analyze the changed files for duplication and consolidation opportunities.
-2. **Code Quality Review Agent** - Read `references/code-quality-review.md` and analyze the changed files for clarity, naming, complexity, and standards compliance.
-3. **Efficiency Review Agent** - Read `references/efficiency-review.md` and analyze the changed files for performance and resource usage issues.
+1. **Агент ревью переиспользования кода** — Прочитай `references/code-reuse-review.md` и проанализируй изменённые файлы на дублирование и возможности объединения.
+2. **Агент ревью качества кода** — Прочитай `references/code-quality-review.md` и проанализируй изменённые файлы на ясность, имена, сложность и соответствие стандартам.
+3. **Агент ревью эффективности** — Прочитай `references/efficiency-review.md` и проанализируй изменённые файлы на проблемы производительности и использования ресурсов.
 
-Each sub-agent should:
-- Read the corresponding reference document for detailed criteria and output format
-- Read `AGENTS.md` at the repository root for project-specific coding conventions
-- Analyze only the recently changed code (unless instructed otherwise)
-- Return findings in the format specified by its reference document
+Каждый субагент должен:
+- Прочитать соответствующий справочный документ для детальных критериев и формата вывода
+- Прочитать `AGENTS.md` в корне репозитория для специфичных для проекта соглашений о коде
+- Анализировать только недавно изменённый код (если не указано иное)
+- Вернуть выводы в формате, заданном его справочным документом
 
-After all sub-agents complete, synthesize their findings into a single consolidated report.
+После завершения всех субагентов обобщи их выводы в единый консолидированный отчёт.
 
-### Sequential Review (Fallback)
+### Последовательное ревью (запасной вариант)
 
-When sub-agents are not available, perform all three reviews sequentially:
+Когда субагенты недоступны, выполни все три ревью последовательно:
 
-1. Read `references/code-reuse-review.md` - review for duplication and reuse
-2. Read `references/code-quality-review.md` - review for clarity and standards
-3. Read `references/efficiency-review.md` - review for performance and resources
+1. Прочитай `references/code-reuse-review.md` — ревью на дублирование и переиспользование
+2. Прочитай `references/code-quality-review.md` — ревью на ясность и стандарты
+3. Прочитай `references/efficiency-review.md` — ревью на производительность и ресурсы
 
-Apply the criteria and output format from each reference document.
+Примени критерии и формат вывода из каждого справочного документа.
 
-## Guiding Philosophy
+## Руководящая философия
 
-- **Preserve Functionality**: Never change what the code does - only how it does it. All original features, outputs, and behaviors remain intact.
-- **Follow Project Standards**: Apply the coding conventions from `AGENTS.md` at the repository root (import ordering, naming, module structure, error handling, component patterns).
-- **Clarity Over Brevity**: Prefer explicit, readable code over compact one-liners. Avoid nested ternaries - use `if/else` or `switch` for multiple conditions.
-- **Maintain Balance**: Avoid over-simplification that reduces clarity, creates overly clever solutions, or combines too many concerns into a single function.
-- **Pragmatism**: Solve real problems, not imaginary ones. Do not optimize for theoretical edge cases or micro-benchmarks that do not matter at the project's scale.
+- **Сохраняй функциональность**: Никогда не меняй то, что делает код — только как он это делает. Все исходные функции, выходы и поведения остаются нетронутыми.
+- **Следуй стандартам проекта**: Применяй соглашения о коде из `AGENTS.md` в корне репозитория (порядок импортов, имена, структура модулей, обработка ошибок, паттерны компонентов).
+- **Ясность важнее краткости**: Предпочитай явный, читаемый код компактным однострочникам. Избегай вложенных тернарников — используй `if/else` или `switch` для множественных условий.
+- **Сохраняй баланс**: Избегай чрезмерного упрощения, снижающего ясность, создающего слишком хитрые решения или объединяющего слишком много задач в одну функцию.
+- **Прагматизм**: Решай реальные проблемы, а не воображаемые. Не оптимизируй под теоретические крайние случаи или микро-бенчмарки, не имеющие значения в масштабе проекта.
 
-## Consolidated Output Format
+## Консолидированный формат вывода
 
-Present the combined results from all three review aspects:
+Представь объединённые результаты всех трёх аспектов ревью:
 
 ```
 ## Code Simplification Review
 
 ### Scope
-[List of files reviewed and how scope was determined]
+[Список просмотренных файлов и как был определён объём]
 
 ### Code Reuse
-[Findings from the reuse review, using **[REUSE]** tags]
+[Выводы ревью переиспользования, с тегами **[REUSE]**]
 
 ### Code Quality
-[Findings from the quality review, using **[QUALITY]** tags]
+[Выводы ревью качества, с тегами **[QUALITY]**]
 
 ### Efficiency
-[Findings from the efficiency review, using **[EFFICIENCY]** tags]
+[Выводы ревью эффективности, с тегами **[EFFICIENCY]**]
 
 ### Summary
-[Overall assessment: is the code in good shape, or does it need significant refinement?]
-[Prioritized list of the most impactful changes to make first]
+[Общая оценка: код в хорошем состоянии, или требуется значительное улучшение?]
+[Приоритизированный список наиболее значимых изменений для выполнения первыми]
 ```
 
-When a review aspect has no findings, include it with an explicit "no issues found" statement rather than omitting the section.
+Когда у аспекта ревью нет выводов, включи его с явным утверждением «проблем не найдено» вместо пропуска раздела.
 
-## Reference Files
+## Справочные файлы
 
-- **`references/code-reuse-review.md`** - Detailed criteria for detecting duplication, consolidation opportunities, and over-abstraction
-- **`references/code-quality-review.md`** - Detailed criteria for naming, complexity, error handling, and project standards compliance
-- **`references/efficiency-review.md`** - Detailed criteria for algorithmic complexity, unnecessary work, resource usage, and I/O patterns
+- **`references/code-reuse-review.md`** — Детальные критерии обнаружения дублирования, возможностей объединения и чрезмерной абстракции
+- **`references/code-quality-review.md`** — Детальные критерии имён, сложности, обработки ошибок и соответствия стандартам проекта
+- **`references/efficiency-review.md`** — Детальные критерии алгоритмической сложности, лишней работы, использования ресурсов и паттернов I/O

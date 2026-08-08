@@ -1,35 +1,35 @@
 ---
 name: add-javadoc
-description: Add comprehensive JavaDoc documentation to Java classes and methods. Use when documenting Java code, adding API documentation, or improving code documentation.
+description: Добавление подробной JavaDoc-документации к Java-классам и методам. Используй при документировании Java-кода, добавлении API-документации или улучшении документации кода.
 license: MIT
-compatibility: Requires Java source files
+compatibility: Требуются исходные файлы Java
 triggers:
   - javadoc
   - java documentation
   - document java
 ---
 
-Add comprehensive JavaDoc documentation to all public classes and methods.
+Добавь подробную JavaDoc-документацию ко всем публичным классам и методам.
 
-## Class-Level Documentation
+## Документация уровня класса
 
-For each public class:
-- Add class-level JavaDoc describing the purpose and responsibility of the class
-- Include `@author` tag if appropriate
+Для каждого публичного класса:
+- Добавь JavaDoc уровня класса, описывающий назначение и ответственность класса
+- Включи тег `@author`, если уместно
 
-## Method-Level Documentation
+## Документация уровня метода
 
-For each public method:
-- Add method-level JavaDoc describing what the method does
-- Include `@param` tags for all parameters with clear descriptions
-- Include `@return` tag describing the return value
-- Include `@throws` tags for any checked exceptions
+Для каждого публичного метода:
+- Добавь JavaDoc уровня метода, описывающий, что делает метод
+- Включи теги `@param` для всех параметров с чёткими описаниями
+- Включи тег `@return`, описывающий возвращаемое значение
+- Включи теги `@throws` для всех проверяемых исключений
 
-## Style Guidelines
+## Рекомендации по стилю
 
-- First sentence should be a concise summary
-- Use HTML tags sparingly (prefer plain text)
-- Document preconditions and postconditions when relevant
-- Include code examples with `{@code ...}` for complex methods
+- Первое предложение должно быть кратким резюме
+- Используй HTML-теги экономно (предпочитай обычный текст)
+- Документируй предусловия и постусловия, когда это уместно
+- Включай примеры кода с `{@code ...}` для сложных методов
 
-See [references/example.md](references/example.md) for before/after examples.
+См. [references/example.md](references/example.md) для примеров до/после.

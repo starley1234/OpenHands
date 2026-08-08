@@ -1,36 +1,36 @@
 ---
 name: pdflatex
-description: Install and use pdflatex to compile LaTeX documents into PDFs on Linux. Use when generating academic papers, research publications, or any documents written in LaTeX.
+description: Установка и использование pdflatex для компиляции LaTeX-документов в PDF на Linux. Используй при генерации научных статей, исследовательских публикаций или любых документов, написанных на LaTeX.
 triggers:
 - pdflatex
 ---
 
-PdfLatex is a tool that converts Latex sources into PDF. This is specifically very important for researchers, as they use it to publish their findings. It could be installed very easily using Linux terminal, though this seems an annoying task on Windows. Installation commands are given below.
+PdfLatex — это инструмент, который преобразует исходники LaTeX в PDF. Это особенно важно для исследователей, так как они используют его для публикации своих результатов. Его можно легко установить через терминал Linux, хотя на Windows это кажется утомительной задачей. Команды установки приведены ниже.
 
-* Install the TexLive base
+* Установи базу TexLive
 
 ```
 apt-get install texlive-latex-base
 ```
 
-On Windows, install MiKTeX or TeX Live with the native installer or a package manager such as `winget`. The `apt-get` commands only work in Linux or WSL.
+На Windows установи MiKTeX или TeX Live с помощью нативного установщика или менеджера пакетов, такого как `winget`. Команды `apt-get` работают только в Linux или WSL.
 
-* Also install the recommended and extra fonts to avoid running into errors, when trying to use pdflatex on latex files with more fonts.
+* Также установи рекомендуемые и дополнительные шрифты, чтобы избежать ошибок при использовании pdflatex с файлами LaTeX, содержащими больше шрифтов.
 
 ```
 apt-get install texlive-fonts-recommended
 apt-get install texlive-fonts-extra
 ```
 
-* Install the extra packages,
+* Установи дополнительные пакеты,
 
 ```
 apt-get install texlive-latex-extra
 ```
 
-Once installed as above, you may be able to create PDF files from latex sources using PdfLatex as below.
+После установки, как описано выше, ты сможешь создавать PDF-файлы из исходников LaTeX с помощью PdfLatex следующим образом.
 ```
 pdflatex latex_source_name.tex
 ```
 
-Ref: http://kkpradeeban.blogspot.com/2014/04/installing-latexpdflatex-on-ubuntu.html
+Ссылка: http://kkpradeeban.blogspot.com/2014/04/installing-latexpdflatex-on-ubuntu.html

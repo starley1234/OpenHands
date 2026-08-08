@@ -1,6 +1,6 @@
 ---
 name: uv
-description: If the project uses uv, use this skill. Use this skill to create/manage Python projects and environments with `uv`, add/remove dependencies, sync a project from `uv.lock`, and run commands in the project environment.
+description: Если проект использует uv, используй этот навык. Используй его для создания/управления Python-проектами и окружениями с помощью `uv`, добавления/удаления зависимостей, синхронизации проекта из `uv.lock` и запуска команд в окружении проекта.
 triggers:
 - uv
 - uv.lock
@@ -8,51 +8,51 @@ triggers:
 
 # uv (Python)
 
-Use `uv` as the default tool for Python dependency + environment management when the repo has `uv.lock`, mentions `uv` in its docs/Makefile, or already uses a `.venv` created by `uv`.
+Используй `uv` как инструмент по умолчанию для управления зависимостями и окружениями Python, когда репозиторий содержит `uv.lock`, упоминает `uv` в документации/Makefile или уже использует `.venv`, созданный `uv`.
 
-## Quick decision rules
+## Быстрые правила принятия решений
 
-- If the repo has `uv.lock` and `pyproject.toml`: treat it as a uv-managed project.
-- If the repo has only `requirements.txt`: you can still use `uv pip` for fast installs.
-- Prefer **project commands** (`uv add/remove/sync/run/lock`) over raw `pip` unless the repo explicitly uses `uv pip`.
+- Если в репозитории есть `uv.lock` и `pyproject.toml`: считай его проектом, управляемым через uv.
+- Если в репозитории только `requirements.txt`: ты всё равно можешь использовать `uv pip` для быстрых установок.
+- Предпочитай **проектные команды** (`uv add/remove/sync/run/lock`) обычному `pip`, если только репозиторий явно не использует `uv pip`.
 
-## Installation (if needed)
+## Установка (если нужно)
 
-Prefer a packaged install method when available. If you use the official installer, review it first (avoid blindly piping into a shell) and follow the latest instructions in the official docs.
+Предпочитай упакованный метод установки, когда он доступен. Если используешь официальный установщик, сначала просмотри его (избегай слепого перенаправления в shell) и следуй последним инструкциям в официальной документации.
 
 ```bash
-# macOS/Linux (official installer)
+# macOS/Linux (официальный установщик)
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Windows (PowerShell, official installer)
+# Windows (PowerShell, официальный установщик)
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-## Common operations
+## Частые операции
 
-### Initialize a new project
+### Инициализация нового проекта
 
 ```bash
 uv init
-# or
+# или
 uv init my-project
 ```
 
-### Create / use a virtual environment
+### Создание / использование виртуального окружения
 
 ```bash
-uv venv  # creates .venv
+uv venv  # создаёт .venv
 
-# If you need a specific version, match the project's declared requirement
-# (e.g., pyproject.toml / CI config), not an arbitrary latest version.
+# Если нужна конкретная версия, сопоставь её с объявленным требованием проекта
+# (например, pyproject.toml / конфиг CI), а не с произвольной последней версией.
 uv venv --python 3.x
 
-# optional activation (not required for uv commands)
+# необязательная активация (не требуется для команд uv)
 source .venv/bin/activate  # macOS/Linux
-# .venv\\Scripts\\activate   # Windows
+# .venv\Scripts\activate    # Windows
 ```
 
-### Add / remove dependencies (updates pyproject.toml and uv.lock)
+### Добавление / удаление зависимостей (обновляет pyproject.toml и uv.lock)
 
 ```bash
 uv add requests
@@ -62,16 +62,16 @@ uv add -r requirements.txt
 uv remove requests
 ```
 
-### Lock + sync (reproducible installs)
+### Lock + sync (воспроизводимые установки)
 
 ```bash
-uv lock   # (re)generate uv.lock
-uv sync   # create/update .venv to match uv.lock
+uv lock   # (пере)генерировать uv.lock
+uv sync   # создать/обновить .venv под uv.lock
 ```
 
-If you pulled new changes and `uv.lock` changed, run `uv sync`.
+Если ты подтянул новые изменения и `uv.lock` изменился — запусти `uv sync`.
 
-### Run commands inside the project environment
+### Запуск команд в окружении проекта
 
 ```bash
 uv run python -m pytest -q
@@ -79,7 +79,7 @@ uv run python main.py
 uv run ruff check .
 ```
 
-### Using uv as a fast pip replacement (requirements workflows)
+### Использование uv как быстрой замены pip (рабочие процессы с requirements)
 
 ```bash
 uv venv
@@ -88,8 +88,8 @@ uv pip freeze
 uv pip list
 ```
 
-## Notes / pitfalls
+## Примечания / подводные камни
 
-- `uv` will usually auto-detect and use `.venv` in the project root.
-- In CI/containers you may see `uv pip install --system`, but prefer virtualenvs for local dev.
-- If a command mutates deps, prefer `uv add/remove/lock/sync` so `uv.lock` stays correct.
+- `uv` обычно автоматически обнаруживает и использует `.venv` в корне проекта.
+- В CI/контейнерах ты можешь увидеть `uv pip install --system`, но для локальной разработки предпочитай виртуальные окружения.
+- Если команда изменяет зависимости, предпочитай `uv add/remove/lock/sync`, чтобы `uv.lock` оставался корректным.

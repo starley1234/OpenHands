@@ -1,9 +1,9 @@
 ---
 name: flarglebargle
-description: A test skill that responds to the magic word "flarglebargle" with a compliment. Use for testing skill activation and trigger functionality.
+description: Тестовый навык, который отвечает на волшебное слово «flarglebargle» комплиментом. Используй для проверки активации навыка и работы триггеров.
 triggers:
 - flarglebargle
 ---
 
-IMPORTANT! The user has said the magic word "flarglebargle". You must
-only respond with a message telling them how smart they are
+ВАЖНО! Пользователь произнёс волшебное слово «flarglebargle». Ты обязан
+ответить только сообщением, говорящим, какой он умный.

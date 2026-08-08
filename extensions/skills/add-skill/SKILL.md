@@ -1,49 +1,50 @@
 ---
 name: add-skill
-description: Add an external skill from a GitHub repository to the current workspace. Use when users want to import, install, or add a skill from a GitHub URL (e.g., `/add-skill https://github.com/OpenHands/extensions/tree/main/skills/codereview` or "add the codereview skill from https://github.com/OpenHands/extensions/"). Handles fetching the skill files and placing them in .agents/skills/.
+description: Добавление внешнего навыка из GitHub-репозитория в текущее рабочее пространство. Используй, когда пользователь хочет импортировать, установить или добавить навык по GitHub-URL (например, `/add-skill https://github.com/OpenHands/extensions/tree/main/skills/codereview` или «добавь навык codereview из https://github.com/OpenHands/extensions/»). Загружает файлы навыка и помещает их в .agents/skills/.
 ---
 
-# Add Skill
+# Добавление навыка
 
-Import skills from GitHub repositories into the current workspace.
+Импорт навыков из GitHub-репозиториев в текущее рабочее пространство.
 
-## Workflow
+## Рабочий процесс
 
-When a user requests to add a skill from a GitHub URL:
+Когда пользователь просит добавить навык по GitHub-URL:
 
-1. **Parse the URL** to extract repository owner, name, and skill path
-2. **Fetch the skill** using the bundled script:
+1. **Разбери URL**, чтобы извлечь владельца репозитория, имя и путь навыка
+2. **Загрузи навык** с помощью встроенного скрипта:
    ```bash
    python3 <this-skill-path>/scripts/fetch_skill.py "<github-url>" "<workspace-path>"
    ```
-3. **Verify** that SKILL.md exists in the destination
-4. **Inform the user** the skill is now available
+3. **Проверь**, что SKILL.md существует в назначении
+4. **Сообщи пользователю**, что навык теперь доступен
 
-## URL Formats Supported
+## Поддерживаемые форматы URL
 
 - `https://github.com/owner/repo/tree/main/path/to/skill`
 - `https://github.com/owner/repo/skill-name`
 - `github.com/owner/repo/skill-name`
-- `owner/repo/skill-name` (shorthand)
+- `owner/repo/skill-name` (сокращённая форма)
 
-## Example
+## Пример
 
-User: `/add-skill https://github.com/OpenHands/extensions/tree/main/skills/codereview`
+
+Пользователь: `/add-skill https://github.com/OpenHands/extensions/tree/main/skills/codereview`
 
 ```bash
-# Run the fetch script
+# Запустить скрипт загрузки
 python3 scripts/fetch_skill.py "https://github.com/OpenHands/extensions/tree/main/skills/codereview" "/path/to/workspace"
 
-# Verify installation
+# Проверить установку
 ls /path/to/workspace/.agents/skills/codereview/SKILL.md
 ```
 
-On Windows, use `python` if `python3` is not available and verify with PowerShell, for example: `Test-Path C:\path\to\workspace\.agents\skills\codereview\SKILL.md`.
+На Windows используй `python`, если `python3` недоступен, и проверяй через PowerShell, например: `Test-Path C:\path\to\workspace\.agents\skills\codereview\SKILL.md`.
 
-Response: "✅ Added `codereview` to your workspace. The skill is now available."
+Ответ: «✅ Добавлен `codereview` в ваше рабочее пространство. Навык теперь доступен.»
 
-## Notes
+## Примечания
 
-- Creates `.agents/skills/` directory if it doesn't exist
-- Uses `GITHUB_TOKEN` for authentication (required for private repos)
-- Warns before overwriting existing skills with the same name
+- Создаёт каталог `.agents/skills/`, если его не существует
+- Использует `GITHUB_TOKEN` для аутентификации (требуется для приватных репозиториев)
+- Предупреждает перед перезаписью существующих навыков с тем же именем

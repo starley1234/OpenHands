@@ -1,6 +1,6 @@
 ---
 name: deno
-description: If the project uses deno, use this skill. Use this skill to initialize and work with Deno projects, add/remove dependencies (JSR and npm), run tasks and scripts with appropriate permissions, and use built-in tooling (fmt/lint/test).
+description: Если проект использует deno, используй этот навык. Используй его для инициализации и работы с Deno-проектами, добавления/удаления зависимостей (JSR и npm), запуска задач и скриптов с подходящими разрешениями и использования встроенных инструментов (fmt/lint/test).
 triggers:
 - deno
 - deno.json
@@ -10,46 +10,46 @@ triggers:
 
 # Deno
 
-Use Deno as the default runtime/tooling when the repo contains `deno.json`/`deno.jsonc`, uses `deno.lock`, or scripts/documentation reference `deno task`, `deno run`, `deno test`, etc.
+Используй Deno как среду выполнения/инструментарий по умолчанию, когда репозиторий содержит `deno.json`/`deno.jsonc`, использует `deno.lock` или скрипты/документация ссылаются на `deno task`, `deno run`, `deno test` и т.д.
 
-## Quick decision rules
+## Быстрые правила принятия решений
 
-- Prefer `deno task <name>` if the repo defines tasks.
-- Use `deno add` / `deno remove` to manage dependencies (writes to config).
-- Be explicit about permissions for `deno run` / `deno test`.
+- Предпочитай `deno task <name>`, если в репозитории определены задачи.
+- Используй `deno add` / `deno remove` для управления зависимостями (записывает в конфиг).
+- Будь явным о разрешениях для `deno run` / `deno test`.
 
-## Common operations
+## Частые операции
 
-### Initialize a new project
+### Инициализация нового проекта
 
 ```bash
 deno init
 ```
 
-### Add dependencies (JSR and npm)
+### Добавление зависимостей (JSR и npm)
 
 ```bash
-# JSR (recommended for Deno-first packages)
+# JSR (рекомендуется для пакетов, ориентированных на Deno)
 deno add jsr:@std/path
 
-# npm packages are supported too
+# npm-пакеты тоже поддерживаются
 deno add npm:react
 
-# multiple at once
+# несколько сразу
 deno add jsr:@std/assert npm:chalk
 ```
 
-### Remove dependencies
+### Удаление зависимостей
 
 ```bash
 deno remove jsr:@std/path
 ```
 
-### Run a script
+### Запуск скрипта
 
 ```bash
-# Minimal permissions: only what the program needs
-# Examples:
+# Минимальные разрешения: только то, что нужно программе
+# Примеры:
 #   --allow-net=api.example.com
 #   --allow-read=./data
 #   --allow-env=FOO,BAR
@@ -57,43 +57,43 @@ deno remove jsr:@std/path
 deno run --allow-net --allow-read main.ts
 ```
 
-### Run tasks
+### Запуск задач
 
 ```bash
-# list tasks
+# список задач
 deno task
 
-# run a task defined in deno.json/deno.jsonc
+# запуск задачи, определённой в deno.json/deno.jsonc
 deno task dev
 ```
 
-### Formatting, linting, testing
+### Форматирование, линтинг, тестирование
 
 ```bash
 deno fmt
 deno lint
 deno test
 
-# common permissioned test run
+# частый запуск тестов с разрешениями
 deno test --allow-net --allow-read
 ```
 
-### Install / run CLIs
+### Установка / запуск CLI
 
 ```bash
-# Run a JSR or npm package's CLI without installing globally
+# Запуск CLI JSR или npm-пакета без глобальной установки
 deno x jsr:@std/http/file-server -p 8080
 
-# Install globally (requires choosing permissions at install time)
-# Prefer the smallest set of permissions; avoid blanket flags unless necessary.
+# Глобальная установка (требует выбора разрешений при установке)
+# Предпочитай наименьший набор разрешений; избегай глобальных флагов, если не нужно.
 deno install -g -N -R jsr:@std/http/file-server -- -p 8080
 ```
 
-## Notes / pitfalls
+## Примечания / подводные камни
 
-- Deno is secure-by-default: missing permissions cause runtime errors; add the smallest set of `--allow-*` flags needed.
-- Dependency specifiers:
-  - `jsr:` for JSR registry packages
-  - `npm:` for npm packages
-  - URL imports are also supported (and cached)
-- Lockfile: `deno.lock` helps ensure reproducible dependency resolution.
+- Deno безопасен по умолчанию: отсутствующие разрешения вызывают ошибки времени выполнения; добавляй наименьший набор флагов `--allow-*`, который нужен.
+- Спецификаторы зависимостей:
+  - `jsr:` для пакетов реестра JSR
+  - `npm:` для npm-пакетов
+  - URL-импорты тоже поддерживаются (и кэшируются)
+- Lockfile: `deno.lock` помогает обеспечить воспроизводимое разрешение зависимостей.

@@ -1,83 +1,81 @@
 ---
 name: iterate
 description: >-
-  Iterate on a GitHub pull request — drive it through CI, code review, and QA
-  until it is merge-ready. Poll verification layers with `gh` CLI, diagnose
-  and fix CI failures, address review feedback, retry flaky checks, push
-  fixes, and repeat. The agent is the orchestration loop.
+  Итеративная работа с GitHub-пул-реквестом — проведение его через CI, ревью кода и QA
+  до готовности к слиянию. Опрашивай уровни проверки с помощью `gh` CLI, диагностируй
+  и исправляй сбои CI, учитывай фидбек ревью, перезапускай флаки-проверки, пуши
+  исправления и повторяй. Агент — это цикл оркестрации.
 triggers:
 - /iterate
 - /verify
 - /babysit
 ---
 
-# /iterate — Drive a PR to Merge-Ready
+# /iterate — Довести PR до готовности к слиянию
 
-Iterate on a pull request until it passes all verification layers.
-You push, poll, fix, and push again — the loop only ends when the PR is green
-or a blocker requires human help.
+Итерируй по пул-реквесту, пока он не пройдёт все уровни проверки.
+Ты пушишь, опрашиваешь, чинишь и пушишь снова — цикл заканчивается только когда PR
+зелёный или блокер требует помощи человека.
 
-No scripts — you are the orchestration loop. Uses only standard `gh` CLI
-commands that work on any GitHub repo.
+Никаких скриптов — ты и есть цикл оркестрации. Используй только стандартные команды
+`gh` CLI, работающие в любом GitHub-репозитории.
 
-Requires: `gh` CLI authenticated with repo access, a PR branch.
-Windows PowerShell equivalents for Bash-only assignment, redirection, and quoting patterns in this skill are in `references/windows.md`.
+Требования: `gh` CLI, аутентифицированный с доступом к репозиторию, ветка PR.
+Эквиваленты для Windows PowerShell для присваиваний, перенаправлений и паттернов цитирования только для Bash в этом навыке — в `references/windows.md`.
 
-## Discover what the repo has
+## Узнай, что есть в репозитории
 
-Not every repo has all three verification layers. Before entering the loop,
-check which ones exist. Only poll layers that are actually set up.
+Не в каждом репозитории есть все три уровня проверки. Перед входом в цикл
+проверь, какие из них существуют. Опрашивай только уровни, которые реально настроены.
 
 ```bash
 gh workflow list --json name --jq '.[].name'
 ```
 
-- **CI checks** — almost every repo has these. If `gh pr checks` returns results, CI is present.
-- **PR review bot** — look for a workflow named like "PR Review" or "pr-review" in the output above, or check for `.github/workflows/pr-review*.yml` in the repo. If it's not there, the repo doesn't have automated PR review. Skip step 3 entirely.
-- **QA bot** — look for a workflow named like "QA" or "qa-changes". If it's not there, the repo doesn't have automated QA. Skip step 4 entirely.
+- **CI-проверки** — почти в каждом репозитории есть. Если `gh pr checks` возвращает результаты, CI присутствует.
+- **Бот ревью PR** — ищи воркфлоу с именем вроде "PR Review" или "pr-review" в выводе выше, или проверь наличие `.github/workflows/pr-review*.yml` в репозитории. Если его нет — у репозитория нет автоматического ревью PR. Полностью пропусти шаг 3.
+- **QA-бот** — ищи воркфлоу с именем вроде "QA" или "qa-changes". Если его нет — у репозитория нет автоматического QA. Полностью пропусти шаг 4.
 
-A repo might have only CI. Or CI + review. Or all three. Your "all passed"
-condition is: every *present* layer is green. Don't block waiting for layers
-that don't exist.
+В репозитории может быть только CI. Или CI + ревью. Или все три. Твоё условие «все прошли»:
+каждый *присутствующий* уровень зелёный. Не жди уровней, которых не существует.
 
-## The loop
+## Цикл
 
-1. Push and ensure a draft PR exists.
-2. Poll each present verification layer.
-3. Decide: all passed? fix needed? wait?
-4. If fix needed — fix, refresh any `.pr/` artifacts affected (see below),
-   commit, push, re-request review from bots, go to 2.
-5. If waiting — sleep per polling cadence, go to 2.
-6. If all present layers passed on the *current* SHA — mark PR ready, done.
+1. Запушь и убедись, что существует черновой PR.
+2. Опрашивай каждый присутствующий уровень проверки.
+3. Реши: все прошли? нужен фикс? ждать?
+4. Если нужен фикс — исправь, обнови затронутые артефакты `.pr/` (см. ниже),
+   закоммить, запушь, запроси ревью заново у ботов, перейди к 2.
+5. Если ждёшь — спи согласно частоте опроса, перейди к 2.
+6. Если все присутствующие уровни прошли на *текущем* SHA — пометь PR готовым, конец.
 
-IMPORTANT: pushing a fix is NOT the end. After every fix+push you MUST
-re-request review from the review bot (if present) and go back to step 2.
-The loop only ends when the verifiers pass on your latest SHA. Addressing
-feedback and pushing a commit is just one iteration — the bot needs to
-review the new code too.
+ВАЖНО: push исправления — это НЕ конец. После каждого фикса+push ты ОБЯЗАН
+заново запросить ревью у бота ревью (если он есть) и вернуться к шагу 2.
+Цикл заканчивается только когда проверяющие пройдут на твоём последнем SHA. Учёт
+фидбека и push коммита — это всего одна итерация — боту нужно проверить и новый код.
 
-Do not stop to ask the user whether to continue polling; continue
-autonomously until a strict stop condition is met or the user interrupts.
+Не останавливайся спрашивать пользователя, продолжать ли опрос; продолжай
+автономно, пока не достигнуто строгое условие остановки или пользователь не прервёт.
 
-## Step 1 — Push and ensure PR exists (as draft)
+## Шаг 1 — Запушь и убедись, что PR существует (как черновик)
 
-Create the PR as a draft. This prevents repo automations (merge workflows,
-artifact cleanup, auto-merge) from triggering while you're still iterating.
-You mark it ready only after all verification layers pass.
+Создай PR как черновик. Это предотвращает срабатывание автоматизаций репозитория
+(merge-воркфлоу, очистка артефактов, авто-мерж), пока ты ещё итерируешь.
+Ты помечаешь его готовым только после прохождения всех уровней проверки.
 
 ```bash
 git push origin HEAD
 gh pr create --fill --draft 2>/dev/null || true
-gh pr view --json number,url,headRefOid,isDraft --jq '"\(.number) \(.url) \(.headRefOid) draft=\(.isDraft)"'
+gh pr view --json number,url,headRefOid,isDraft --jq '"\\(.number) \\(.url) \\(.headRefOid) draft=\\(.isDraft)"'
 ```
 
-If the PR already exists and is not a draft, convert it:
+Если PR уже существует и не является черновиком, конвертируй его:
 
 ```bash
 gh pr ready --undo
 ```
 
-## Step 2 — Poll CI checks
+## Шаг 2 — Опрос CI-проверок
 
 ```bash
 gh pr checks --json name,state,bucket --jq '
@@ -86,22 +84,22 @@ gh pr checks --json name,state,bucket --jq '
     pending: [.[] | select(.bucket=="pending")] | length }'
 ```
 
-- Zero failed, zero pending → CI green.
-- Any pending → wait and re-poll.
-- Any failed → diagnose (see "CI failure classification" below).
+- Ноль сбоев, ноль ожидающих → CI зелёный.
+- Есть ожидающие → жди и пере-опроси.
+- Есть сбои → диагностируй (см. «Классификация сбоев CI» ниже).
 
-To inspect a failure:
+Для проверки сбоя:
 
 ```bash
 SHA=$(gh pr view --json headRefOid --jq .headRefOid)
 gh run list --commit "$SHA" --status failure --json databaseId,name,conclusion \
-  --jq '.[] | "\(.databaseId)\t\(.name)\t\(.conclusion)"'
+  --jq '.[] | "\\(.databaseId)\\t\\(.name)\\t\\(.conclusion)"'
 gh run view <run-id> --log-failed
 ```
 
-## Step 3 — Poll PR review (if present)
+## Шаг 3 — Опрос ревью PR (если есть)
 
-Skip this step if the repo has no review bot.
+Пропусти этот шаг, если в репозитории нет бота ревью.
 
 ```bash
 gh pr view --json reviews --jq '
@@ -113,12 +111,12 @@ gh pr view --json reviews --jq '
   )] | last | { state: .state, reviewer: .author.login, body: .body[0:300] }'
 ```
 
-- `APPROVED` → review passed.
-- `CHANGES_REQUESTED` → read the body and inline comments, fix code.
-- `COMMENTED` → may have actionable suggestions; read and decide.
-- No matching review yet → bot may still be running; wait and re-poll.
+- `APPROVED` → ревью пройдено.
+- `CHANGES_REQUESTED` → прочитай тело и инлайн-комментарии, исправь код.
+- `COMMENTED` → могут быть применимые предложения; прочитай и реши.
+- Подходящего ревью ещё нет → бот может всё ещё работать; жди и пере-опроси.
 
-Inline review comments (when changes requested):
+Инлайн-комментарии ревью (когда запрошены изменения):
 
 ```bash
 gh api "repos/{owner}/{repo}/pulls/{number}/comments" \
@@ -126,15 +124,15 @@ gh api "repos/{owner}/{repo}/pulls/{number}/comments" \
         | { path: .path, line: .line, body: .body[0:200] }'
 ```
 
-On a fresh iteration, existing pending review feedback should be checked
-immediately — not only comments that arrive after monitoring starts.
-Already-open review comments must not be missed.
+При новой итерации существующий ожидающий фидбек ревью следует проверять
+немедленно — не только комментарии, пришедшие после начала мониторинга.
+Уже открытые комментарии ревью нельзя пропускать.
 
-## Step 4 — Poll QA report (if present)
+## Шаг 4 — Опрос QA-отчёта (если есть)
 
-Skip this step if the repo has no QA bot.
+Пропусти этот шаг, если в репозитории нет QA-бота.
 
-QA reports are PR issue comments with a status line like `Status: PASS`.
+QA-отчёты — это комментарии в issue PR со строкой статуса вроде `Status: PASS`.
 
 ```bash
 gh api "repos/{owner}/{repo}/issues/{number}/comments" --paginate \
@@ -144,105 +142,105 @@ gh api "repos/{owner}/{repo}/issues/{number}/comments" --paginate \
   )] | last | { author: .user.login, body: .body[0:500], url: .html_url }'
 ```
 
-- `PASS` → QA passed.
-- `FAIL` → read details, fix code.
-- `PARTIAL` → some passed, some failed; read details.
-- No QA comment yet → bot may still be running; wait and re-poll.
+- `PASS` → QA пройдено.
+- `FAIL` → прочитай детали, исправь код.
+- `PARTIAL` → часть прошла, часть нет; прочитай детали.
+- Комментария QA ещё нет → бот может всё ещё работать; жди и пере-опроси.
 
-## Step 5 — Decide and act
+## Шаг 5 — Реши и действуй
 
-For each present layer, check its status. If a layer is not present in the
-repo, treat it as passing.
+Для каждого присутствующего уровня проверь его статус. Если уровень отсутствует в
+репозитории, считай его прошедшим.
 
-- All present layers green on current SHA → done.
-- CI failed → fix code, or rerun if flaky (see below).
-- Review requested changes → read comments, fix, push.
-- QA failed/partial → read report, fix, push.
-- Anything still pending → sleep per polling cadence, re-poll.
-- PR closed/merged → stop.
+- Все присутствующие уровни зелёные на текущем SHA → готово.
+- CI упал → исправь код или перезапусти, если флаки (см. ниже).
+- Ревью запросило изменения → прочитай комментарии, исправь, запушь.
+- QA упал/частичный → прочитай отчёт, исправь, запушь.
+- Что-то ещё ожидает → спи согласно частоте опроса, пере-опроси.
+- PR закрыт/слит → остановись.
 
-**Priority rule:** when both review feedback and flaky CI failures are present,
-prioritize review feedback first. A new commit will retrigger CI, so avoid
-rerunning flaky checks on the old SHA when you're about to push a review fix.
+**Правило приоритета:** когда одновременно есть фидбек ревью и флаки-сбои CI,
+сначала приоритизируй фидбек ревью. Новый коммит перезапустит CI, поэтому избегай
+перезапуска флаки-проверок на старом SHA, если собираешься пушить фикс по ревью.
 
-After fixing, commit, push, AND re-request review:
+После исправления закоммить, запушь И заново запроси ревью:
 
 ```bash
 git add -A
 git commit -m "fix: address <CI failure | review feedback | QA failure>"
 git push origin HEAD
 
-# Re-request review from the bot so it reviews the new SHA:
+# Заново запросить ревью у бота, чтобы он проверил новый SHA:
 gh pr comment --body "Addressed feedback in $(git rev-parse --short HEAD). Ready for another look."
 gh api -X POST "repos/{owner}/{repo}/pulls/{number}/requested_reviewers" \
   -f 'reviewers[]=all-hands-bot'
 ```
 
-Then go back to step 2. You are not done until the bot reviews the new
-SHA and all present layers pass.
+Затем вернись к шагу 2. Ты не закончил, пока бот не проверит новый
+SHA и все присутствующие уровни не пройдут.
 
-## CI failure classification
+## Классификация сбоев CI
 
-Use `gh` commands to inspect failed runs before deciding to rerun:
+Используй команды `gh` для проверки неудачных запусков перед решением о перезапуске:
 
 ```bash
 gh run view <run-id> --json jobs,name,workflowName,conclusion,status,url,headSha
 gh run view <run-id> --log-failed
 ```
 
-**Branch-related** (fix the code):
-- Compile/lint/typecheck failures in files you touched
-- Deterministic test failures in changed areas
-- Snapshot or static-analysis violations from your changes
-- Build config changes causing deterministic failures
+**Связанные с веткой** (исправь код):
+- Сбои компиляции/линта/тайпчека в файлах, которые ты трогал
+- Детерминированные сбои тестов в изменённых областях
+- Нарушения снимков или статического анализа из-за твоих изменений
+- Изменения конфигурации сборки, вызывающие детерминированные сбои
 
-**Flaky / unrelated** (rerun the jobs):
-- Network/DNS/registry timeouts
-- Runner provisioning or startup failures
-- GitHub Actions infrastructure errors
-- Non-deterministic failures in code you didn't touch
-- Cloud/service rate limits or transient API outages
+**Флаки / несвязанные** (перезапусти задания):
+- Таймауты сети/DNS/реестра
+- Сбои предоставления раннера или запуска
+- Ошибки инфраструктуры GitHub Actions
+- Не-детерминированные сбои в коде, который ты не трогал
+- Ограничения rate limit облака/сервиса или временные сбои API
 
-If classification is ambiguous, perform one manual diagnosis attempt (inspect
-logs) before choosing rerun.
+Если классификация неоднозначна, выполни одну ручную попытку диагностики (проверь
+логи), прежде чем выбирать перезапуск.
 
-Rerun: `gh run rerun <run-id> --failed`
+Перезапуск: `gh run rerun <run-id> --failed`
 
-Retry budget: at most 3 reruns per SHA. After that, treat as real.
+Бюджет повторов: максимум 3 перезапуска на SHA. После этого считай реальным сбоем.
 
-Read `references/heuristics.md` for a concise decision tree.
+Прочитай `references/heuristics.md` для краткого дерева решений.
 
-## Review comment handling
+## Обработка комментариев ревью
 
-The review polling in Step 3 surfaces feedback from trusted sources: human
-reviewers (OWNER/MEMBER/COLLABORATOR) and approved review bots (openhands,
-all-hands-bot, etc.). Ignore unrelated bot noise.
+Опрос ревью на шаге 3 выявляет фидбек из доверенных источников: человеческие
+ревьюеры (OWNER/MEMBER/COLLABORATOR) и одобренные боты ревью (openhands,
+all-hands-bot и т.д.). Игнорируй несвязанный шум ботов.
 
-Review items come from:
-- PR issue comments
-- Inline review comments
-- Review submissions (COMMENT / APPROVED / CHANGES_REQUESTED)
+Элементы ревью приходят из:
+- Комментарии к issue PR
+- Инлайн-комментарии ревью
+- Подписи ревью (COMMENT / APPROVED / CHANGES_REQUESTED)
 
-When a comment is actionable and correct:
-1. Fix the code.
-2. Commit with `chore: address PR review feedback (#<n>)`.
-3. Push and continue the loop.
-4. Reply to the review thread referencing the commit SHA.
-5. Resolve the thread.
+Когда комментарий применим и корректен:
+1. Исправь код.
+2. Закоммить с `chore: address PR review feedback (#<n>)`.
+3. Запушь и продолжай цикл.
+4. Ответь в ветку ревью, сославшись на SHA коммита.
+5. Закрой ветку.
 
-When a comment is non-actionable, already addressed, or you disagree:
-reply briefly explaining why, then resolve the thread. Do not leave
-threads dangling without a response.
+Когда комментарий неприменим, уже учтён или ты не согласен:
+кратко ответь, объяснив почему, затем закрой ветку. Не оставляй
+ветки без ответа.
 
-If a review thread is already resolved in GitHub, ignore it unless new
-unresolved follow-up appears.
+Если ветка ревью уже закрыта в GitHub, игнорируй её, если не появилось нового
+незакрытого продолжения.
 
-### Replying to and resolving review threads
+### Ответы и закрытие веток ревью
 
-Every inline review comment creates a thread. After addressing a comment
-(or deciding it's non-actionable), you must:
+Каждый инлайн-комментарий ревью создаёт ветку. После учёта комментария
+(или решения, что он неприменим), ты должен:
 
-1. **Reply** to the thread so the reviewer can see how you addressed it:
+1. **Ответить** в ветку, чтобы ревьюер видел, как ты его учёл:
 
    ```bash
    gh api "repos/{owner}/{repo}/pulls/{number}/comments" \
@@ -250,9 +248,9 @@ Every inline review comment creates a thread. After addressing a comment
      -F "in_reply_to=<comment_database_id>"
    ```
 
-   Use `-F` (not `-f`) for `in_reply_to` so it is sent as a number.
+   Используй `-F` (не `-f`) для `in_reply_to`, чтобы он отправлялся как число.
 
-2. **Resolve** the thread via GraphQL:
+2. **Закрыть** ветку через GraphQL:
 
    ```bash
    gh api graphql \
@@ -264,7 +262,7 @@ Every inline review comment creates a thread. After addressing a comment
      -f id="<thread_node_id>"
    ```
 
-To discover unresolved threads and their IDs:
+Чтобы обнаружить незакрытые ветки и их ID:
 
 ```bash
 gh api graphql -f query='
@@ -289,132 +287,132 @@ query($owner: String!, $repo: String!, $pr: Int!) {
         | select(.isResolved == false)'
 ```
 
-**Rules:**
-- Reply to every thread, even nits. A brief "Done" or "Kept as-is because…" is fine.
-- Resolve threads you have addressed. Do not leave resolved-in-code threads
-  showing as unresolved in the GitHub UI.
-- Before marking the PR ready, verify zero unresolved threads remain.
+**Правила:**
+- Отвечай на каждую ветку, даже на мелочи. Краткое «Done» или «Kept as-is because…» подойдёт.
+- Закрывай ветки, которые ты учёл. Не оставляй учтённые в коде ветки
+  показанными как незакрытые в UI GitHub.
+- Перед пометкой PR готовым убедись, что незакрытых веток не осталось.
 
-### Requesting re-review
+### Запрос повторного ревью
 
-If the PR is green but blocked on review approval and you've addressed all
-feedback, you can request another look — but only when the user explicitly
-asks, or after confirming with them (avoid spamming humans):
+Если PR зелёный, но заблокирован ожиданием одобрения ревью, и ты учёл весь
+фидбек, можно запросить ещё один просмотр — но только когда пользователь явно
+просит, или после подтверждения с ним (избегай спама людям):
 
-1. Leave a brief PR comment summarizing what changed:
+1. Оставь краткий комментарий в PR, обобщающий, что изменилось:
    ```bash
    gh pr comment <pr> --body "Addressed the requested changes in <sha>. Could you take another look?"
    ```
-   Do NOT tag humans.
+   НЕ тегай людей.
 
-2. Re-request reviewers via the GitHub API:
+2. Заново запроси ревьюеров через GitHub API:
    ```bash
    gh api -X POST repos/{owner}/{repo}/pulls/{number}/requested_reviewers \
      -f reviewers[]=<reviewer>
    ```
 
-Prefer requesting review only once per new head SHA. If the API returns an
-error indicating reviewers are already requested, treat it as non-fatal.
+Предпочитай запрашивать ревью только один раз на новый head SHA. Если API вернёт
+ошибку, что ревьюеры уже запрошены, считай это нефатальным.
 
-## Polling cadence
+## Частота опроса
 
-- CI pending or failing: every 30–60 seconds.
-- CI green, waiting for review/QA: start at 60s, back off exponentially
-  (60s → 2m → 4m → 8m → 16m → 32m), cap at 1 hour.
-- Reset to 60s whenever anything changes (new SHA, check status, review
-  comment, mergeability change).
-- If CI stops being green (new commit, rerun, regression): return to 30–60s.
-- After pushing a fix: re-poll immediately.
-- If any poll shows the PR is merged or closed: stop immediately.
+- CI ожидает или падает: каждые 30–60 секунд.
+- CI зелёный, ждём ревью/QA: начни с 60с, отступай экспоненциально
+  (60с → 2м → 4м → 8м → 16м → 32м), предел 1 час.
+- Сбрасывай до 60с при любом изменении (новый SHA, статус проверки, комментарий
+  ревью, изменение мержимости).
+- Если CI перестал быть зелёным (новый коммит, перезапуск, регрессия): вернись к 30–60с.
+- После push фикса: пере-опроси немедленно.
+- Если какой-либо опрос показывает, что PR слит или закрыт: немедленно остановись.
 
-## Stop conditions
+## Условия остановки
 
-Stop **only** when:
-- All present verification layers passed on current SHA and PR is mergeable.
-- PR merged or closed (stop as soon as a poll confirms this).
-- Flaky retry budget exhausted (3 reruns per SHA).
-- Blocked on something requiring human input (infra outage, permissions,
-  ambiguity that cannot be resolved safely).
+Останавливайся **только** когда:
+- Все присутствующие уровни проверки прошли на текущем SHA, и PR мержится.
+- PR слит или закрыт (остановись, как только опрос это подтвердит).
+- Бюджет флаки-повторов исчерпан (3 перезапуска на SHA).
+- Заблокировано чем-то, требующим ввода человека (сбой инфраструктуры, права,
+  неоднозначность, которую нельзя безопасно разрешить).
 
-**Not** a stop condition:
-- You pushed a fix. That's one iteration — keep going.
-- You addressed review comments. The bot still needs to review new code.
-- CI is green but review bot hasn't re-reviewed yet. Wait.
-- CI is still running/queued.
-- CI is green but mergeability is unknown/pending.
-- CI is green and mergeable, but waiting for possible new review comments
-  per the green-state cadence.
-- PR is green but blocked on review approval (`REVIEW_REQUIRED`); continue
-  polling and surface new review comments without asking for confirmation.
+**Не** является условием остановки:
+- Ты запушил фикс. Это одна итерация — продолжай.
+- Ты учёл комментарии ревью. Боту всё ещё нужно проверить новый код.
+- CI зелёный, но бот ревью ещё не пере-проверил. Жди.
+- CI всё ещё выполняется/в очереди.
+- CI зелёный, но мержимость неизвестна/ожидает.
+- CI зелёный и мержится, но ожидаемы возможные новые комментарии ревью
+  по частоте зелёного состояния.
+- PR зелёный, но заблокирован ожиданием одобрения ревью (`REVIEW_REQUIRED`); продолжай
+  опрос и выявляй новые комментарии ревью без запроса подтверждения.
 
-## Keep `.pr/` artifacts fresh
+## Держи артефакты `.pr/` актуальными
 
-By convention, a PR may carry generated artifacts (diagrams, reports, generated
-docs, fixtures) in a `.pr/` folder. These are derived from the code, so they go
-stale when you push fixes.
+По соглашению PR может нести сгенерированные артефакты (диаграммы, отчёты, сгенерированную
+документацию, фикстуры) в папке `.pr/`. Они производны от кода, поэтому устаревают,
+когда ты пушишь фиксы.
 
-After each fix — and before marking the PR ready — check `.pr/`:
+После каждого фикса — и перед пометкой PR готовым — проверь `.pr/`:
 
-1. If there's no `.pr/` folder or it's empty, skip this entirely.
-2. For each artifact, work out how it was generated (a script, a documented
-   command, a comment in the file, or the PR/commit history).
-3. If you can figure out how — and the code it derives from changed — regenerate
-   it and commit the update, so the artifact matches the latest code.
-4. If you can't tell how it was generated, leave it alone. Don't guess.
+1. Если папки `.pr/` нет или она пуста, полностью пропусти это.
+2. Для каждого артефакта выясни, как он был сгенерирован (скрипт, документированная
+   команда, комментарий в файле или история PR/коммитов).
+3. Если ты можешь понять как — и код, из которого он получен, изменился — перегенерируй
+   его и закоммить обновление, чтобы артефакт соответствовал последнему коду.
+4. Если ты не можешь понять, как он был создан, оставь его в покое. Не гадай.
 
-The rule is simple: if you know how an artifact was made and the code moved on,
-keep it up to date; otherwise don't touch it.
+Правило простое: если ты знаешь, как сделан артефакт, и код продвинулся,
+поддерживай его актуальным; иначе не трогай его.
 
-## When done — mark PR ready
+## Когда готово — пометь PR готовым
 
-Once all present verification layers pass on the current SHA:
+Как только все присутствующие уровни проверки пройдут на текущем SHA:
 
-1. Verify all review threads are resolved (zero unresolved remaining).
-2. Ensure `.pr/` artifacts are up to date with the latest code (see above).
-3. Convert the draft PR to ready for review:
+1. Убедись, что все ветки ревью закрыты (не осталось ни одной незакрытой).
+2. Убедись, что артефакты `.pr/` актуальны под последний код (см. выше).
+3. Конвертируй черновой PR в готовый к ревью:
 
 ```bash
 gh pr ready
 ```
 
-Only do this at the very end, after the loop exits successfully.
+Делай это только в самом конце, после успешного выхода из цикла.
 
-## Git safety
+## Безопасность git
 
-- Work only on the PR head branch.
-- No destructive git commands.
-- Do not switch branches unless necessary to recover context.
-- Check for unrelated uncommitted changes before editing. If present, ask user.
-- After every fix, commit and push, then re-poll.
-- A push is not a terminal outcome; continue the monitoring loop.
+- Работай только в ветке head PR.
+- Никаких деструктивных git-команд.
+- Не переключай ветки, если это не нужно для восстановления контекста.
+- Проверяй несвязанные незакоммиченные изменения перед редактированием. Если они есть, спроси пользователя.
+- После каждого фикса закоммить и запушь, затем пере-опроси.
+- Push — не конечный результат; продолжай цикл мониторинга.
 
-Commit message defaults:
+Сообщения коммитов по умолчанию:
 - `fix: CI failure on PR #<n>`
 - `chore: address PR review feedback (#<n>)`
 
-## Output
+## Вывод
 
-Provide concise progress updates during monitoring:
+Давай краткие обновления прогресса во время мониторинга:
 
-- During long unchanged periods, avoid emitting a full update on every poll;
-  summarize only status changes plus occasional heartbeat updates.
-- Treat push confirmations, intermediate CI snapshots, and review-action
-  updates as progress updates only; do not emit the final summary unless a
-  strict stop condition is met.
-- When CI first transitions to all green for the current SHA, emit a one-time
-  celebratory update. Preferred style:
+- В длительные периоды без изменений избегай полного обновления на каждом опросе;
+  обобщай только изменения статуса плюс редкие heartbeat-обновления.
+- Считай подтверждения push, промежуточные снимки CI и обновления действий ревью
+  только обновлениями прогресса; не выдавай финальное резюме, пока не достигнуто
+  строгое условие остановки.
+- Когда CI впервые перейдёт в полностью зелёный для текущего SHA, выдай разовое
+  праздничное обновление. Предпочтительный стиль:
   `🚀 CI is all green! 33/33 passed. Still watching for review.`
 
-Final summary should include:
-- Final PR SHA
-- CI status summary
-- Mergeability / conflict status
-- Fixes pushed
-- Flaky retry cycles used
-- Review threads resolved (count)
-- Remaining unresolved failures or review comments
+Финальное резюме должно включать:
+- Финальный SHA PR
+- Сводку статуса CI
+- Статус мержимости / конфликтов
+- Запушенные фиксы
+- Использованные циклы флаки-повторов
+- Закрытые ветки ревью (количество)
+- Оставшиеся незакрытые сбои или комментарии ревью
 
-## References
+## Ссылки
 
-- Verification stack (layers, signals, retriggering): `references/verification.md`
-- CI/review heuristics and decision tree: `references/heuristics.md`
+- Стек проверки (уровни, сигналы, повторный запуск): `references/verification.md`
+- Эвристики CI/ревью и дерево решений: `references/heuristics.md`

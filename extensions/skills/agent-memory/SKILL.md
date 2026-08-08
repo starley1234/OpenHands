@@ -1,30 +1,30 @@
 ---
 name: agent-memory
-description: Persist and retrieve repository-specific knowledge using AGENTS.md files. Use when you want to save important information about a codebase (build commands, code style, workflows) for future sessions.
+description: Сохранение и извлечение специфичных для репозитория знаний с помощью файлов AGENTS.md. Используй, когда хочешь сохранить важную информацию о кодовой базе (команды сборки, стиль кода, рабочие процессы) для будущих сессий.
 triggers:
 - /remember
 ---
 
-* Repository memory: Use AGENTS.md in each repository root to store and access important information.
-  - If this file exists, it will be added to your context automatically.
-  - If missing, you should create it unless the user has explicitly asked you to not do so.
+* Память репозитория: используй AGENTS.md в корне каждого репозитория для хранения и доступа к важной информации.
+  - Если этот файл существует, он будет автоматически добавлен в твой контекст.
+  - Если он отсутствует, ты должен создать его, если пользователь явно не попросил этого не делать.
 
-* Store and maintain **general knowledge** that will be helpful for most future tasks:
-  1. Repository structure
-  2. Common commands (build, lint, test, pre-commit, etc.)
-  3. Code style preferences
-  4. Workflows and best practices
-  5. Any other repository-specific knowledge you learn
+* Храни и поддерживай **общие знания**, которые будут полезны для большинства будущих задач:
+  1. Структура репозитория
+  2. Частые команды (build, lint, test, pre-commit и т.д.)
+  3. Предпочтения по стилю кода
+  4. Рабочие процессы и лучшие практики
+  5. Любые другие специфичные для репозитория знания, которые ты узнаёшь
 
-* IMPORTANT: ONLY LOG the information that would be helpful for different future tasks, for example, how to configure the settings, how to setup the repository. Do NOT add issue-specific information (e.g., what specific error you have ran into and how you fix it).
+* ВАЖНО: ЛОГИРУЙ только ту информацию, которая пригодится для разных будущих задач, например, как настроить параметры, как настроить репозиторий. НЕ добавляй информацию, специфичную для конкретной задачи (например, с какой конкретно ошибкой ты столкнулся и как её исправил).
 
-* When adding new information:
-  - ALWAYS ask for user confirmation first by listing the exact items (numbered 1, 2, 3, etc.) you plan to save to AGENTS.md
-  - Only save the items the user approves (they may ask you to save a subset)
-  - Ensure it integrates nicely with existing knowledge in AGENTS.md
-  - Reorganize the content if needed to maintain clarity and organization
-  - Group related information together under appropriate sections or headings
-  - If you've only explored a portion of the codebase, clearly note this limitation in the repository structure documentation
-  - If you don't know the essential commands for working with the repository, such as lint or typecheck, ask the user and suggest adding them to AGENTS.md for future reference (with permission)
+* При добавлении новой информации:
+  - ВСЕГДА сначала спрашивай подтверждение пользователя, перечисляя точные пункты (пронумерованные 1, 2, 3 и т.д.), которые ты планируешь сохранить в AGENTS.md
+  - Сохраняй только те пункты, которые одобрит пользователь (он может попросить сохранить подмножество)
+  - Убедись, что это хорошо интегрируется с существующими знаниями в AGENTS.md
+  - При необходимости реорганизуй содержимое для поддержания ясности и организации
+  - Группируй связанную информацию под подходящими разделами или заголовками
+  - Если ты изучил только часть кодовой базы, чётко отметь это ограничение в документации структуры репозитория
+  - Если ты не знаешь основных команд для работы с репозиторием, таких как lint или typecheck, спроси пользователя и предложи добавить их в AGENTS.md для будущих ссылок (с разрешения)
 
-When you receive this message, please review and summarize your recent actions and observations, then present a list of valuable information that should be saved in AGENTS.md to the user.
+Когда ты получишь это сообщение, просмотри и обобщи свои последние действия и наблюдения, затем представь пользователю список ценной информации, которую стоит сохранить в AGENTS.md.

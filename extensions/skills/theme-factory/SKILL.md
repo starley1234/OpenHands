@@ -1,59 +1,59 @@
 ---
 name: theme-factory
-description: Toolkit for styling artifacts with a theme. These artifacts can be slides, docs, reportings, HTML landing pages, etc. There are 10 pre-set themes with colors/fonts that you can apply to any artifact that has been creating, or can generate a new theme on-the-fly.
-license: Complete terms in LICENSE.txt
+description: Набор инструментов для стилизации артефактов темой. Артефакты могут быть слайдами, документами, отчётами, HTML-лендингами и т.д. Есть 10 готовых тем с цветами/шрифтами, которые можно применить к любому созданному артефакту, или можно сгенерировать новую тему на лету.
+license: Полные условия в LICENSE.txt
 ---
 
 
-# Theme Factory Skill
+# Навык Theme Factory
 
-This skill provides a curated collection of professional font and color themes themes, each with carefully selected color palettes and font pairings. Once a theme is chosen, it can be applied to any artifact.
+Этот навык предоставляет тщательно подобранную коллекцию профессиональных тем со шрифтами и цветами, каждая с аккуратно выбранными цветовыми палитрами и сочетаниями шрифтов. Выбрав тему, её можно применить к любому артефакту.
 
-## Purpose
+## Назначение
 
-To apply consistent, professional styling to presentation slide decks, use this skill. Each theme includes:
-- A cohesive color palette with hex codes
-- Complementary font pairings for headers and body text
-- A distinct visual identity suitable for different contexts and audiences
+Для применения согласованного, профессионального стиля к презентационным слайдам используй этот навык. Каждая тема включает:
+- Целостную цветовую палитру с hex-кодами
+- Дополняющие сочетания шрифтов для заголовков и основного текста
+- Отчётливую визуальную идентичность, подходящую для разных контекстов и аудиторий
 
-## Usage Instructions
+## Инструкции по использованию
 
-To apply styling to a slide deck or other artifact:
+Для применения стиля к слайд-деку или другому артефакту:
 
-1. **Show the theme showcase**: Display the `theme-showcase.pdf` file to allow users to see all available themes visually. Do not make any modifications to it; simply show the file for viewing.
-2. **Ask for their choice**: Ask which theme to apply to the deck
-3. **Wait for selection**: Get explicit confirmation about the chosen theme
-4. **Apply the theme**: Once a theme has been chosen, apply the selected theme's colors and fonts to the deck/artifact
+1. **Покажи витрину тем**: Отобрази файл `theme-showcase.pdf`, чтобы пользователи могли увидеть все доступные темы визуально. Не вноси в него изменений; просто покажи файл для просмотра.
+2. **Спроси о выборе**: Спроси, какую тему применить к деке.
+3. **Дождись выбора**: Получи явное подтверждение выбранной темы.
+4. **Примени тему**: После выбора примени цвета и шрифты выбранной темы к деке/артефакту.
 
-## Themes Available
+## Доступные темы
 
-The following 10 themes are available, each showcased in `theme-showcase.pdf`:
+Доступны следующие 10 тем, каждая показана в `theme-showcase.pdf`:
 
-1. **Ocean Depths** - Professional and calming maritime theme
-2. **Sunset Boulevard** - Warm and vibrant sunset colors
-3. **Forest Canopy** - Natural and grounded earth tones
-4. **Modern Minimalist** - Clean and contemporary grayscale
-5. **Golden Hour** - Rich and warm autumnal palette
-6. **Arctic Frost** - Cool and crisp winter-inspired theme
-7. **Desert Rose** - Soft and sophisticated dusty tones
-8. **Tech Innovation** - Bold and modern tech aesthetic
-9. **Botanical Garden** - Fresh and organic garden colors
-10. **Midnight Galaxy** - Dramatic and cosmic deep tones
+1. **Ocean Depths** — профессиональная и спокойная морская тема
+2. **Sunset Boulevard** — тёплые и яркие цвета заката
+3. **Forest Canopy** — натуральные и приземлённые земляные тона
+4. **Modern Minimalist** — чистый и современный градиент серого
+5. **Golden Hour** — насыщенная и тёплая осенняя палитра
+6. **Arctic Frost** — холодная и свежая зимняя тема
+7. **Desert Rose** — мягкие и изысканные пыльные тона
+8. **Tech Innovation** — смелая и современная техно-эстетика
+9. **Botanical Garden** — свежие и органичные садовые цвета
+10. **Midnight Galaxy** — драматичные и космические глубокие тона
 
-## Theme Details
+## Детали тем
 
-Each theme is defined in the `themes/` directory with complete specifications including:
-- Cohesive color palette with hex codes
-- Complementary font pairings for headers and body text
-- Distinct visual identity suitable for different contexts and audiences
+Каждая тема определена в каталоге `themes/` с полными спецификациями, включая:
+- Целостную цветовую палитру с hex-кодами
+- Дополняющие сочетания шрифтов для заголовков и основного текста
+- Отчётливую визуальную идентичность, подходящую для разных контекстов и аудиторий
 
-## Application Process
+## Процесс применения
 
-After a preferred theme is selected:
-1. Read the corresponding theme file from the `themes/` directory
-2. Apply the specified colors and fonts consistently throughout the deck
-3. Ensure proper contrast and readability
-4. Maintain the theme's visual identity across all slides
+После выбора предпочтительной темы:
+1. Прочитай соответствующий файл темы из каталога `themes/`
+2. Примени указанные цвета и шрифты согласованно по всей деке
+3. Обеспечь надлежащий контраст и читаемость
+4. Сохраняй визуальную идентичность темы на всех слайдах
 
-## Create your Own Theme
-To handle cases where none of the existing themes work for an artifact, create a custom theme. Based on provided inputs, generate a new theme similar to the ones above. Give the theme a similar name describing what the font/color combinations represent. Use any basic description provided to choose appropriate colors/fonts. After generating the theme, show it for review and verification. Following that, apply the theme as described above.
+## Создай свою тему
+Для случаев, когда ни одна из существующих тем не подходит для артефакта, создай кастомную тему. На основе предоставленных входных данных сгенерируй новую тему, подобную описанным выше. Дай теме похожее имя, описывающее, что представляют эти сочетания шрифтов/цветов. Используй любое базовое описание для выбора подходящих цветов/шрифтов. После генерации темы покажи её для проверки и подтверждения. Затем примени тему, как описано выше.

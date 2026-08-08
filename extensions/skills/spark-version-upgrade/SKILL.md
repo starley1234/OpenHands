@@ -1,8 +1,8 @@
 ---
 name: spark-version-upgrade
-description: Upgrade Apache Spark applications between major versions (2.x→3.x, 3.x→4.x). Covers build files, deprecated APIs, configuration changes, SQL/DataFrame updates, and test validation.
+description: Обновление приложений Apache Spark между мажорными версиями (2.x→3.x, 3.x→4.x). Охватывает файлы сборки, устаревшие API, изменения конфигурации, обновления SQL/DataFrame и валидацию тестов.
 license: MIT
-compatibility: Requires Java 8+/11+/17+, Scala 2.12/2.13, Maven/Gradle/SBT, Apache Spark
+compatibility: Требуются Java 8+/11+/17+, Scala 2.12/2.13, Maven/Gradle/SBT, Apache Spark
 triggers:
   - spark upgrade
   - spark migration
@@ -13,53 +13,53 @@ triggers:
   - pyspark upgrade
 ---
 
-Upgrade Apache Spark applications between major versions with a structured, phase-by-phase workflow.
+Обнови приложения Apache Spark между мажорными версиями с помощью структурированного, поэтапного рабочего процесса.
 
-## When to Use
+## Когда использовать
 
-- Migrating from Spark 2.x → 3.x or Spark 3.x → 4.x
-- Updating PySpark, Spark SQL, or Structured Streaming applications
-- Resolving deprecation warnings before a Spark version bump
+- Миграция с Spark 2.x → 3.x или Spark 3.x → 4.x
+- Обновление приложений PySpark, Spark SQL или Structured Streaming
+- Устранение предупреждений об устаревании перед обновлением версии Spark
 
-## Workflow Overview
+## Обзор рабочего процесса
 
-1. **Inventory & Impact Analysis** — Scan the codebase and assess scope
-2. **Build File Updates** — Bump Spark/Scala/Java dependencies
-3. **API Migration** — Replace deprecated and removed APIs
-4. **Configuration Migration** — Update Spark config properties
-5. **SQL & DataFrame Migration** — Fix query-level breaking changes
-6. **Test Validation** — Compile, run tests, verify results
+1. **Инвентаризация и анализ влияния** — Просканируй кодовую базу и оцени объём
+2. **Обновление файлов сборки** — Обнови зависимости Spark/Scala/Java
+3. **Миграция API** — Замени устаревшие и удалённые API
+4. **Миграция конфигурации** — Обнови свойства конфигурации Spark
+5. **Миграция SQL и DataFrame** — Исправь изменения запросов, ломающие совместимость
+6. **Валидация тестов** — Скомпилируй, запусти тесты, проверь результаты
 
 ---
 
-## Phase 1: Inventory & Impact Analysis
+## Фаза 1: Инвентаризация и анализ влияния
 
-Before changing any code, assess what needs to change. Read the official Apache Spark migration guide for the target version — it documents every API removal, config rename, and behavioral change per release:
+Перед изменением любого кода оцени, что нужно изменить. Прочитай официальное руководство по миграции Apache Spark для целевой версии — в нём документированы каждое удаление API, переименование конфига и изменение поведения по версиям:
 https://spark.apache.org/docs/latest/migration-guide.html
 
-### Checklist
+### Чек-лист
 
-- [ ] Read the migration guide section for the target Spark version
-- [ ] Identify current Spark version (check `pom.xml`, `build.sbt`, `build.gradle`, or `requirements.txt`)
-- [ ] Identify target Spark version
-- [ ] Search for deprecated APIs: `grep -rn 'import org.apache.spark' --include='*.scala' --include='*.java' --include='*.py'`
-- [ ] List all Spark config properties: `grep -rn 'spark\.' --include='*.conf' --include='*.properties' --include='*.scala' --include='*.java' --include='*.py' | grep -v 'test'`
-- [ ] On Windows PowerShell, use `Get-ChildItem -Recurse -Include *.scala,*.java,*.py | Select-String 'import org.apache.spark'` and adjust the extensions/pattern for config searches.
-- [ ] Check for custom `SparkSession` or `SparkContext` extensions
-- [ ] Identify connector dependencies (Hive, Kafka, Cassandra, Delta, Iceberg)
-- [ ] Document findings in `spark_upgrade_impact.md`
+- [ ] Прочитай раздел руководства по миграции для целевой версии Spark
+- [ ] Определи текущую версию Spark (проверь `pom.xml`, `build.sbt`, `build.gradle` или `requirements.txt`)
+- [ ] Определи целевую версию Spark
+- [ ] Найди устаревшие API: `grep -rn 'import org.apache.spark' --include='*.scala' --include='*.java' --include='*.py'`
+- [ ] Перечисли все свойства конфигурации Spark: `grep -rn 'spark\.' --include='*.conf' --include='*.properties' --include='*.scala' --include='*.java' --include='*.py' | grep -v 'test'`
+- [ ] В Windows PowerShell используй `Get-ChildItem -Recurse -Include *.scala,*.java,*.py | Select-String 'import org.apache.spark'` и адаптируй расширения/шаблон для поиска конфигов.
+- [ ] Проверь кастомные расширения `SparkSession` или `SparkContext`
+- [ ] Определи зависимости коннекторов (Hive, Kafka, Cassandra, Delta, Iceberg)
+- [ ] Задокументируй находки в `spark_upgrade_impact.md`
 
-### Output
+### Вывод
 
 ```
-spark_upgrade_impact.md   # Summary of affected files, APIs, and configs
+spark_upgrade_impact.md   # Сводка затронутых файлов, API и конфигов
 ```
 
 ---
 
-## Phase 2: Build File Updates
+## Фаза 2: Обновление файлов сборки
 
-Update dependency versions and resolve compilation.
+Обнови версии зависимостей и устрани проблемы компиляции.
 
 ### Maven (`pom.xml`)
 
@@ -101,27 +101,27 @@ dependencies {
 pyspark==3.5.1   # or 4.0.0
 ```
 
-### Checklist
+### Чек-лист
 
-- [ ] Update Spark version in build file
-- [ ] Update Scala version if crossing 2.12→2.13 boundary
-- [ ] Update Java source/target level if required (Spark 4.x requires Java 17+)
-- [ ] Update connector library versions to match new Spark version
-- [ ] Resolve dependency conflicts (`mvn dependency:tree` / `sbt dependencyTree`)
-- [ ] Confirm project compiles (errors at this stage are expected — they guide Phase 3)
+- [ ] Обнови версию Spark в файле сборки
+- [ ] Обнови версию Scala, если переходишь границу 2.12→2.13
+- [ ] Обнови уровень source/target Java, если требуется (Spark 4.x требует Java 17+)
+- [ ] Обнови версии библиотек коннекторов под новую версию Spark
+- [ ] Устрани конфликты зависимостей (`mvn dependency:tree` / `sbt dependencyTree`)
+- [ ] Подтверди, что проект компилируется (ошибки на этом этапе ожидаемы — они направляют Фазу 3)
 
 ---
 
-## Phase 3: API Migration
+## Фаза 3: Миграция API
 
-Replace removed and deprecated APIs. Work through compiler errors systematically.
+Замени удалённые и устаревшие API. Прорабатывай ошибки компилятора систематически.
 
-### Common Patterns
+### Частые паттерны
 
-Consult the official Apache Spark migration guide for the complete list of changes for each version:
+Обратись к официальному руководству по миграции Apache Spark за полным списком изменений для каждой версии:
 https://spark.apache.org/docs/latest/migration-guide.html
 
-#### SparkSession Creation (2.x → 3.x)
+#### Создание SparkSession (2.x → 3.x)
 
 ```scala
 // BEFORE (Spark 1.x/2.x)
@@ -136,7 +136,7 @@ val spark = SparkSession.builder()
 val sc = spark.sparkContext
 ```
 
-#### RDD to DataFrame (2.x → 3.x)
+#### RDD в DataFrame (2.x → 3.x)
 
 ```scala
 // BEFORE
@@ -147,7 +147,7 @@ import spark.implicits._
 rdd.toDF()  // implicit from SparkSession
 ```
 
-#### Accumulator API (2.x → 3.x)
+#### API Accumulator (2.x → 3.x)
 
 ```scala
 // BEFORE
@@ -157,78 +157,78 @@ val acc = sc.accumulator(0)
 val acc = sc.longAccumulator("name")
 ```
 
-### Checklist
+### Чек-лист
 
-- [ ] Replace `SQLContext` / `HiveContext` with `SparkSession`
-- [ ] Replace deprecated `Accumulator` with `AccumulatorV2`
-- [ ] Update `DataFrame` → `Dataset[Row]` where needed
-- [ ] Replace removed `RDD.mapPartitionsWithContext` with `mapPartitions`
-- [ ] Fix `SparkConf` deprecated setters
-- [ ] Update custom `UserDefinedFunction` registration
-- [ ] Migrate `Experimental` / `DeveloperApi` usages that were removed
-- [ ] Verify all compilation errors from Phase 2 are resolved
+- [ ] Замени `SQLContext` / `HiveContext` на `SparkSession`
+- [ ] Замени устаревший `Accumulator` на `AccumulatorV2`
+- [ ] Обнови `DataFrame` → `Dataset[Row]` там, где нужно
+- [ ] Замени удалённый `RDD.mapPartitionsWithContext` на `mapPartitions`
+- [ ] Исправь устаревшие сеттеры `SparkConf`
+- [ ] Обнови регистрацию кастомного `UserDefinedFunction`
+- [ ] Мигрируй использования `Experimental` / `DeveloperApi`, которые были удалены
+- [ ] Убедись, что все ошибки компиляции из Фазы 2 устранены
 
 ---
 
-## Phase 4: Configuration Migration
+## Фаза 4: Миграция конфигурации
 
-Spark renames and removes configuration properties between versions. The official migration guide documents every renamed and removed property per release:
+Spark переименовывает и удаляет свойства конфигурации между версиями. Официальное руководство по миграции документирует каждое переименованное и удалённое свойство по релизам:
 https://spark.apache.org/docs/latest/migration-guide.html
 
-### Checklist
+### Чек-лист
 
-- [ ] Rename deprecated config keys (e.g., `spark.shuffle.file.buffer.kb` → `spark.shuffle.file.buffer`)
-- [ ] Update removed configs to their replacements
-- [ ] Review `spark-defaults.conf`, application code, and submit scripts
-- [ ] Check for hardcoded config values in test fixtures
-- [ ] Verify `SparkSession.builder().config(...)` calls use current property names
-
----
-
-## Phase 5: SQL & DataFrame Migration
-
-Spark SQL behavior changes between versions can silently alter query results.
-
-### Key Breaking Changes (2.x → 3.x)
-
-- `CAST` to integer no longer truncates silently — set `spark.sql.ansi.enabled` if needed
-- `FROM` clause is required in `SELECT` (no more `SELECT 1`)
-- Column resolution order changed in subqueries
-- `spark.sql.legacy.timeParserPolicy` controls date/time parsing behavior
-
-### Key Breaking Changes (3.x → 4.x)
-
-- ANSI mode is default (`spark.sql.ansi.enabled=true`)
-- Stricter type coercion in comparisons
-- `spark.sql.legacy.*` flags removed
-
-### Checklist
-
-- [ ] Audit SQL strings and DataFrame expressions for changed behavior
-- [ ] Add explicit `CAST` where implicit coercion relied on legacy behavior
-- [ ] Update date/time format patterns to match new parser
-- [ ] Test SQL queries with representative data and compare output to pre-upgrade baseline
-- [ ] Set `spark.sql.legacy.*` flags temporarily if needed for phased migration
+- [ ] Переименуй устаревшие ключи конфигов (например, `spark.shuffle.file.buffer.kb` → `spark.shuffle.file.buffer`)
+- [ ] Обнови удалённые конфиги их заменами
+- [ ] Просмотри `spark-defaults.conf`, код приложения и submit-скрипты
+- [ ] Проверь жёстко закодированные значения конфигов в тестовых фикстурах
+- [ ] Убедись, что вызовы `SparkSession.builder().config(...)` используют актуальные имена свойств
 
 ---
 
-## Phase 6: Test Validation
+## Фаза 5: Миграция SQL и DataFrame
 
-### Checklist
+Изменения поведения Spark SQL между версиями могут молча менять результаты запросов.
 
-- [ ] All code compiles without errors
-- [ ] All existing unit tests pass
-- [ ] All existing integration tests pass
-- [ ] Run Spark jobs locally with sample data and compare output to pre-upgrade baseline
-- [ ] No deprecation warnings remain (or are documented with a migration timeline)
-- [ ] Update CI/CD pipeline to use new Spark version
-- [ ] Document any `spark.sql.legacy.*` flags that are set temporarily
+### Ключевые breaking changes (2.x → 3.x)
 
-## Done When
+- `CAST` в integer больше не обрезает молча — при необходимости установи `spark.sql.ansi.enabled`
+- Предложение `FROM` обязательно в `SELECT` (больше нет `SELECT 1`)
+- Изменился порядок разрешения колонок в подзапросах
+- `spark.sql.legacy.timeParserPolicy` управляет поведением парсинга даты/времени
 
-✓ Project compiles against target Spark version
-✓ All tests pass
-✓ No removed APIs remain in code
-✓ Configuration properties are current
-✓ SQL queries produce correct results
-✓ Upgrade impact documented in `spark_upgrade_impact.md`
+### Ключевые breaking changes (3.x → 4.x)
+
+- Режим ANSI включён по умолчанию (`spark.sql.ansi.enabled=true`)
+- Более строгое приведение типов в сравнениях
+- Флаги `spark.sql.legacy.*` удалены
+
+### Чек-лист
+
+- [ ] Проверь SQL-строки и выражения DataFrame на изменённое поведение
+- [ ] Добавь явный `CAST`, где неявное приведение опиралось на легаси-поведение
+- [ ] Обнови паттерны форматов даты/времени под новый парсер
+- [ ] Протестируй SQL-запросы на репрезентативных данных и сравни вывод с базовым уровнем до обновления
+- [ ] При необходимости временно установи флаги `spark.sql.legacy.*` для поэтапной миграции
+
+---
+
+## Фаза 6: Валидация тестов
+
+### Чек-лист
+
+- [ ] Весь код компилируется без ошибок
+- [ ] Все существующие юнит-тесты проходят
+- [ ] Все существующие интеграционные тесты проходят
+- [ ] Запусти Spark-задания локально на примере данных и сравни вывод с базовым уровнем до обновления
+- [ ] Не осталось предупреждений об устаревании (или они задокументированы с планом миграции)
+- [ ] Обнови CI/CD-пайплайн под новую версию Spark
+- [ ] Задокументируй любые временно установленные флаги `spark.sql.legacy.*`
+
+## Готово, когда
+
+✓ Проект компилируется под целевую версию Spark
+✓ Все тесты проходят
+✓ В коде не осталось удалённых API
+✓ Свойства конфигурации актуальны
+✓ SQL-запросы дают корректные результаты
+✓ Влияние обновления задокументировано в `spark_upgrade_impact.md`

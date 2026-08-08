@@ -1,6 +1,6 @@
 ---
 name: github-actions
-description: Create, debug, and test GitHub Actions workflows and custom actions. Use when building CI/CD pipelines, automating workflows, or troubleshooting GitHub Actions.
+description: Создание, отладка и тестирование воркфлоу GitHub Actions и кастомных действий. Используй при построении CI/CD-пайплайнов, автоматизации воркфлоу или устранении неполадок GitHub Actions.
 triggers:
 - github actions
 - github workflow
@@ -9,36 +9,36 @@ triggers:
 - .github/workflows
 ---
 
-# GitHub Actions Guide
+# Руководство по GitHub Actions
 
-## Critical Rules
+## Критические правила
 
-**Custom Action Deployment:**
-- New custom actions MUST be merged to the main branch before they can be used
-- After the initial merge, they should be tested from feature branches
+**Развёртывание кастомных действий:**
+- Новые кастомные действия ОБЯЗАНЫ быть слиты в ветку main, прежде чем их можно использовать
+- После начального слияния их следует тестировать из фиче-веток
 
-**Debug Steps:**
-Add debug steps that print non-secret parameters when:
-- Creating a new action, OR
-- Troubleshooting a particularly tricky issue
+**Шаги отладки:**
+Добавляй шаги отладки, печатающие не-секретные параметры, когда:
+- Создаёшь новое действие, ИЛИ
+- Устраняешь особенно хитрую проблему
 
-(Not required for every workflow - use when needed)
+(Требуется не для каждого воркфлоу — используй, когда нужно)
 
-## Effectiveness Principles
+## Принципы эффективности
 
-Actions cost CI minutes. Be deliberate, not iterative:
+Действия стоят минут CI. Будь обдуманным, а не итеративным:
 
-1. **Monitor, don't poll** - use `gh run watch` / `gh pr checks --watch` to follow runs live
-2. **Read logs, don't guess** - fetch the failed job's log before changing code
-3. **Print actual values** - debug steps reveal the real `inputs`/`github` context, not your assumptions
-4. **Test locally first** - `act` runs workflows on your machine and avoids burning CI minutes
-5. **Plan the smallest reproduction** - one job, minimal matrix, narrow trigger before scaling up
+1. **Мониторь, а не опрашивай** — используй `gh run watch` / `gh pr checks --watch` для наблюдения за запусками вживую
+2. **Читай логи, а не гадай** — получай лог неудачного задания перед изменением кода
+3. **Печатай фактические значения** — шаги отладки раскрывают реальный контекст `inputs`/`github`, а не твои предположения
+4. **Тестируй локально сначала** — `act` запускает воркфлоу на твоей машине и избегает сжигания минут CI
+5. **Планируй минимальное воспроизведение** — одно задание, минимальная матрица, узкий триггер перед масштабированием
 
-See [README.md](README.md) for the full debugging workflow, `gh` commands, and YAML debug-step examples.
+См. [README.md](README.md) для полного рабочего процесса отладки, команд `gh` и примеров YAML-шагов отладки.
 
-## Key Gotchas
+## Ключевые подводные камни
 
-1. **Secrets unavailable in fork PRs** - `pull_request` has no secrets for forks; `pull_request_target` does but **never check out or execute fork PR code inside it** (RCE with write permissions)
-2. **Pin action versions** - Use `@v4` or SHA, not `@main` (prevents breaking changes)
-3. **Explicit permissions** - Set `permissions:` block for GITHUB_TOKEN operations
-4. **Artifacts for job-to-job data** - Files don't persist between jobs without `upload-artifact`/`download-artifact`
+1. **Секреты недоступны в PR из форков** — `pull_request` не имеет секретов для форков; `pull_request_target` имеет, но **никогда не чекаут и не выполняй код PR из форка внутри него** (RCE с правами записи)
+2. **Пинируй версии действий** — используй `@v4` или SHA, а не `@main` (предотвращает ломающие изменения)
+3. **Явные права** — задавай блок `permissions:` для операций GITHUB_TOKEN
+4. **Артефакты для данных между заданиями** — файлы не сохраняются между заданиями без `upload-artifact`/`download-artifact`

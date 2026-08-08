@@ -1,229 +1,229 @@
 ---
 name: qa-changes
-description: This skill should be used when the user asks to "QA a pull request", "test PR changes", "verify a PR works", "functionally test changes", or when an automated workflow triggers QA validation of code changes. Provides a structured methodology for setting up the environment, exercising changed behavior, and reporting results.
+description: Этот навык следует использовать, когда пользователь просит «провести QA пул-реквеста», «протестировать изменения PR», «проверить, что PR работает», «функционально протестировать изменения» или когда автоматизированный воркфлоу запускает QA-валидацию изменений кода. Даёт структурированную методологию настройки окружения, проверки изменённого поведения и сообщения результатов.
 triggers:
 - /qa-changes
 ---
 
-# QA Changes
+# QA изменений
 
-Validate pull request changes by actually running the code — not just reading it. The goal is to verify that new behavior works as the PR claims, existing behavior is not broken, and the repository remains healthy after the change.
+Проверяй изменения пул-реквеста, фактически запуская код — а не просто читая его. Цель — убедиться, что новое поведение работает так, как заявляет PR, существующее поведение не сломано, и репозиторий остаётся здоровым после изменения.
 
-The bar is high: test the way a thorough human QA engineer would. If the PR changes a web UI, spin up the server and verify it in a real browser. If it changes a CLI, run the CLI with real inputs. Do not settle for "the tests pass" — actually use the software.
+Стандарт высокий: тестируй так, как делал бы дотошный человеческий QA-инженер. Если PR меняет веб-UI — подними сервер и проверь в реальном браузере. Если меняет CLI — запусти CLI с реальными входами. Не останавливайся на «тесты проходят» — реально используй программное обеспечение.
 
-## Core Methodology
+## Основная методология
 
-QA proceeds in four phases. Complete each phase in order. If a phase fails, report the failure and stop.
+QA проходит в четыре фазы. Выполняй каждую фазу по порядку. Если фаза не удалась, сообщи о сбое и остановись.
 
-### Phase 1: Understand the Change
+### Фаза 1: Понимание изменения
 
-Read the PR diff, title, and description. **Identify the goal of this PR** — this is the single most important thing to understand before proceeding. A PR might fix a bug, add a feature, refactor code, improve performance, update documentation, or something else entirely. Check:
+Прочитай дифф PR, заголовок и описание. **Определи цель этого PR** — это самая важная вещь для понимания перед продолжением. PR может исправлять баг, добавлять функцию, рефакторить код, улучшать производительность, обновлять документацию или делать что-то совсем иное. Проверь:
 
-1. **The PR description "Why" / "Summary" section** — what is the author trying to accomplish?
-2. **Linked issues** — if the PR references an issue, read it. But note: the PR may address the issue differently than expected, or only partially. The PR description is the real specification for what *this PR* intends to deliver.
-3. **The PR title** — often summarizes the intent (e.g., "fix: X not working when Y", "feat: add Z capability", "refactor: consolidate duplicated X logic").
+1. **Раздел описания PR «Почему» / «Резюме»** — что автор пытается достичь?
+2. **Связанные задачи** — если PR ссылается на задачу, прочитай её. Но учти: PR может решать задачу иначе, чем ожидалось, или только частично. Описание PR — это реальная спецификация того, что *этот* PR намерен доставить.
+3. **Заголовок PR** — часто обобщает намерение (например, «fix: X не работает, когда Y», «feat: добавить возможность Z», «refactor: консолидировать дублированную логику X»).
 
-Then classify every changed file:
+Затем классифицируй каждый изменённый файл:
 
-- **New feature**: User-visible behavior that did not exist before.
-- **Bug fix**: Corrects existing behavior to match intended behavior.
-- **Refactor**: Restructuring that should not change external behavior.
-- **Configuration / CI / docs**: Non-functional changes.
+- **Новая функция**: Видимое пользователю поведение, которого раньше не было.
+- **Исправление бага**: Корректирует существующее поведение под ожидаемое.
+- **Рефакторинг**: Реструктуризация, не меняющая внешнее поведение.
+- **Конфигурация / CI / документация**: Нефункциональные изменения.
 
-For each change, identify the *entry point* — the concrete way a user would interact with it (CLI command, API endpoint, UI page, function call). This drives what to exercise in Phase 3.
+Для каждого изменения определи *точку входа* — конкретный способ, которым пользователь будет взаимодействовать с ним (команда CLI, эндпоинт API, страница UI, вызов функции). Это определяет, что проверять в Фазе 3.
 
-Finally, form a clear hypothesis: "This PR should [achieve stated goal] by [approach taken in the diff]." Phase 3 will test that hypothesis.
+Наконец, сформулируй чёткую гипотезу: «Этот PR должен [достичь заявленной цели] путём [подхода, взятого в диффе]». Фаза 3 проверит эту гипотезу.
 
-### Phase 2: Set Up the Environment
+### Фаза 2: Настройка окружения
 
-Bootstrap the repository so the project builds and runs successfully.
+Разверни репозиторий так, чтобы проект собирался и работал.
 
-1. **Read the repo's bootstrap instructions.** Check `AGENTS.md`, `README.md`, `Makefile`, `package.json`, `pyproject.toml`, `Cargo.toml`, or equivalent. Always prefer the project's own documented setup commands.
-2. **Install dependencies.** Use the project's dependency manager (`uv sync`, `npm install`, `pip install -r requirements.txt`, `bundle install`, `cargo build`, etc.).
-3. **Build the project** if a build step is required (compile, transpile, bundle).
-4. **Note CI status.** Glance at the PR's CI checks and note whether they pass or fail. Do NOT re-run the test suite yourself — that is CI's job, not yours. Your job starts in Phase 3.
+1. **Прочитай инструкции по развёртыванию репозитория.** Проверь `AGENTS.md`, `README.md`, `Makefile`, `package.json`, `pyproject.toml`, `Cargo.toml` или эквиваленты. Всегда предпочитай собственные документированные команды настройки проекта.
+2. **Установи зависимости.** Используй менеджер зависимостей проекта (`uv sync`, `npm install`, `pip install -r requirements.txt`, `bundle install`, `cargo build` и т.д.).
+3. **Собери проект**, если требуется шаг сборки (компиляция, транспиляция, бандлинг).
+4. **Отметь статус CI.** Взгляни на проверки CI PR и отметь, проходят ли они или падают. НЕ перезапускай тестовый набор сам — это работа CI, а не твоя. Твоя работа начинается в Фазе 3.
 
-If setup fails, report the failure with the exact error output and stop.
+Если настройка не удалась, сообщи о сбое с точным выводом ошибки и остановись.
 
-### Phase 3: Exercise the Changed Behavior
+### Фаза 3: Проверка изменённого поведения
 
-This is the most important phase. **Actually use the software** the way a real user would to verify the change works as the PR claims. This is what distinguishes QA from CI (which runs tests) and code review (which reads code).
+Это самая важная фаза. **Реально используй программное обеспечение** так, как это делал бы настоящий пользователь, чтобы убедиться, что изменение работает так, как заявляет PR. Это отличает QA от CI (которое запускает тесты) и ревью кода (которое читает код).
 
-**Do NOT:**
-- Run the test suite (`pytest`, `npm test`, `cargo test`, etc.) — that is CI's job.
-- Analyze code by reading files and commenting on style, structure, or logic — that is code review's job.
-- Run linters, formatters, type checkers, or pre-commit hooks — that is CI's job.
+**НЕ делай:**
+- Запуск тестового набора (`pytest`, `npm test`, `cargo test` и т.д.) — это работа CI.
+- Анализ кода чтением файлов и комментированием стиля, структуры или логики — это работа ревью кода.
+- Запуск линтеров, форматтеров, тайпчекеров или pre-commit хуков — это работа CI.
 
-**DO:**
-- Run the actual application, CLI, or server and interact with it as a user would.
-- Make real HTTP requests, run real commands, open real browser pages.
-- Always attempt real execution first. Running `--help`, `--dry-run`, or `--version` is NOT functional verification — it only proves argument parsing works. If real execution fails due to missing credentials, external services, or environment constraints, report what you tried and what could not be verified. Do not substitute `--help` output for evidence the software works.
-- Reproduce bugs and verify fixes end-to-end.
-- Test user-facing behavior that automated tests cannot or do not cover.
+**ДЕЛАЙ:**
+- Запусти фактическое приложение, CLI или сервер и взаимодействуй с ним, как пользователь.
+- Делай реальные HTTP-запросы, запускай реальные команды, открывай реальные страницы браузера.
+- Всегда сначала пытайся выполнить реально. Запуск `--help`, `--dry-run` или `--version` — это НЕ функциональная проверка; он доказывает только, что парсинг аргументов работает. Если реальное выполнение падает из-за отсутствующих учётных данных, внешних сервисов или ограничений окружения, сообщи, что ты попробовал и что не удалось проверить. Не подменяй вывод `--help` доказательством, что программное обеспечение работает.
+- Воспроизводи баги и проверяй исправления от начала до конца.
+- Тестируй видимое пользователю поведение, которое автоматические тесты не могут или не покрывают.
 
-**Start by verifying the PR achieves its stated goal.** Use the hypothesis from Phase 1. For example:
-- If the PR claims to "fix crash when X is empty", reproduce the crash scenario and confirm it no longer occurs.
-- If the PR claims to "add support for Y", actually use Y end-to-end and confirm it works.
-- If the PR claims to "add a new dashboard page", navigate to the page and verify it renders and functions correctly.
-- If the PR claims to "add a new CLI flag", run the CLI with that flag and verify the output.
+**Начни с проверки, что PR достигает заявленной цели.** Используй гипотезу из Фазы 1. Например:
+- Если PR заявляет «исправить краш, когда X пуст», воспроизведи сценарий краша и подтверди, что он больше не происходит.
+- Если PR заявляет «добавить поддержку Y», реально используй Y от начала до конца и подтверди, что работает.
+- Если PR заявляет «добавить новую страницу дашборда», перейди на страницу и проверь, что она рендерится и функционирует.
+- Если PR заявляет «добавить новый флаг CLI», запусти CLI с этим флагом и проверь вывод.
 
-"Tests pass" is not a QA finding. The question is: does the software actually do what the PR says it does?
+«Тесты проходят» — не результат QA. Вопрос в том, действительно ли программное обеспечение делает то, что говорит PR?
 
-**For frontend / UI changes:**
-- Start the development server.
-- Use a real browser (via Playwright, browser automation tools, or the built-in browser) to navigate to the affected pages.
-- Verify the visual change renders correctly. Take screenshots as evidence.
-- Test user interactions (clicks, form submissions, navigation).
-- Try at least one edge case (empty state, long text, missing data).
+**Для фронтенд / UI-изменений:**
+- Запусти сервер разработки.
+- Используй реальный браузер (через Playwright, инструменты автоматизации браузера или встроенный браузер) для навигации по затронутым страницам.
+- Проверь, что визуальное изменение рендерится корректно. Сделай скриншоты как доказательство.
+- Протестируй взаимодействия пользователя (клики, отправку форм, навигацию).
+- Попробуй хотя бы один крайний случай (пустое состояние, длинный текст, отсутствующие данные).
 
-**For CLI changes:**
-- Run the CLI command with realistic arguments. Capture stdout and stderr.
-- Verify the output matches the PR's claimed behavior.
-- Try at least one edge case (invalid input, missing flags, empty input).
+**Для изменений CLI:**
+- Запусти команду CLI с реалистичными аргументами. Захвати stdout и stderr.
+- Проверь, что вывод соответствует заявленному поведению PR.
+- Попробуй хотя бы один крайний случай (некорректный ввод, отсутствующие флаги, пустой ввод).
 
-**For API / backend changes:**
-- Start the server.
-- Make actual HTTP requests (`curl`, `httpie`, or a test client) to affected endpoints.
-- Verify response status codes, response bodies, and side effects (database writes, file creation).
-- Test error cases (bad input, missing auth, not found).
+**Для изменений API / бэкенда:**
+- Запусти сервер.
+- Сделай фактические HTTP-запросы (`curl`, `httpie` или тестовый клиент) к затронутым эндпоинтам.
+- Проверь коды статуса ответа, тела ответов и побочные эффекты (записи в БД, создание файлов).
+- Протестируй случаи ошибок (плохой ввод, отсутствующая аутентификация, не найдено).
 
-**For bug fixes — use a before/after comparison:**
-1. **Reproduce the bug without the fix.** Check out the base branch (or revert the PR's changes) and run a concrete command or code path that triggers the reported failure. Show the exact command and its output.
-2. **Interpret the baseline result.** Explain what the output means — e.g., "This confirms the bug exists: the resolver cannot find the package because the lockfile's cutoff date is too old."
-3. **Apply the PR's changes.** Check out the PR branch, apply the patch, or set the environment variable — whatever the fix entails.
-4. **Re-run the same verification.** Run the same command or exercise the same code path with the fix in place. Show the exact command and its output.
-5. **Interpret the result.** Explain what the new output means — e.g., "The resolver now finds the package, confirming the fix works."
-6. **Check for side effects.** Confirm the fix does not break related functionality.
+**Для исправлений багов — используй сравнение до/после:**
+1. **Воспроизведи баг без исправления.** Переключись на базовую ветку (или откати изменения PR) и запусти конкретную команду или путь кода, вызывающий заявленный сбой. Покажи точную команду и её вывод.
+2. **Интерпретируй базовый результат.** Объясни, что значит вывод — например, «Это подтверждает, что баг существует: резолвер не может найти пакет, потому что дата отсечки lockfile слишком старая».
+3. **Примени изменения PR.** Переключись на ветку PR, примени патч или установи переменную окружения — всё, что влечёт за собой исправление.
+4. **Повтори ту же проверку.** Запусти ту же команду или пройди по тому же пути кода с применённым исправлением. Покажи точную команду и её вывод.
+5. **Интерпретируй результат.** Объясни, что значит новый вывод — например, «Резолвер теперь находит пакет, что подтверждает, что исправление работает».
+6. **Проверь побочные эффекты.** Подтверди, что исправление не ломает связанную функциональность.
 
-**For library / SDK changes:**
-- Write a short script that imports and calls the changed functions.
-- Verify the return values and behavior match the PR's claims.
-- Test edge cases the PR author may have missed.
+**Для изменений библиотек / SDK:**
+- Напиши короткий скрипт, импортирующий и вызывающий изменённые функции.
+- Проверь, что возвращаемые значения и поведение соответствуют заявлениям PR.
+- Протестируй крайние случаи, которые автор PR мог упустить.
 
-**For refactors:**
-- If the refactor touches a critical or user-facing path, manually exercise that path to confirm behavior is unchanged.
-- For pure internal refactors where CI passes and no user-facing path is affected, Phase 2's CI check is sufficient.
+**Для рефакторингов:**
+- Если рефакторинг затрагивает критический или видимый пользователю путь, вручную пройди по нему, чтобы подтвердить, что поведение не изменилось.
+- Для чистых внутренних рефакторингов, где CI проходит и видимый пользователю путь не затронут, проверки CI из Фазы 2 достаточно.
 
-**For configuration / CI / docs:**
-- Validate syntax (YAML lint, JSON parse, markdown render).
-- If it is a build change, confirm the build still succeeds.
-- For doc changes, confirm the documentation renders correctly if a preview is available.
+**Для конфигурации / CI / документации:**
+- Проверь синтаксис (YAML lint, парсинг JSON, рендер markdown).
+- Если это изменение сборки, подтверди, что сборка по-прежнему успешна.
+- Для изменений документации подтверди, что документация рендерится корректно, если доступен превью.
 
-**Always show your work with a before/after narrative.** For every verification, the report must include: (a) the exact command you ran, (b) the actual output you observed, and (c) your interpretation of that output. For bug fixes and behavioral changes, demonstrate BOTH the broken/old state AND the fixed/new state so the reviewer can see the delta. Present this evidence inside collapsible `<details>` blocks — the core deliverable is the verdict and summary, not raw logs.
+**Всегда показывай свою работу нарративом до/после.** Для каждой проверки отчёт должен включать: (а) точную команду, которую ты запустил, (б) фактический вывод, который ты наблюдал, и (в) твою интерпретацию этого вывода. Для исправлений багов и изменений поведения покажи И сломанное/старое состояние, И исправленное/новое состояние, чтобы ревьюер видел разницу. Представляй это доказательство внутри сворачиваемых блоков `<details>` — основной результат — вердикт и резюме, а не сырые логи.
 
-### Knowing When to Give Up
+### Когда сдаться
 
-Some verification approaches will fail due to environment constraints, missing system dependencies, or tooling limitations. That is expected.
+Некоторые подходы к проверке будут падать из-за ограничений окружения, отсутствующих системных зависимостей или ограничений инструментов. Это ожидаемо.
 
-**The rule: if the same general approach fails after three materially different attempts, stop trying that approach.** For example, if three different Playwright configurations all fail to connect to the dev server, do not try a fourth Playwright variation. Switch to a fundamentally different approach (e.g., `curl` + manual HTML inspection instead of browser automation). If two fundamentally different approaches both fail, give up on that specific verification and say so in the report.
+**Правило: если один и тот же общий подход не сработал после трёх материально разных попыток, перестань пытаться с этим подходом.** Например, если три разные конфигурации Playwright не могут подключиться к dev-серверу, не пробуй четвёртый вариант Playwright. Переключись на принципиально другой подход (например, `curl` + ручной просмотр HTML вместо автоматизации браузера). Если два принципиально разных подхода оба не сработали, сдайся с этой конкретной проверкой и скажи об этом в отчёте.
 
-When giving up on a verification:
-- State clearly what was attempted and why it failed.
-- State what *could not* be verified as a result.
-- Suggest the human add guidance to `AGENTS.md` (or a custom `/qa-changes` skill) that would help future QA runs succeed — for example: which port the dev server runs on, what system packages are required, how to configure browser automation, or what the expected test output looks like.
+Когда сдаёшься с проверкой:
+- Ясно укажи, что было предпринято и почему не удалось.
+- Укажи, что *не удалось* проверить в результате.
+- Предложи человеку добавить руководство в `AGENTS.md` (или кастомный навык `/qa-changes`), которое поможет будущим прогонам QA — например, на каком порту работает dev-сервер, какие системные пакеты требуются, как настроить автоматизацию браузера или как должен выглядеть ожидаемый тестовый вывод.
 
-Do not silently skip verification. An honest "I could not verify X because Y" is far more valuable than a false "everything works."
+Не пропускай проверку молча. Честное «Я не смог проверить X, потому что Y» гораздо ценнее ложного «всё работает».
 
-### Phase 4: Report Results
+### Фаза 4: Отчёт о результатах
 
-Post a structured report as a PR review using the GitHub API. **Keep the report scannable.** A reviewer should grasp the verdict and key results in under 10 seconds. Put lengthy evidence (logs, code snippets, full command output) inside collapsible `<details>` blocks so the top-level report stays compact.
+Опубликуй структурированный отчёт как ревью PR через GitHub API. **Держи отчёт легко сканируемым.** Ревьюер должен понять вердикт и ключевые результаты за 10 секунд. Помещай длинные доказательства (логи, фрагменты кода, полный вывод команд) внутрь сворачиваемых блоков `<details>`, чтобы верхний уровень отчёта оставался компактным.
 
-#### Report format
+#### Формат отчёта
 
 ```markdown
 ## {verdict_emoji} QA Report: {VERDICT}
 
-{One-sentence summary of what was verified and the outcome.}
+{Одно предложение, резюмирующее что проверено и исход.}
 
 ### Does this PR achieve its stated goal?
 
-{Direct answer: Yes / Partially / No.}
-{2-3 sentences explaining WHY, referencing specific evidence from
-exercising the software. For bug fixes: is the bug actually fixed?
-For features: does the new capability work end-to-end? For refactors:
-is the restructuring achieved without changing behavior? Be specific
-about what the goal was and whether the changes deliver on it.}
+{Прямой ответ: Yes / Partially / No.}
+{2-3 предложения, объясняющие ПОЧЕМУ, со ссылками на конкретные
+доказательства из проверки ПО. Для исправлений багов: баг реально
+исправлен? Для функций: работает ли новая возможность от начала до конца?
+Для рефакторингов: достигнута ли реструктуризация без изменения поведения?
+Будь конкретен о цели и о том, доставляют ли изменения её.}
 
 | Phase | Result |
 |-------|--------|
-| Environment Setup | {emoji} {one-line status} |
-| CI Status | {emoji} {one-line note from CI checks, e.g. "all green" or "2 checks failing"} |
-| Functional Verification | {emoji} {one-line status} |
+| Environment Setup | {emoji} {однострочный статус} |
+| CI Status | {emoji} {однострочная заметка из проверок CI, например "all green" или "2 checks failing"} |
+| Functional Verification | {emoji} {однострочный статус} |
 
 <details><summary>Functional Verification</summary>
 
-{Structure each verification as a before/after narrative:
+{Оформи каждую проверку как нарратив до/после:
 
-### Test N: {Description}
+### Test N: {Описание}
 
 **Step 1 — Reproduce / establish baseline (without the fix):**
-Ran `{exact command}`:
+Ran `{точная команда}`:
 ```
-{actual output}
+{фактический вывод}
 ```
-This shows {interpretation — what the output means, e.g. "the bug
+This shows {интерпретация — что значит вывод, например "the bug
 exists because..."}.
 
 **Step 2 — Apply the PR's changes:**
-{What was done — e.g. checked out the PR branch, set env var, etc.}
+{Что было сделано — например, переключился на ветку PR, установил env-переменную и т.д.}
 
 **Step 3 — Re-run with the fix in place:**
-Ran `{same or equivalent command}`:
+Ran `{та же или эквивалентная команда}`:
 ```
-{actual output}
+{фактический вывод}
 ```
-This shows {interpretation — e.g. "the fix works because the error
+This shows {интерпретация — например "the fix works because the error
 is gone and the expected result appears"}.
 
-Repeat for each changed behavior. For non-bug-fix changes
-(features, refactors), the baseline step may simply describe the
-prior state rather than reproducing a failure.}
+Повторяй для каждого изменённого поведения. Для изменений, не являющихся
+исправлением багов (функции, рефакторинги), шаг базового уровня может просто
+описывать предыдущее состояние, а не воспроизводить сбой.}
 
 </details>
 
 <details><summary>Unable to Verify</summary>
 
-{What could not be verified, what was attempted, and suggested
-AGENTS.md guidance. Omit this section entirely if everything
-was verified.}
+{Что не удалось проверить, что было предпринято, и предложенное
+руководство для AGENTS.md. Полностью опусти этот раздел, если всё
+было проверено.}
 
 </details>
 
 ### Issues Found
 
-{List concrete problems, or "None." if clean.}
+{Перечисли конкретные проблемы или "None.", если чисто.}
 
 - 🔴 **Blocker**: ...
 - 🟠 **Issue**: ...
 - 🟡 **Minor**: ...
 ```
 
-#### Formatting rules
+#### Правила форматирования
 
-- **Verdict line + summary** come first. One emoji, one sentence. No preamble.
-- **Status table** gives the at-a-glance overview. One row per phase, one-line status.
-- **Evidence goes in `<details>` blocks.** Any code block, log excerpt, or command output longer than ~4 lines belongs inside a collapsible. Reviewers who want proof can expand; others can skip.
-- **Do not repeat information.** The summary, table, and details should each add new information — not restate the same facts in different formats.
-- **Issues Found** is always visible (not collapsible). If there are no issues, write "None."
-- **Omit empty sections.** If there is nothing unable to verify, drop that `<details>` block entirely.
+- **Строка вердикта + резюме** идут первыми. Один эмодзи, одно предложение. Без преамбулы.
+- **Таблица статуса** даёт обзор с одного взгляда. Одна строка на фазу, однострочный статус.
+- **Доказательства идут в блоки `<details>`.** Любой блок кода, фрагмент лога или вывод команды длиннее ~4 строк принадлежит сворачиваемому блоку. Ревьюеры, желающие доказательства, могут развернуть; остальные могут пропустить.
+- **Не повторяй информацию.** Резюме, таблица и детали должны добавлять новую информацию — а не пересказывать те же факты в разных форматах.
+- **Issues Found всегда виден** (не сворачиваемый). Если проблем нет, напиши «None.»
+- **Опускай пустые разделы.** Если нечего не удалось проверить, убери этот блок `<details>` целиком.
 
-#### Verdict values
+#### Значения вердикта
 
-- ✅ **PASS**: Change works as described, no regressions.
-- ⚠️ **PASS WITH ISSUES**: Change mostly works, but issues were found (list them).
-- ❌ **FAIL**: Change does not work as described, or introduces regressions.
-- 🟡 **PARTIAL**: Some behavior verified, some could not be (list what was and was not verified).
+- ✅ **PASS**: Изменение работает как описано, регрессий нет.
+- ⚠️ **PASS WITH ISSUES**: Изменение в основном работает, но найдены проблемы (перечисли их).
+- ❌ **FAIL**: Изменение не работает как описано или вносит регрессии.
+- 🟡 **PARTIAL**: Часть поведения проверена, часть не удалось (перечисли, что проверено, а что нет).
 
-## Key Principles
+## Ключевые принципы
 
-- **Answer the core question first: does this PR achieve its stated goal?** This is the primary deliverable. Explicitly state whether the changes deliver on what the PR description promises — whether that is a bug fix, a new feature, a refactor, or anything else.
-- **Fail fast.** If setup fails, stop and report. Do not spend tokens on later phases with a broken environment.
-- **Run the code, not the tests.** Execute the actual software — start servers, run CLI commands, make HTTP requests, open browsers. Do not run `pytest`, `npm test`, or equivalent test suites. That is CI's job.
-- **Do not analyze code.** Reading files and commenting on style, structure, or logic is code review's job. Your job is to exercise behavior, not read source files.
-- **Set a high bar.** If the change affects a UI, open it in a real browser. If it affects a CLI, run the actual CLI with real inputs. If it affects an API, make real HTTP requests.
-- **Test what the PR claims.** The PR description is the specification. Verify the claim, not hypothetical scenarios.
-- **Leave CI to CI.** Do not re-run tests, linters, formatters, or type checkers. Note CI status, then focus entirely on functional verification that CI cannot do.
-- **Report evidence, not opinions.** Include exact commands, outputs, and error messages — inside collapsible blocks.
-- **Keep it scannable.** The report is for busy reviewers. Verdict and summary up top, evidence collapsed below. Do not repeat information across sections.
-- **Give up gracefully.** If a verification approach does not work after three materially different attempts, switch approaches. If two different approaches fail, give up and report honestly. Suggest `AGENTS.md` improvements.
-- **Respect the project's conventions.** Use the project's own tools and build commands for setup.
+- **Сначала ответь на главный вопрос: достигает ли этот PR заявленной цели?** Это основной результат. Явно укажи, доставляют ли изменения то, что обещает описание PR — будь то исправление бага, новая функция, рефакторинг или что-то ещё.
+- **Падай быстро.** Если настройка не удалась, остановись и сообщи. Не трать токены на поздние фазы со сломанным окружением.
+- **Запускай код, а не тесты.** Выполняй фактическое программное обеспечение — запускай серверы, выполняй команды CLI, делай HTTP-запросы, открывай браузеры. Не запускай `pytest`, `npm test` или эквивалентные наборы тестов. Это работа CI.
+- **Не анализируй код.** Чтение файлов и комментирование стиля, структуры или логики — это работа ревью кода. Твоя работа — проверять поведение, а не читать исходники.
+- **Установи высокую планку.** Если изменение затрагивает UI, открой его в реальном браузере. Если затрагивает CLI, запусти фактический CLI с реальными входами. Если затрагивает API, сделай реальные HTTP-запросы.
+- **Тестируй то, что заявляет PR.** Описание PR — это спецификация. Проверяй утверждение, а не гипотетические сценарии.
+- **Оставь CI для CI.** Не перезапускай тесты, линтеры, форматтеры или тайпчекеры. Отметь статус CI, затем сосредоточься исключительно на функциональной проверке, которую CI не может выполнить.
+- **Сообщай доказательства, а не мнения.** Включай точные команды, выводы и сообщения об ошибках — внутри сворачиваемых блоков.
+- **Держи сканируемым.** Отчёт для занятых ревьюеров. Вердикт и резюме сверху, доказательства свёрнуты ниже. Не повторяй информацию между разделами.
+- **Сдавайся элегантно.** Если подход к проверке не сработал после трёх материально разных попыток, смени подход. Если два подхода не сработали, сдайся и честно сообщи. Предложи улучшения `AGENTS.md`.
+- **Уважай соглашения проекта.** Используй собственные инструменты и команды сборки проекта для настройки.

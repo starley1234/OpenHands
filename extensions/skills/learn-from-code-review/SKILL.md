@@ -1,139 +1,139 @@
 ---
 name: learn-from-code-review
-description: Distill code review feedback from GitHub PRs into reusable skills and guidelines. This skill should be used when users ask to "learn from code reviews", "distill PR feedback", "improve coding standards", "extract learnings from reviews", or want to generate skills/guidelines from historical review comments.
+description: Дистилляция фидбека ревью кода из GitHub PR в переиспользуемые навыки и рекомендации. Этот навык следует использовать, когда пользователи просят «учиться на ревью кода», «дистиллировать PR-фидбек», «улучшить стандарты кода», «извлечь уроки из ревью» или хотят сгенерировать навыки/рекомендации из исторических комментариев ревью.
 triggers:
 - /learn-from-reviews
 - learn from code review
 - distill reviews
 ---
 
-# Learn from Code Review
+# Учиться на ревью кода
 
-Analyze code review comments from GitHub pull requests and distill them into reusable skills or repository guidelines that improve future code quality.
+Анализируй комментарии ревью кода из GitHub-пул-реквестов и дистиллируй их в переиспользуемые навыки или рекомендации репозитория, улучшающие будущее качество кода.
 
-## Overview
+## Обзор
 
-Code review feedback contains valuable institutional knowledge that often gets buried across hundreds of PRs. This skill extracts meaningful patterns from review comments and transforms them into:
+Фидбек ревью кода содержит ценное институциональное знание, которое часто теряется среди сотен PR. Этот навык извлекает осмысленные паттерны из комментариев ревью и преобразует их в:
 
-1. **Repository-specific skills** - Placed in `.openhands/skills/` for domain-specific patterns
-2. **AGENTS.md guidelines** - Overall repository conventions and best practices
+1. **Специфичные для репозитория навыки** — размещаются в `.openhands/skills/` для доменных паттернов
+2. **Рекомендации AGENTS.md** — общие соглашения репозитория и лучшие практики
 
-## Prerequisites
+## Предварительные требования
 
-- `GITHUB_TOKEN` environment variable must be set
-- GitHub CLI (`gh`) should be available
+- Переменная окружения `GITHUB_TOKEN` должна быть установлена
+- GitHub CLI (`gh`) должен быть доступен
 
-## Workflow
+## Рабочий процесс
 
-### Step 1: Identify Target Repository
+### Шаг 1: Определи целевой репозиторий
 
-Determine the repository to analyze:
+Определи репозиторий для анализа:
 
 ```bash
-# Get current repo info
+# Получить информацию о текущем репозитории
 gh repo view --json nameWithOwner -q '.nameWithOwner'
 ```
 
-If not in a repository, ask the user which repository to analyze.
+Если ты не в репозитории, спроси пользователя, какой репозиторий анализировать.
 
-### Step 2: Fetch Review Comments
+### Шаг 2: Получи комментарии ревью
 
-Retrieve PR review comments from the repository:
+Получи комментарии ревью PR из репозитория:
 
 ```bash
-# Fetch merged PRs from the last 30 days (adjustable)
+# Получить слитые PR за последние 30 дней (настраивается)
 gh pr list --repo {owner}/{repo} \
   --state merged \
   --limit 50 \
   --json number,title,mergedAt
 
-# For each PR, fetch review comments
+# Для каждого PR получить комментарии ревью
 gh api repos/{owner}/{repo}/pulls/{pr_number}/comments \
   --jq '.[] | {body: .body, path: .path, user: .user.login, created_at: .created_at}'
 
-# Also fetch review-level comments (not tied to specific lines)
+# Также получить комментарии уровня ревью (не привязанные к конкретным строкам)
 gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
   --jq '.[] | select(.body != "") | {body: .body, user: .user.login, state: .state}'
 ```
 
-### Step 3: Filter and Categorize Comments
+### Шаг 3: Фильтрация и категоризация комментариев
 
-Apply noise filtering to keep only meaningful feedback:
+Примени фильтрацию шума, чтобы оставить только осмысленный фидбек:
 
-**Exclude:**
-- Bot comments (dependabot, copilot, github-actions, etc.)
-- Low-signal responses ("LGTM", "+1", "looks good", "thanks", "nice")
-- Comments shorter than 30 characters
-- Auto-generated comments (CI status, coverage reports)
+**Исключи:**
+- Комментарии ботов (dependabot, copilot, github-actions и т.д.)
+- Низкозначимые ответы («LGTM», «+1», «выглядит хорошо», «спасибо», «круто»)
+- Комментарии короче 30 символов
+- Авто-генерируемые комментарии (статус CI, отчёты о покрытии)
 
-**Categorize remaining comments by:**
-- Security concerns
-- Performance patterns
-- Code style/conventions
-- Architecture/design patterns
-- Error handling
-- Testing requirements
-- Documentation standards
+**Категоризируй оставшиеся комментарии по:**
+- Проблемам безопасности
+- Паттернам производительности
+- Стилю кода/соглашениям
+- Архитектурным/дизайн-паттернам
+- Обработке ошибок
+- Требованиям к тестированию
+- Стандартам документации
 
-### Step 4: Distill Patterns
+### Шаг 4: Дистилляция паттернов
 
-For each category with sufficient examples (3+ similar comments), identify:
+Для каждой категории с достаточным числом примеров (3+ похожих комментария) определи:
 
-1. **The recurring issue** - What mistake or oversight keeps appearing
-2. **The desired pattern** - What reviewers consistently ask for
-3. **Example context** - Concrete before/after code snippets when available
+1. **Повторяющуюся проблему** — какая ошибка или упущение появляется снова
+2. **Желаемый паттерн** — что ревьюеры последовательно просят
+3. **Пример контекста** — конкретные фрагменты до/после, когда доступны
 
-### Step 5: Generate Output
+### Шаг 5: Генерация вывода
 
-If clear, actionable patterns emerge, generate focused skill files. If no clear patterns emerge, report this to the user—it's fine to produce no output when the codebase already has strong conventions or when review comments don't cluster into recurring themes.
+Если выявлены чёткие, применимые паттерны, сгенерируй сфокусированные файлы навыков. Если чётких паттернов нет, сообщи это пользователю — ничего не выдать нормально, когда кодовая база уже имеет сильные соглашения или когда комментарии ревью не группируются в повторяющиеся темы.
 
-When creating skills, place them in `.openhands/skills/{domain-name}/SKILL.md`:
+При создании навыков размещай их в `.openhands/skills/{domain-name}/SKILL.md`:
 
 ```yaml
 ---
 name: database-queries
-description: Database query patterns and best practices for this repository.
+description: Паттерны запросов к базе данных и лучшие практики для этого репозитория.
 ---
 
-# Database Query Guidelines
+# Рекомендации по запросам к БД
 
-### Always Use Parameterized Queries
-[Pattern description with examples]
+### Всегда используй параметризованные запросы
+[Описание паттерна с примерами]
 
-### Connection Pool Management
-[Pattern description with examples]
+### Управление пулом соединений
+[Описание паттерна с примерами]
 ```
 
-Prefer skills over AGENTS.md updates, since AGENTS.md typically already contains general coding guidelines.
+Предпочитай навыки обновлению AGENTS.md, поскольку AGENTS.md обычно уже содержит общие рекомендации по коду.
 
-### Step 6: Create Draft PR (if applicable)
+### Шаг 6: Создание черновика PR (если применимо)
 
-Use the `create_pr` tool to open a draft PR with the proposed changes. The PR description should include:
-- Number of PRs analyzed
-- Number of comments processed
-- Categories of patterns found
-- List of proposed changes (new skills and/or AGENTS.md updates)
+Используй инструмент `create_pr` для открытия чернового PR с предлагаемыми изменениями. Описание PR должно включать:
+- Количество проанализированных PR
+- Количество обработанных комментариев
+- Категории найденных паттернов
+- Список предлагаемых изменений (новые навыки и/или обновления AGENTS.md)
 
-## Example Output
+## Пример вывода
 
-### Sample Skill: API Error Handling
+### Пример навыка: Обработка ошибок API
 
 ```yaml
 ---
 name: api-error-handling
-description: API error handling patterns for this repository.
+description: Паттерны обработки ошибок API для этого репозитория.
 ---
 
-# API Error Handling
+# Обработка ошибок API
 
-## Always Return Structured Errors
+## Всегда возвращай структурированные ошибки
 
-❌ Avoid:
+❌ Избегай:
 ```python
 return {"error": str(e)}
 ```
 
-✅ Prefer:
+✅ Предпочитай:
 ```python
 return {
     "error": {
@@ -144,7 +144,7 @@ return {
 }
 ```
 
-## Log Before Returning Errors
+## Логируй перед возвратом ошибок
 
 ```python
 logger.error(f"API error in {endpoint}: {e}", exc_info=True)
@@ -152,35 +152,35 @@ return error_response(e)
 ```
 ```
 
-## Defaults
+## Значения по умолчанию
 
-This workflow analyzes PRs from the past 30 days by default.
+Этот рабочий процесс по умолчанию анализирует PR за последние 30 дней.
 
-## Best Practices
+## Лучшие практики
 
-1. **Run periodically** - Schedule monthly or quarterly to capture evolving patterns
-2. **Review before merging** - Generated content is a draft; human review is essential
-3. **Iterate** - Refine patterns based on team feedback
-4. **Avoid duplication** - Check existing AGENTS.md and skills before adding
-5. **Cite sources** - Reference PR numbers when documenting patterns
+1. **Запускай периодически** — планируй ежемесячно или ежеквартально, чтобы улавливать эволюцию паттернов
+2. **Просматривай перед слиянием** — сгенерированное содержимое — это черновик; ревью человеком обязательно
+3. **Итерируй** — уточняй паттерны на основе фидбека команды
+4. **Избегай дублирования** — проверяй существующие AGENTS.md и навыки перед добавлением
+5. **Цитируй источники** — ссылайся на номера PR при документировании паттернов
 
-## Error Handling
+## Обработка ошибок
 
-Handle these common edge cases gracefully:
+Обрабатывай эти частые крайние случаи корректно:
 
-- **Repository has few PRs**: If fewer than 10 merged PRs exist in the timeframe, inform the user that there may not be enough data to identify patterns. Proceed with analysis but note the limited sample size.
-- **No patterns emerge**: When comments don't cluster into recurring themes (common for well-established codebases), report this to the user and suggest either expanding the time range or that the codebase may already have strong conventions.
-- **Token lacks repository access**: If the GitHub API returns 403/404, explain that the token may not have access to the repository and suggest checking token permissions.
-- **`gh` CLI unavailable**: Fall back to direct GitHub API calls using `curl` with `$GITHUB_TOKEN`, or inform the user that `gh` needs to be installed.
+- **В репозитории мало PR**: Если за период существует меньше 10 слитых PR, сообщи пользователю, что данных может быть недостаточно для выявления паттернов. Продолжай анализ, но отметь ограниченный размер выборки.
+- **Паттернов не выявлено**: Когда комментарии не группируются в повторяющиеся темы (часто для устоявшихся кодовых баз), сообщи об этом пользователю и предложи либо расширить временной диапазон, либо отметь, что кодовая база может уже иметь сильные соглашения.
+- **У токена нет доступа к репозиторию**: Если GitHub API возвращает 403/404, объясни, что токен может не иметь доступа к репозиторию, и предложи проверить права токена.
+- **`gh` CLI недоступен**: Перейди на прямые вызовы GitHub API через `curl` с `$GITHUB_TOKEN` или сообщи пользователю, что нужно установить `gh`.
 
-## Limitations
+## Ограничения
 
-- Only analyzes accessible repositories (requires appropriate permissions)
-- Cannot capture verbal feedback from pair programming or meetings
-- Patterns may reflect individual reviewer preferences vs. team consensus
-- Historical comments may reference outdated code patterns
+- Анализирует только доступные репозитории (требуются соответствующие права)
+- Не может уловить вербальный фидбек от парного программирования или встреч
+- Паттерны могут отражать личные предпочтения отдельных ревьюеров, а не консенсус команды
+- Исторические комментарии могут ссылаться на устаревшие паттерны кода
 
-## Additional Resources
+## Дополнительные ресурсы
 
-For posting structured code reviews, see the `github-pr-review` skill.
-For creating new skills, see the `skill-creator` skill.
+Для публикации структурированных ревью кода см. навык `github-pr-review`.
+Для создания новых навыков см. навык `skill-creator`.

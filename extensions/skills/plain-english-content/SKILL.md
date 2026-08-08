@@ -1,78 +1,78 @@
 ---
 name: plain-english-content
 description: >
-  This skill should be used when the user asks to "write in plain English",
-  "make this easier to read", "rewrite guidance", "improve report clarity",
-  or produce accessible public-facing prose. It applies plain English content
-  design principles: active voice, front-loaded content, sentence case, and no
-  bold or italics for emphasis.
+  Этот навык следует использовать, когда пользователь просит «написать простым английским языком»,
+  «сделать это легче для чтения», «переписать руководство», «улучшить ясность отчёта»
+  или создать доступную публичную прозу. Он применяет принципы дизайна контента на простом
+  английском: активный залог, контент с приоритетом главного, строчные буквы и отсутствие
+  жирного/курсива для выделения.
 license: MIT
 triggers:
   - plain English
 ---
 
-Open content up so anyone can understand it the first time they read it, without losing substance, nuance or precision. Aim to open up, not dumb down. Apply the GOV.UK style guide approach: plain English, user needs first, active voice, front-loaded structure and accessible formatting.
+Открой контент, чтобы каждый понял его с первого прочтения, не теряя сути, нюансов или точности. Стремись открыть, а не упростить. Применяй подход руководства GOV.UK: простой английский, приоритет потребностей пользователя, активный залог, структура с приоритетом главного и доступное форматирование.
 
-Use this skill for reports, research write-ups, guidance, documentation, summaries, and public-facing prose where clarity and accessibility matter. When writing a report, default to this style. When briefing a research agent, pass this skill so the report follows the same style.
+Используй этот навык для отчётов, исследовательских записей, руководств, документации, резюме и публичной прозы, где важны ясность и доступность. При написании отчёта по умолчанию используй этот стиль. При постановке задачи исследовательскому агенту передай этот навык, чтобы отчёт следовал тому же стилю.
 
-## Content design principles
+## Принципы дизайна контента
 
-- Start from the user need. Write what the reader needs to know to do or decide something, not what the writer wants to say.
-- Front-load everything. Put the most important point first in the document, each section, each paragraph and each sentence. Use the inverted pyramid: conclusion first, then detail, then background.
-- Keep one idea per sentence and one topic per paragraph. Split sentences that contain more than one idea.
-- Be specific and concrete. Give the number, name and date. Cut vague abstractions like "a range of", "going forward" and "in terms of".
-- Cut everything that does not add meaning. Shorter is clearer. Remove duplication.
+- Начинай с потребности пользователя. Пиши то, что читателю нужно знать, чтобы сделать или решить что-то, а не то, что хочет сказать писатель.
+- Всё с приоритетом главного. Ставь самый важный пункт первым в документе, каждом разделе, каждом абзаце и каждом предложении. Используй перевёрнутую пирамиду: вывод в начале, затем детали, затем контекст.
+- Одна идея на предложение и одна тема на абзац. Разделяй предложения, содержащие более одной идеи.
+- Будь конкретным и определённым. Указывай число, имя и дату. Убирай расплывчатые абстракции вроде «ряд», «в дальнейшем» и «в плане».
+- Убирай всё, что не добавляет смысла. Короче — яснее. Устраняй дублирование.
 
-## Plain English
+## Простой английский
 
-- Open content up, do not dumb it down. Keep the substance, nuance and precision. Strip out only what makes it hard to read: jargon, long sentences, abstract nouns and tangled structure. Make the content clear enough for a non-specialist and precise enough for an expert.
-- Use the active voice. Say who does what. Write "We reviewed the data", not "The data was reviewed".
-- Keep sentences short: about 15 to 20 words, and rarely more than 25. Keep paragraphs short.
-- Use everyday words. Replace jargon and formal wording with plain alternatives:
-  - use, not utilise or leverage
-  - help, not facilitate or empower
-  - work with, not collaborate, liaise or engage with
-  - make or provide, not deliver
-  - about, not in relation to or with regard to
-  - so, not in order to
-  - start, not commence
-  - end, not terminate
-  - buy, not purchase
-  - enough, not sufficient
-  - solve, fix or deal with, not tackle or combat
-  - effect on, not impact on
-- Do not use impact as a verb.
-- Avoid metaphors and cliches: drive, unlock, deep dive, robust, key, ring-fence, hub, portal, landscape, ecosystem and going forward.
-- Address the reader as "you". Write about the organisation as "we". Use "they", "them" and "their" rather than gendered pronouns. Write "disabled people", not "the disabled".
-- Use contractions for a warmer tone when appropriate, such as "we'll" and "you'll". Avoid negative contractions: write "cannot", not "can't". Avoid "should've", "could've" and "would've".
+- Открой контент, не упрощай его. Сохраняй суть, нюансы и точность. Убирай только то, что затрудняет чтение: жаргон, длинные предложения, абстрактные существительные и запутанную структуру. Сделай контент достаточно ясным для неспециалиста и достаточно точным для эксперта.
+- Используй активный залог. Говори, кто что делает. Пиши «Мы проанализировали данные», а не «Данные были проанализированы».
+- Держи предложения короткими: около 15–20 слов и редко больше 25. Держи абзацы короткими.
+- Используй повседневные слова. Заменяй жаргон и формальные формулировки простыми альтернативами:
+  - use, а не utilise или leverage
+  - help, а не facilitate или empower
+  - work with, а не collaborate, liaise или engage with
+  - make или provide, а не deliver
+  - about, а не in relation to или with regard to
+  - so, а не in order to
+  - start, а не commence
+  - end, а не terminate
+  - buy, а не purchase
+  - enough, а не sufficient
+  - solve, fix или deal with, а не tackle или combat
+  - effect on, а не impact on
+- Не используй impact как глагол.
+- Избегай метафор и клише: drive, unlock, deep dive, robust, key, ring-fence, hub, portal, landscape, ecosystem и going forward.
+- Обращайся к читателю как «вы». Пиши об организации как «мы». Используй «они», «их» вместо местоимений по гендерному признаку. Пиши «люди с инвалидностью», а не «инвалиды».
+- Используй сокращения для более тёплого тона, когда уместно, например «we'll» и «you'll». Избегай отрицательных сокращений: пиши «cannot», а не «can't». Избегай «should've», «could've» и «would've».
 
-## Formatting
+## Форматирование
 
-- Do not use bold or italics for emphasis. Plain words and good structure carry the meaning. Use bold only for a literal interface element in an instruction, for example: select Save. Use single quotation marks for the titles of schemes or documents, not italics.
-- Use sentence case everywhere: headings, titles and table headers. Capitalise only proper nouns.
-- Front-load headings, keep them under about 65 characters, and make them unique and descriptive. Do not use a full stop, dash, slash or question mark in headings. Use headings to help readers skim.
-- Introduce bullet lists with a lead-in line that ends in a colon. Start each bullet lowercase. Keep each bullet to one idea. Do not put "and" or "or" after each bullet. Do not use semicolons. Do not use a full stop after the last bullet unless the bullet is a full sentence.
-- Use a numbered list only for steps readers must follow in order. Write steps as full sentences that end with a full stop. Do not use a lead-in colon.
-- Use descriptive link text that says where the link goes and front-loads the key words. Never write "click here" or "read more". Make link text understandable out of context.
-- Do not use Latin abbreviations. Write "for example" not "eg", "that is" not "ie", and "and so on" or "such as" not "etc". Latin abbreviations confuse some readers and screen readers.
-- Write "and", not "&", except in a registered name or logo.
-- Write "one", but use numerals from 2 upwards. Use the % symbol with numerals, such as 50%. Use £ with no decimals unless there are pence: £75, £75.50. Spell out millions and billions, such as £5 million. Write ranges with "to", not a hyphen: 10 to 20, Monday to Friday.
-- Write dates as "4 June 2026" with no comma or ordinal suffix. Use "to" for ranges, such as "4 to 8 June". Write times as "10am to 11.30am". Use "midday" and "midnight".
-- Do not use FAQs when the content can meet the user need directly. Do not use exclamation marks. Do not use all caps for emphasis.
+- Не используй жирный или курсив для выделения. Простые слова и хорошая структура несут смысл. Используй жирный только для буквального элемента интерфейса в инструкции, например: выберите Сохранить. Используй одинарные кавычки для названий схем или документов, а не курсив.
+- Используй строчные буквы везде: в заголовках, названиях и заголовках таблиц. Заглавные — только у имён собственных.
+- Заголовки с приоритетом главного, длиной до ~65 символов, уникальные и описательные. Не используй точку, тире, слэш или вопросительный знак в заголовках. Используй заголовки, чтобы помочь читателю бегло просматривать.
+- Вводи маркированные списки строкой-подводкой, заканчивающейся двоеточием. Начинай каждый пункт со строчной буквы. Держи каждый пункт на одной идее. Не ставь «и» или «или» после каждого пункта. Не используй точки с запятой. Не ставь точку после последнего пункта, если только пункт не является полным предложением.
+- Используй нумерованный список только для шагов, которые читатель должен выполнить по порядку. Пиши шаги полными предложениями, заканчивающимися точкой. Не используй двоеточие-подводку.
+- Используй описательный текст ссылок, говорящий, куда ведёт ссылка, с ключевыми словами в начале. Никогда не пиши «нажмите здесь» или «читать дальше». Делай текст ссылки понятным вне контекста.
+- Не используй латинские сокращения. Пиши «for example» вместо «eg», «that is» вместо «ie», «and so on» или «such as» вместо «etc». Латинские сокращения путают некоторых читателей и программы чтения с экрана.
+- Пиши «and», а не «&», кроме зарегистрированного имени или логотипа.
+- Пиши «one», но используй цифры от 2 и выше. Используй символ % с цифрами, например 50%. Используй £ без десятичных, если нет пенсов: £75, £75.50. Пиши миллионы и миллиарды словами, например £5 million. Пиши диапазоны с «to», а не дефисом: 10 to 20, Monday to Friday.
+- Пиши даты как «4 June 2026» без запятой или порядкового суффикса. Используй «to» для диапазонов, например «4 to 8 June». Пиши время как «10am to 11.30am». Используй «midday» и «midnight».
+- Не используй FAQ, когда контент может удовлетворить потребность пользователя напрямую. Не используй восклицательные знаки. Не используй ЗАГЛАВНЫЕ буквы для выделения.
 
-## Before finishing: self-check
+## Перед завершением: самопроверка
 
-- Is the single most important thing first?
-- Could a non-expert understand every sentence on first read?
-- Is every sentence active, short and focused on one idea?
-- Have all bold or italic emphasis, jargon, Latin abbreviations and marketing language been removed?
-- Is everything in sentence case, with descriptive headings and links?
-- Can any more words be cut without losing meaning? If yes, cut them.
+- Самое важное стоит первым?
+- Сможет ли неспециалист понять каждое предложение с первого прочтения?
+- Каждое ли предложение активное, короткое и сосредоточено на одной идее?
+- Убраны ли все жирные/курсивные выделения, жаргон, латинские сокращения и маркетинговый язык?
+- Всё ли в строчных буквах, с описательными заголовками и ссылками?
+- Можно ли убрать ещё какие-то слова без потери смысла? Если да — убери их.
 
-## Scope note
+## Примечание о сфере применения
 
-The no-bold and formatting rules apply to produced prose, such as reports, guidance and summaries. Keep the conventions of code, data tables and direct quotations. Markdown headings and lists are acceptable because they provide structure, not emphasis.
+Правила без жирного и форматирования применяются к создаваемой прозе, такой как отчёты, руководства и резюме. Сохраняй соглашения кода, таблиц данных и прямых цитат. Markdown-заголовки и списки допустимы, потому что они дают структуру, а не выделение.
 
-## Source
+## Источник
 
-Imported and adapted from the public gist at https://gist.github.com/fofr/505e225f9bf5e839d30c12ba6bfa0be2.
+Импортировано и адаптировано из публичного gist по адресу https://gist.github.com/fofr/505e225f9bf5e839d30c12ba6bfa0be2.
