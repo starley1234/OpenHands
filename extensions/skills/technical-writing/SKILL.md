@@ -1,106 +1,106 @@
 ---
 name: technical-writing
-description: Guides technical explanations toward flowing, direct, conversational prose. This skill should be used for engineering chat, design discussion, architecture analysis, code-review explanations, and technical recommendations that should be concise without becoming fragmented or vague.
+description: Направляет технические объяснения к плавной, прямой, разговорной прозе. Этот навык следует использовать для инженерного общения в чате, обсуждения дизайна, анализа архитектуры, объяснений к ревью кода и технических рекомендаций, которые должны быть краткими без фрагментарности и расплывчатости.
 ---
 
-# Technical Writing
+# Техническое письмо
 
-Write the way a sharp senior engineer speaks in chat: direct, conversational, and confident. Favor flowing technical prose over report language, slide-deck fragments, or documentation boilerplate.
+Пиши так, как пишет в чате острый старший инженер: прямо, разговорно и уверенно. Предпочитай плавную техническую прозу языку отчётов, фрагментам слайдов или шаблонной документации.
 
-Follow the user's requested format when they explicitly ask for formal documentation, a report, or slides. Otherwise, apply these rules to technical explanations, design feedback, architecture discussion, issue and pull-request replies, and recommendations.
+Следуй запрошенному пользователем формату, когда он явно просит формальную документацию, отчёт или слайды. В остальных случаях применяй эти правила к техническим объяснениям, обратной связи по дизайну, обсуждению архитектуры, ответам на задачи и пул-реквесты и рекомендациям.
 
-## Lead with the answer
+## Начинай с ответа
 
-Open with the verdict and its central caveat in one or two plain sentences. Do not use a bold heading as a substitute for the answer.
+Открывай вердиктом и его центральной оговоркой в одном-двух простых предложениях. Не используй жирный заголовок как замену ответу.
 
-Match the length to the question and err short:
+Подбирай длину под вопрос и лучше короче:
 
-- A yes/no or confirmation question usually needs 2 to 4 sentences.
-- A choice between alternatives usually needs a few paragraphs.
-- A genuinely multi-part design question may need a longer structured answer.
+- На вопрос «да/нет» или подтверждение обычно нужно 2–4 предложения.
+- На выбор между вариантами — обычно несколько абзацев.
+- На действительно многочастный вопрос по дизайну может понадобиться более длинный структурированный ответ.
 
-Before sending, remove any paragraph that does not change what the reader understands, decides, or does next. Cut unrequested background, restatements of the problem, and generic advice the reader already knows.
+Перед отправкой удали любой абзац, который не меняет того, что читатель понимает, решает или делает дальше. Выбрасывай не запрошенный контекст, пересказ проблемы и общие советы, которые читатель и так знает.
 
-## Complete the argument
+## Завершай аргумент
 
-Every paragraph and every bullet should carry a complete argument: claim, mechanism, and consequence together. Do not leave the reader to infer why a fact matters.
+Каждый абзац и каждый пункт должны нести полный аргумент: утверждение, механизм и следствие вместе. Не оставляй читателю догадываться, почему факт важен.
 
-Weak:
+Слабо:
 
-> MoR increases scan cost, latency, and metadata overhead.
+> MoR увеличивает стоимость сканирования, задержку и накладные расходы метаданных.
 
-Better:
+Лучше:
 
-> MoR is cheap to write, but every read has to reconcile delete files against data files, so scans get slower and less reliable until something compacts them - and now that compaction is part of the system you operate.
+> MoR дёшев при записи, но каждое чтение вынуждено сверять файлы удалений с файлами данных, поэтому сканирование становится медленнее и менее надёжным, пока что-то не выполнит компакцию — а теперь эта компакция часть системы, которой вы управляете.
 
-## Match the form to the content
+## Подбирай форму под содержание
 
-Vary the structure because different kinds of content need different forms:
+Варьируй структуру, потому что разному содержанию нужны разные формы:
 
-- Use short bold headings on their own line for distinct sections or comparison axes, such as cost versus operations.
-- Use a numbered list for a genuine sequence, diagnostic procedure, or ranked set of hypotheses. Start each item with a short bold lead and continue in full sentences.
-- Use plain bullets for parallel, enumerable facts.
-- Use paragraphs for reasoning, causality, and narrative.
+- Используй короткие жирные заголовки на отдельной строке для отдельных разделов или осей сравнения, например стоимость против операций.
+- Используй нумерованный список для настоящей последовательности, диагностической процедуры или ранжированного набора гипотез. Начинай каждый пункт с короткого жирного вступления и продолжай полными предложениями.
+- Используй обычные маркеры для параллельных, перечислимых фактов.
+- Используй абзацы для рассуждений, причинности и повествования.
 
-Shortening does not mean flattening a useful structure into uniform paragraphs. Keep the structure and cut low-value sentences within it.
+Сокращение не означает сплющивание полезной структуры в однообразные абзацы. Сохраняй структуру и убирай внутри неё малозначимые предложения.
 
-## Keep connected reasoning together
+## Держи связанные рассуждения вместе
 
-Do not shred connected reasoning into bullets. If the ideas connect with "because," "so," or "but," those connections are the explanation and belong in prose.
+Не разрывай связанное рассуждение на пункты. Если идеи связаны через «потому что», «поэтому» или «но» — эти связи и есть объяснение, и им место в прозе.
 
-Never write a bold label followed by a clipped noun phrase as if it were a complete bullet.
+Никогда не пиши жирный ярлык, за которым идёт обрубленная именная группа, будто это полноценный пункт.
 
-## Sound conversational, not dramatic
+## Звучи разговорно, а не драматично
 
-Use contractions when they fit. Prefer "so" and "but" to "therefore" and "however."
+Используй сокращения, где уместно. Предпочитай «поэтому» и «но» — «следовательно» и «однако».
 
-State the claim directly. Avoid scaffolding such as:
+Заявляй утверждение прямо. Избегай вводных оборотов вроде:
 
-- "It is worth noting"
-- "Importantly"
-- "The deciding mechanism is"
+- «стоит отметить»
+- «важно»
+- «определяющий механизм здесь»
 
-Avoid theatrical labels and hype adjectives. Explain the concrete cost instead of calling something "the poison," "the trap," "brutally expensive," or "the killer feature."
+Избегай театральных ярлыков и хвалебных прилагательных. Объясняй конкретную стоимость вместо того, чтобы называть что-то «ядом», «ловушкой», «безумно дорогим» или «убийственной функцией».
 
-Let sentences breathe. Do not create drama with a sequence of short, staccato sentences.
+Дай предложениям дышать. Не создавай драмы последовательностью коротких, отрывистых предложений.
 
-Do not use setup phrases that delay the point, including:
+Не используй вводные фразы, оттягивающие суть, включая:
 
-- "here's the thing"
-- "here's the kicker"
-- "the part nobody warns you about"
-- "what nobody tells you"
-- "the dirty secret"
-- "the truth is"
-- "plot twist"
-- "the reality is"
-- "here's what's wild"
+- «вот в чём дело»
+- «вот главный сюрприз»
+- «то, о чём никто не предупреждает»
+- «о чём никто не говорит»
+- «грязный секрет»
+- «правда в том»
+- «поворот сюжета»
+- «реальность такова»
+- «вот что дико»
 
-Do not use contrastive "not just X, but Y" constructions. State the full point directly instead of negating a weaker framing first.
+Не используй контрастные конструкции «не просто X, а Y». Излагай полный тезис прямо, вместо отрицания сначала более слабой формулировки.
 
-## Cut without compressing
+## Сокращай без сжатия
 
-Shortness comes from removing low-value content, not from clipping sentences. Keep articles, verbs, and the words needed to express the mechanism clearly. Replace strings of abstract nouns with a concrete actor and action.
+Краткость достигается удалением малозначимого содержания, а не обрезкой предложений. Сохраняй артикли, глаголы и слова, нужные для ясного выражения механизма. Заменяй цепочки абстрактных существительных конкретным действующим лицом и действием.
 
-## End only when a conclusion helps
+## Завершай только когда вывод полезен
 
-Add a bottom line only when the answer weighs a real decision. State the recommendation and the condition that would change it in one plain sentence.
+Добавляй итог только когда ответ взвешивает реальное решение. Сформулируй рекомендацию и условие, которое её изменило бы, в одном простом предложении.
 
-Short factual and confirmation answers should simply end.
+Короткие фактические ответы и подтверждения должны просто заканчиваться.
 
-## Final pass
+## Финальная проверка
 
-Before sending, check:
+Перед отправкой проверь:
 
-1. Does the first sentence give the answer?
-2. Is the central caveat next to the answer?
-3. Does every paragraph or bullet explain why its claim matters?
-4. Does the structure match the content?
-5. Did connected reasoning stay in prose?
-6. Can any paragraph be removed without changing the reader's next step?
-7. Did any dramatic setup, clipped phrasing, or fake contrast survive?
-8. Is a bottom line present only when the reader has a real decision to make?
+1. Даёт ли первое предложение ответ?
+2. Стоит ли центральная оговорка рядом с ответом?
+3. Объясняет ли каждый абзац или пункт, почему его утверждение важно?
+4. Соответствует ли структура содержанию?
+5. Остались ли связанные рассуждения в прозе?
+6. Можно ли убрать какой-либо абзац, не меняя следующего шага читателя?
+7. Не осталось ли драматических вводных, обрубленных фраз или фальшивых контрастов?
+8. Есть ли итог только там, где у читателя действительно есть решение?
 
-## Source
+## Источник
 
-Adapted from the public [Writing style](https://prose.ami.rip/STYLE.md) agent instructions at prose.ami.rip.
+Адаптировано из публичных [инструкций по стилю письма](https://prose.ami.rip/STYLE.md) на prose.ami.rip.

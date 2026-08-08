@@ -1,81 +1,80 @@
 ---
 name: research-brief
 description: >
-  Create an automation that writes a recurring research brief. Uses Tavily
-  MCP for web research and Notion MCP to publish the final brief with
-  executive summary, implications, and source citations.
+  Создание автоматизации, которая готовит регулярный исследовательский обзор. Использует
+  Tavily MCP для веб-исследований и Notion MCP для публикации итогового обзора с резюме,
+  выводами и цитированием источников.
 triggers:
   - /research-brief:setup
 ---
 
-# Research Brief Writer Automation
+# Автоматизация написания исследовательских обзоров
 
-Set up a recurring automation that researches a topic and publishes a brief
-to Notion.
-
----
-
-## Prerequisites
-
-### Required integrations
-
-Both MCP integrations must be installed in Settings → MCP:
-
-- **Tavily MCP** — for web research and source gathering
-- **Notion MCP** — to publish the research brief
-
-### Information to collect
-
-Ask the user for:
-
-1. **Topic** — what should be researched (e.g. "AI code review tools", "competitor pricing changes")
-2. **Keywords and competitors** — specific terms, companies, or products to track
-3. **Source quality rules** — any preferences on source types (e.g. prefer academic papers, exclude social media)
-4. **Cadence** — how often should the brief run? (daily, weekly, bi-weekly)
-5. **Notion destination** — which Notion database or page should receive the brief
-6. **Citation style** — inline links, footnotes, or a references section
-7. **Brief structure** — default: Executive Summary, Key Findings, Implications, Recommended Actions, Sources
+Настрой регулярную автоматизацию, которая исследует тему и публикует обзор в Notion.
 
 ---
 
-## Setup Workflow
+## Предварительные требования
 
-### Step 1 — Verify MCP access
+### Необходимые интеграции
 
-Test each integration:
+Обе MCP-интеграции должны быть установлены в Settings → MCP:
+
+- **Tavily MCP** — для веб-исследований и сбора источников
+- **Notion MCP** — для публикации исследовательского обзора
+
+### Информация для сбора
+
+Спроси у пользователя:
+
+1. **Тема** — что нужно исследовать (например «инструменты AI-ревью кода», «изменения цен конкурентов»)
+2. **Ключевые слова и конкуренты** — конкретные термины, компании или продукты для отслеживания
+3. **Правила качества источников** — любые предпочтения по типам источников (например предпочитать научные статьи, исключить соцсети)
+4. **Периодичность** — как часто должен выходить обзор? (ежедневно, еженедельно, раз в две недели)
+5. **Назначение в Notion** — в какую базу данных или на какую страницу Notion отправлять обзор
+6. **Стиль цитирования** — инлайн-ссылки, сноски или раздел источников
+7. **Структура обзора** — по умолчанию: Резюме, Ключевые выводы, Выводы, Рекомендуемые действия, Источники
+
+---
+
+## Рабочий процесс настройки
+
+### Шаг 1 — Проверка доступа к MCP
+
+Протестируй каждую интеграцию:
 ```
-Use the Tavily MCP to search for a sample topic.
-Use the Notion MCP to search for the destination database.
+Используй Tavily MCP для поиска по примеру темы.
+Используй Notion MCP для поиска целевой базы данных.
 ```
 
-If any fail, tell the user which integration needs to be installed first.
+Если что-то не работает, сообщи пользователю, какую интеграцию нужно установить первой.
 
-### Step 2 — Configure the schedule
+### Шаг 2 — Настройка расписания
 
-Based on the user's cadence preference, build a cron schedule:
-- Daily: `0 8 * * 1-5` (weekday mornings)
-- Weekly: `0 9 * * 1` (Monday morning)
-- Bi-weekly: `0 9 1,15 * *` (1st and 15th)
+Исходя из предпочтений пользователя по периодичности, составь cron-расписание:
+- Ежедневно: `0 8 * * 1-5` (утро в будни)
+- Еженедельно: `0 9 * * 1` (утро в понедельник)
+- Раз в две недели: `0 9 1,15 * *` (1-го и 15-го числа)
 
-Ask for timezone preference.
+Уточни предпочтительный часовой пояс.
 
-### Step 3 — Build the research prompt
+### Шаг 3 — Составление промпта исследования
 
-Construct a prompt that includes:
-- Research topic and keywords
-- Competitor/entity tracking list
-- Source quality preferences
-- Brief structure template
-- Notion destination details
-- Citation format
+Собери промпт, который включает:
+- Тему и ключевые слова исследования
+- Список отслеживаемых конкурентов/сущностей
+- Предпочтения по качеству источников
+- Шаблон структуры обзора
+- Данные о назначении в Notion
+- Формат цитирования
 
-### Step 4 — Create the automation
+### Шаг 4 — Создание автоматизации
 
-Read the Automation backend URL and auth from `<RUNTIME_SERVICES>`:
-- Use the **Automation backend** `url_from_agent` as `OPENHANDS_HOST`
-- Auth: `X-Session-API-Key: $OPENHANDS_AUTOMATION_API_KEY`
+Прочитай URL бэкенда автоматизации и авторизацию из `<RUNTIME_SERVICES>`:
+- Используй `url_from_agent` бэкенда **Automation** как `OPENHANDS_HOST`
+- Авторизация: `X-Session-API-Key: $OPENHANDS_AUTOMATION_API_KEY`
 
-Use the **prompt preset** endpoint:
+Используй эндпоинт **промпт-пресета**:
 ```bash
 curl -s -X POST "${OPENHANDS_HOST}/api/automation/v1/preset/prompt" \
   -H "X-Session-API-Key: $OPENHANDS_AUTOMATION_API_KEY" \
@@ -87,15 +86,15 @@ curl -s -X POST "${OPENHANDS_HOST}/api/automation/v1/preset/prompt" \
   }'
 ```
 
-PowerShell note: use `curl.exe` for this exact flag syntax, and replace `${OPENHANDS_HOST}` / `$OPENHANDS_AUTOMATION_API_KEY` with `$env:OPENHANDS_HOST` / `$env:OPENHANDS_AUTOMATION_API_KEY` if running it natively.
+Примечание для PowerShell: используй `curl.exe` для этого точного синтаксиса флагов, а `${OPENHANDS_HOST}` / `$OPENHANDS_AUTOMATION_API_KEY` замени на `$env:OPENHANDS_HOST` / `$env:OPENHANDS_AUTOMATION_API_KEY`, если запускаешь нативно.
 
-### Step 5 — Confirm
+### Шаг 5 — Подтверждение
 
-Tell the user:
-> ✅ **Research Brief Writer** is running!
+Сообщи пользователю:
+> ✅ **Research Brief Writer** запущен!
 >
-> - Automation ID: `{id}`
-> - Topic: `{topic}`
-> - Schedule: `{cron description}`
-> - Notion destination: `{destination}`
-> - Citation style: `{style}`
+> - ID автоматизации: `{id}`
+> - Тема: `{topic}`
+> - Расписание: `{cron description}`
+> - Назначение в Notion: `{destination}`
+> - Стиль цитирования: `{style}`

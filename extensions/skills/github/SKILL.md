@@ -1,60 +1,60 @@
 ---
 name: github
-description: Interact with GitHub repositories, pull requests, issues, and workflows using the GITHUB_TOKEN environment variable and GitHub CLI. Use when working with code hosted on GitHub or managing GitHub resources.
+description: Взаимодействие с репозиториями GitHub, пул-реквестами, задачами и воркфлоу с помощью переменной окружения GITHUB_TOKEN и GitHub CLI. Используй при работе с кодом, размещённым на GitHub, или управлении ресурсами GitHub.
 triggers:
 - github
 ---
 
-You have access to an environment variable, `GITHUB_TOKEN`, which allows you to interact with
-the GitHub API.
+У тебя есть доступ к переменной окружения `GITHUB_TOKEN`, которая позволяет взаимодействовать с
+GitHub API.
 
 <IMPORTANT>
-You can use `curl` with the `GITHUB_TOKEN` to interact with GitHub's API.
-ALWAYS use the GitHub API for operations instead of a web browser.
-ALWAYS use the `create_pr` tool to open a pull request
-If the user asks you to check GitHub Actions status, first try to use `gh` to work with workflows, and only fallback to basic API calls if that fails.
-Examples:
-- `gh run watch` (https://cli.github.com/manual/gh_run_watch) to monitor workflow runs
-- `gh pr checks 200 --watch --interval 10` to check until completed.
+Для работы с GitHub API ты можешь использовать `curl` с `GITHUB_TOKEN`.
+ВСЕГДА используй GitHub API для операций вместо веб-браузера.
+ВСЕГДА используй инструмент `create_pr` для открытия пул-реквеста.
+Если пользователь просит проверить статус GitHub Actions, сначала попробуй использовать `gh` для работы с воркфлоу и переходи к базовым API-вызовам только если это не сработает.
+Примеры:
+- `gh run watch` (https://cli.github.com/manual/gh_run_watch) для отслеживания запусков воркфлоу
+- `gh pr checks 200 --watch --interval 10` для проверки до завершения.
 </IMPORTANT>
 
-Windows PowerShell equivalents for the multi-line shell snippets below are in `references/windows.md`.
+Эквиваленты для Windows PowerShell для многострочных фрагментов shell ниже находятся в `references/windows.md`.
 
-If you encounter authentication issues when pushing to GitHub (such as password prompts or permission errors), the old token may have expired. In such case, update the remote URL to include the current token: `git remote set-url origin https://${GITHUB_TOKEN}@github.com/username/repo.git`
+Если при push на GitHub возникают проблемы с аутентификацией (например, запросы пароля или ошибки прав), возможно, старый токен истёк. В таком случае обнови URL удалённого репозитория, включив текущий токен: `git remote set-url origin https://${GITHUB_TOKEN}@github.com/username/repo.git`
 
-Here are some instructions for pushing, but ONLY do this if the user asks you to:
-* NEVER push directly to the `main` or `master` branch
-* Git config (username and email) is pre-set. Do not modify.
-* You may already be on a branch starting with `openhands-workspace`. Create a new branch with a better name before pushing.
-* Use the `create_pr` tool to create a pull request, if you haven't already
-* Once you've created your own branch or a pull request, continue to update it. Do NOT create a new one unless you are explicitly asked to. Update the PR title and description as necessary, but don't change the branch name.
-* Use the main branch as the base branch, unless the user requests otherwise
-* After opening or updating a pull request, send the user a short message with a link to the pull request.
-* Do NOT mark a pull request as ready to review unless the user explicitly says so
-* Do all of the above in as few steps as possible. E.g. you could push changes with one step by running the following bash commands:
+Вот несколько инструкций по push, но делай это ТОЛЬКО если пользователь просит:
+* НИКОГДА не пуши прямо в ветку `main` или `master`
+* Git-конфиг (имя пользователя и email) уже настроен. Не изменяй его.
+* Возможно, ты уже на ветке, начинающейся с `openhands-workspace`. Создай новую ветку с лучшим именем перед push.
+* Используй инструмент `create_pr` для создания пул-реквеста, если ещё не сделал этого.
+* После создания своей ветки или пул-реквеста продолжай обновлять его. НЕ создавай новый, если тебя явно об этом не просят. Обновляй заголовок и описание PR при необходимости, но не меняй имя ветки.
+* Используй `main` как базовую ветку, если пользователь не просит иное.
+* После открытия или обновления пул-реквеста отправь пользователю короткое сообщение со ссылкой на пул-реквест.
+* НЕ помечай пул-реквест как готовый к ревью, если пользователь явно этого не просил.
+* Делай всё вышеперечисленное за как можно меньшее число шагов. Например, можно запушить изменения за один шаг следующими bash-командами:
 ```bash
-git remote -v && git branch # to find the current org, repo and branch
+git remote -v && git branch # чтобы найти текущую организацию, репозиторий и ветку
 git checkout -b create-widget && git add . && git commit -m "Create widget" && git push -u origin create-widget
 ```
 
-## Handling Review Comments
+## Обработка комментариев ревью
 
-- Critically evaluate each review comment before acting on it. Not all feedback is worth implementing:
-  - Does it fix a real bug or improve clarity significantly?
-  - Does it align with the project's engineering principles (simplicity, maintainability)?
-  - Is the suggested change proportional to the benefit, or does it add unnecessary complexity?
-- It's acceptable to respectfully decline suggestions that add verbosity without clear benefit, over-engineer for hypothetical edge cases, or contradict the project's pragmatic approach.
-- After addressing (or deciding not to address) inline review comments, mark the corresponding review threads as resolved.
-- Before resolving a thread, leave a reply comment that either explains the reason for dismissing the feedback or references the specific commit (e.g., commit SHA) that addressed the issue.
-- Prefer resolving threads only once fixes are pushed or a clear decision is documented.
-- Use the GitHub GraphQL API to reply to and resolve review threads (see below).
-- After making changes to a PR, verify the title and description still match the content. Update them if the scope, features, or intent changed.
+- Критически оценивай каждый комментарий ревью перед тем, как действовать. Не весь фидбек стоит реализовывать:
+  - Исправляет ли он реальный баг или заметно улучшает ясность?
+  - Соответствует ли он инженерным принципам проекта (простота, поддерживаемость)?
+  - Пропорционально ли предлагаемое изменение выгоде, или оно добавляет лишнюю сложность?
+- Допустимо вежливо отклонять предложения, которые добавляют многословие без явной пользы, переусложняют ради гипотетических крайних случаев или противоречат прагматичному подходу проекта.
+- После обработки (или решения не обрабатывать) инлайн-комментариев ревью помечай соответствующие ветки обсуждения как решённые.
+- Перед закрытием ветки оставь комментарий-ответ, который либо объясняет причину отклонения фидбека, либо ссылается на конкретный коммит (например, SHA коммита), решивший вопрос.
+- Предпочитай закрывать ветки только после того, как исправления запушены или задокументировано чёткое решение.
+- Используй GitHub GraphQL API для ответа на ветки ревью и их закрытия (см. ниже).
+- После внесения изменений в PR проверь, что заголовок и описание по-прежнему соответствуют содержимому. Обнови их, если изменился объём, функции или намерение.
 
-## Resolving Review Threads via GraphQL
+## Закрытие веток ревью через GraphQL
 
-To resolve existing review threads programmatically:
+Для программного закрытия существующих веток ревью:
 
-1. Get the thread IDs (replace `<OWNER>`, `<REPO>`, `<PR_NUMBER>`):
+1. Получи ID веток (замени `<OWNER>`, `<REPO>`, `<PR_NUMBER>`):
 ```bash
 gh api graphql -f query='
 {
@@ -74,7 +74,7 @@ gh api graphql -f query='
 }'
 ```
 
-2. Reply to the thread explaining how the feedback was addressed:
+2. Ответь в ветку, объяснив, как был учтён фидбек:
 ```bash
 gh api graphql -f query='
 mutation {
@@ -87,7 +87,7 @@ mutation {
 }'
 ```
 
-3. Resolve the thread:
+3. Закрой ветку:
 ```bash
 gh api graphql -f query='
 mutation {
@@ -97,11 +97,11 @@ mutation {
 }'
 ```
 
-4. Get the failed workflow run ID and rerun it:
+4. Получи ID неудачного запуска воркфлоу и перезапусти его:
 ```bash
-# Find the run ID from the failed check URL, or use:
+# Найди ID запуска по URL неудачной проверки или используй:
 gh run list --repo <OWNER>/<REPO> --branch <BRANCH> --limit 5
 
-# Rerun failed jobs
+# Перезапусти неудачные задания
 gh run rerun <RUN_ID> --repo <OWNER>/<REPO> --failed
 ```

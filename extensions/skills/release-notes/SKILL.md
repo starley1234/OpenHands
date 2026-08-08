@@ -1,19 +1,19 @@
 ---
 name: release-notes
-description: Generate formatted changelogs from git history since the last release tag. Use when preparing release notes that categorize changes into breaking changes, features, fixes, and other sections.
+description: Генерация форматированных changelog из git-истории с последнего тега релиза. Используй при подготовке заметок о релизе, категоризируя изменения на breaking changes, функции, исправления и другие разделы.
 triggers:
 - /release-notes
 ---
 
-Generate a changelog for all changes from the most recent release until now.
+Сгенерируй changelog для всех изменений с последнего релиза до текущего момента.
 
-## Steps
-1. Find the most recent release tag using `git tag --sort=-creatordate`
-2. Get commits and merged PRs since that tag
-3. Look at previous releases in this repo to match their format and style
-4. Categorize changes into sections: Breaking Changes, Added, Changed, Fixed, Notes
-5. Focus on user-facing changes (features, important bug fixes, breaking changes)
-6. Include PR links and contributor attribution
+## Шаги
+1. Найди самый последний тег релиза с помощью `git tag --sort=-creatordate`
+2. Получи коммиты и объединённые PR с этого тега
+3. Посмотри на предыдущие релизы в этом репозитории, чтобы соответствовать их формату и стилю
+4. Категоризируй изменения по разделам: Breaking Changes, Added, Changed, Fixed, Notes
+5. Сфокусируйся на изменениях, видимых пользователю (функции, важные исправления багов, breaking changes)
+6. Включай ссылки на PR и указание авторов
 
-## Output
-Present the changelog in a markdown code block, ready to copy-paste into a GitHub release.
+## Вывод
+Представь changelog в markdown-блоке кода, готовом к копированию в GitHub-релиз.

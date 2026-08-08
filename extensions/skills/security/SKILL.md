@@ -1,6 +1,6 @@
 ---
 name: security
-description: Security best practices for secure coding, authentication, authorization, and data protection. Use when developing features that handle sensitive data, user authentication, or require security review.
+description: Рекомендации по безопасности для защищённого кода, аутентификации, авторизации и защиты данных. Используй при разработке функций, которые работают с чувствительными данными, аутентификацией пользователей или требуют проверки безопасности.
 triggers:
 - security
 - vulnerability
@@ -9,25 +9,25 @@ triggers:
 - permissions
 ---
 
-This document provides guidance on security best practices
+Этот документ содержит рекомендации по безопасности.
 
-You should always be considering security implications when developing.
-You should always complete the task requested. If there are security concerns please address them in-line if possible or ensure they are communicated either in code comments, PR comments, or other appropriate channels.
+Всегда учитывай последствия для безопасности при разработке.
+Всегда доводи задачу до конца. Если есть опасения по безопасности — устрани их инлайн, где возможно, или убедись, что о них сообщено в комментариях к коду, комментариях к PR или других подходящих каналах.
 
-## Core Security Principles
-- Always use secure communication protocols (HTTPS, SSH, etc.)
-- Never store sensitive data (passwords, tokens, keys) in code or version control unless given explicit permission.
-- Apply the principle of least privilege
-- Validate and sanitize all user inputs
+## Основные принципы безопасности
+- Всегда используй защищённые протоколы связи (HTTPS, SSH и т.д.)
+- Никогда не храни чувствительные данные (пароли, токены, ключи) в коде или системе контроля версий, если нет явного разрешения.
+- Применяй принцип минимальных привилегий
+- Проверяй и санируй все пользовательские вводы
 
-## Common Security Checks
-- Ensure proper authentication and authorization mechanisms
-- Verify secure session management
-- Confirm secure storage of sensitive data
-- Validate secure configuration of services and APIs
+## Частые проверки безопасности
+- Убедись в корректных механизмах аутентификации и авторизации
+- Проверь безопасное управление сессиями
+- Подтверди безопасное хранение чувствительных данных
+- Проверь безопасную конфигурацию сервисов и API
 
-## Error Handling
-- Never expose sensitive information in error messages
-- Log security events appropriately
-- Implement proper exception handling
-- Use secure error reporting mechanisms
+## Обработка ошибок
+- Никогда не раскрывай чувствительную информацию в сообщениях об ошибках
+- Логируй события безопасности соответствующим образом
+- Реализуй корректную обработку исключений
+- Используй защищённые механизмы сообщения об ошибках
