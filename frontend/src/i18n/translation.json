@@ -39378,5 +39378,40 @@
     "uk": "Route outbound traffic through proxy",
     "ca": "Route outbound traffic through proxy",
     "ru": "Направлять исходящий трафик через прокси"
+  },
+  "MCP$TOOLS_SHOW": {
+    "en": "Show tools",
+    "ru": "Показать инструменты",
+    "de": "Tools anzeigen",
+    "fr": "Afficher les outils",
+    "es": "Mostrar herramientas"
+  },
+  "MCP$TOOLS_HIDE": {
+    "en": "Hide tools",
+    "ru": "Скрыть инструменты",
+    "de": "Tools ausblenden",
+    "fr": "Masquer les outils",
+    "es": "Ocultar herramientas"
+  },
+  "MCP$TOOLS_LOADING": {
+    "en": "Loading tools…",
+    "ru": "Загрузка инструментов…",
+    "de": "Lade Tools…",
+    "fr": "Chargement des outils…",
+    "es": "Cargando herramientas…"
+  },
+  "MCP$TOOLS_COUNT": {
+    "en": "{{count}} tools",
+    "ru": "Инструментов: {{count}}",
+    "de": "{{count}} Tools",
+    "fr": "{{count}} outils",
+    "es": "{{count}} herramientas"
+  },
+  "MCP$TOOLS_EMPTY": {
+    "en": "No tools advertised",
+    "ru": "Инструменты не объявлены",
+    "de": "Keine Tools gemeldet",
+    "fr": "Aucun outil annoncé",
+    "es": "No se anuncian herramientas"
   }
 }

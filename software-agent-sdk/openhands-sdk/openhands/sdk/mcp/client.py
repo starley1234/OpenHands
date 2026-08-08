@@ -42,6 +42,7 @@ class MCPClient(AsyncMCPClient):
     _closed: bool
     _tools: "list[MCPToolDefinition]"
     _tools_reconciled_callback: ToolsReconciledCallback | None
+    _disabled_tool_names: frozenset[str]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -49,11 +50,21 @@ class MCPClient(AsyncMCPClient):
         self._closed = False
         self._tools = []
         self._tools_reconciled_callback = None
+        self._disabled_tool_names = frozenset()
 
     @property
     def tools(self) -> "list[MCPToolDefinition]":
         """The MCP tools using this client connection (returns a copy)."""
         return list(self._tools)
+
+    def set_disabled_tool_names(self, disabled: set[str] | frozenset[str]) -> None:
+        """Record tool names to withhold from the agent.
+
+        Applied when tools are (re)listed, so a running client can be told which
+        tools to hide without reconnecting. Names that are not actually
+        advertised are ignored.
+        """
+        self._disabled_tool_names = frozenset(disabled)
 
     async def connect(self) -> None:
         """Establish connection to the MCP server."""

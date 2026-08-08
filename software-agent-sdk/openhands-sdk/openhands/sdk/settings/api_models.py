@@ -90,6 +90,15 @@ class MCPServerPatch(BaseModel):
             "restores the canonical default (enabled)."
         ),
     )
+    disabled_tools: list[str] | None = Field(
+        default=None,
+        description=(
+            "Optional list of tool names exposed by this server that should be "
+            "withheld from the agent. Lets users hide noisy or dangerous tools "
+            "from servers that advertise dozens of them, while keeping the "
+            "rest available. None/empty = expose all tools."
+        ),
+    )
 
 
 class MCPConfigPatch(RootModel[dict[str, MCPServerPatch | None]]):

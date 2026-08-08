@@ -26,6 +26,12 @@ export interface MCPServerConfig {
    * explicit `false` disables, so existing configs stay untouched.
    */
   enabled?: boolean;
+  /**
+   * Optional list of tool names exposed by this server that should be withheld
+   * from the agent. Lets users hide noisy or dangerous tools from servers that
+   * advertise dozens of them, while keeping the rest available.
+   */
+  disabled_tools?: string[];
 }
 
 export type MCPTestToolCall = AgentServerMCPToolCall;

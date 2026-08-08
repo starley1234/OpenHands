@@ -17,11 +17,13 @@ import {
 } from "#/utils/extension-module-card-classes";
 import { getInstalledServerTitle } from "#/utils/mcp-installed-server-display";
 import { McpServerHealthSection } from "./mcp-server-health";
+import { McpServerToolsSection } from "./mcp-server-tools";
 
 interface InstalledServerCardProps {
   server: MCPServerConfig;
   onEdit: () => void;
   onToggleEnabled: (enabled: boolean) => void;
+  onToggleTool?: (server: MCPServerConfig, toolName: string, enabled: boolean) => void;
 }
 
 function getServerTransportLabel(type: MCPServerConfig["type"]) {
@@ -50,6 +52,7 @@ export function InstalledServerCard({
   server,
   onEdit,
   onToggleEnabled,
+  onToggleTool = () => {},
 }: InstalledServerCardProps) {
   const { t } = useTranslation("openhands");
   const catalog = findCatalogEntryForServer(
@@ -135,6 +138,13 @@ export function InstalledServerCard({
             catalog={catalog}
             onEdit={onEdit}
           />
+
+          {onToggleTool ? (
+            <McpServerToolsSection
+              server={server}
+              onToggleTool={onToggleTool}
+            />
+          ) : null}
         </div>
       </div>
     </div>

@@ -91,6 +91,31 @@ export default function MCPPage() {
     );
   };
 
+  // Hide/show a single tool exposed by an MCP server without disabling the
+  // whole server. Persisted as `disabled_tools` in the server's config.
+  const handleToggleTool = (
+    server: MCPServerConfig,
+    toolName: string,
+    enabled: boolean,
+  ) => {
+    const current = new Set(server.disabled_tools ?? []);
+    if (enabled) {
+      current.delete(toolName);
+    } else {
+      current.add(toolName);
+    }
+    const disabled_tools = [...current].sort();
+    updateMcpServer(
+      { serverId: server.id, server: { ...server, disabled_tools } },
+      {
+        onError: (err) => {
+          const message = retrieveAxiosErrorMessage(err as AxiosError);
+          displayErrorToast(message || t(I18nKey.ERROR$GENERIC));
+        },
+      },
+    );
+  };
+
   if (isLoading || !settings) {
     return (
       <div
@@ -153,6 +178,7 @@ export default function MCPPage() {
                 query={searchQuery}
                 onEdit={handleEdit}
                 onToggleEnabled={handleToggleEnabled}
+                onToggleTool={handleToggleTool}
               />
             </section>
           ) : null}

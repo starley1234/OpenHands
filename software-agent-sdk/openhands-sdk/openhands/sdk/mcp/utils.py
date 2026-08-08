@@ -186,6 +186,21 @@ async def _refresh_tools(
     existing_by_name = {tool.name: tool for tool in client._tools}
     server_names = {mcp_tool.name for mcp_tool in mcp_type_tools}
 
+    # Withhold tools the user disabled for this server (e.g. noisy tools from
+    # servers advertising dozens). Applied on every (re)list so it also covers
+    # the runtime tools/list_changed reconciliation.
+    disabled = getattr(client, "_disabled_tool_names", frozenset())
+    if disabled:
+        hidden = [name for name in server_names if name in disabled]
+        if hidden:
+            logger.info(
+                "MCP server withholding disabled tools: %s",
+                ", ".join(sorted(hidden)),
+            )
+            mcp_type_tools = [
+                t for t in mcp_type_tools if t.name not in disabled
+            ]
+
     reconciled: list[MCPToolDefinition] = []
     added: list[MCPToolDefinition] = []
     updated: list[MCPToolDefinition] = []
@@ -316,6 +331,14 @@ def create_mcp_tools(
     mcp_config = _require_native_mcp_config(mcp_config)
     requested = mcp_config
     mcp_config = enabled_mcp_servers(mcp_config)
+
+    # Collect tool names the user disabled across enabled servers, so the client
+    # can withhold them from the agent (some MCP servers advertise dozens of
+    # tools; hiding noisy/dangerous ones keeps the tool list manageable).
+    disabled_tool_names: set[str] = set()
+    for server in mcp_config.values():
+        if server.disabled_tools:
+            disabled_tool_names.update(server.disabled_tools)
     if requested and not mcp_config:
         raise ValueError(
             "All configured MCP servers are disabled: "
@@ -334,6 +357,8 @@ def create_mcp_tools(
     client = MCPClient(config, log_handler=log_handler, message_handler=handler)
     handler._client = client
     client._tools_reconciled_callback = on_tools_reconciled
+    if disabled_tool_names:
+        client.set_disabled_tool_names(disabled_tool_names)
 
     try:
         client.call_async_from_sync(

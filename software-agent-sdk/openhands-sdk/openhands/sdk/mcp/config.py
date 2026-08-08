@@ -538,6 +538,15 @@ class MCPServer(_MCPBaseModel):
             "ACP subprocess."
         ),
     )
+    disabled_tools: list[str] | None = Field(
+        default=None,
+        description=(
+            "Optional list of tool names exposed by this MCP server that should "
+            "be withheld from the agent. Lets users hide noisy or dangerous "
+            "tools from servers that advertise dozens of them, while keeping "
+            "the rest available. None/empty = expose all tools."
+        ),
+    )
 
     @field_validator("env", "headers", mode="after")
     @classmethod
