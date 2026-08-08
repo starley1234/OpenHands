@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Книга → Сайт</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 640px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+      h1 { font-size: 1.5rem; }
+      input, button { font-size: 1rem; padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid #ccc; }
+      button { cursor: pointer; background: #111; color: #fff; border: none; }
+      #status { margin-top: 1rem; color: #666; }
+      #error { margin-top: 0.5rem; color: #c00; }
+      a { color: #06c; }
+    </style>
+  </head>
+  <body>
+    <h1>Книга → Сайт</h1>
+    <p>Введите тему — агент напишет книгу, а сервис опубликует её как сайт.</p>
+    <form id="form">
+      <input id="subject" placeholder="Например: как вырастить авокадо на подоконнике" required />
+      <button type="submit">Написать книгу</button>
+    </form>
+    <div id="status"></div>
+    <div id="error"></div>
+    <div id="result"></div>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+      let timer = null;
+
+      $("form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const subject = $("subject").value.trim();
+        $("error").textContent = "";
+        $("result").innerHTML = "";
+        $("status").textContent = "Запускаю…";
+        const res = await fetch("/api/run", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ subject }),
+        });
+        const data = await res.json();
+        if (!data.ok) { $("error").textContent = data.error || "Ошибка запуска"; return; }
+        clearInterval(timer);
+        timer = setInterval(poll, 3000);
+        poll();
+      });
+
+      async function poll() {
+        const res = await fetch("/api/status");
+        const s = await res.json();
+        $("status").textContent = "Статус: " + s.status;
+        if (s.status === "running") return;
+        clearInterval(timer);
+        if (s.status === "error") { $("error").textContent = "Ошибка выполнения"; return; }
+        const r = await (await fetch("/api/result")).json();
+        const count = (r.chapters || []).length;
+        $("result").innerHTML =
+          "Готово: " + count + " глав. " +
+          (count ? '<a href="' + r.site_url + '" target="_blank">Открыть сайт</a>' : "");
+      }
+    </script>
+  </body>
+</html>

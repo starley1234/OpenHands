@@ -31,6 +31,7 @@ export default [
       route("secrets", "routes/secrets-settings.tsx"),
     ]),
     route("oauth/device/verify", "routes/device-verify.tsx"),
+    route("monitor", "routes/monitor.tsx"),
     route("automations", "routes/automations-list.tsx"),
     route("automations/templates", "routes/automation-templates.tsx"),
     route("automations/new/:automationId", "routes/automation-setup-route.tsx"),
