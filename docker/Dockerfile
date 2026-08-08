@@ -125,9 +125,11 @@ USER root
 
 # Install system deps required by automation's transitive dependencies
 # (asyncpg needs libpq, which the agent-server base image may not include).
+# curl is added so the OpenSCAD vision loop (and similar workflows) can
+# download a rendered image URL into the workspace and view it via file_editor.
 RUN if command -v apt-get >/dev/null 2>&1; then \
       apt-get update && \
-      apt-get install -y --no-install-recommends libpq-dev && \
+      apt-get install -y --no-install-recommends libpq-dev curl && \
       rm -rf /var/lib/apt/lists/*; \
     fi
 

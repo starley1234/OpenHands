@@ -240,6 +240,14 @@ VISION_MODEL_OVERRIDES = {
     # Self-hosted / community Gemma models (e.g. unsloth/gemma-4-12b-it) that
     # support image input but are not recognised by LiteLLM's registry.
     "unsloth/gemma": "unsloth/gemma-4-12b-it",
+    # Gemma-3 is multimodal (accepts image input) but local/self-hosted
+    # checkpoints (e.g. google/gemma-3-27b-it, lmstudio gemma-3-* variants)
+    # are often not flagged as vision-capable by LiteLLM's registry. Match
+    # "gemma-3" broadly so local Gemma-3 vision checkpoints work out of the box.
+    # Gemma-2 and Gemma-3 text-only checkpoints are intentionally NOT matched
+    # (no "gemma-2"/bare "gemma"), to avoid enabling vision for non-vision
+    # checkpoints.
+    "gemma-3": "google/gemma-3-27b-it",
 }
 
 

@@ -770,6 +770,19 @@
         "jira",
         "atlassian"
       ]
+    },
+    {
+      "name": "openscad",
+      "source": "./skills/openscad",
+      "description": "Создание деталей и конструкций OpenSCAD по изображению-цели с vision-циклом: рендер, сравнение с исходником и итеративная правка кода.",
+      "category": "design",
+      "keywords": [
+        "openscad",
+        "scad",
+        "3d",
+        "cad",
+        "render"
+      ]
     }
   ]
 }
